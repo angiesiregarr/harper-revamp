@@ -118,8 +118,51 @@ function setupReveals() {
 }
 
 function setupHeroCards() {
-  const cards = [...document.querySelectorAll('.hero-scene')];
+  const container = document.querySelector('.hero-scenes');
+  const cards = [...container.querySelectorAll('.hero-scene')];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let phase = 0, previous = 0, frame = 0, hovered = false, focused = false, visible = true;
   const clear = () => cards.forEach(card => card.setAttribute('aria-pressed', 'false'));
+  const draw = () => {
+    const step = container.clientHeight / 5.6;
+    cards.forEach((card, index) => {
+      // Wrap only at the fully faded ends; the middle card stays bright and foremost.
+      const position = ((index - phase + 2.5 + cards.length * 100) % cards.length) - 2.5;
+      const distance = Math.abs(position);
+      const scale = 1 - Math.min(distance, 2.5) * .16;
+      card.style.transform = `translateY(calc(-50% + ${position * step}px)) scale(${scale})`;
+      card.style.opacity = String(Math.min(1, Math.max(0, (2.5 - distance) * 2)));
+      card.style.zIndex = String(10 - Math.round(distance * 3));
+      card.style.setProperty('--card-light', String(1 - Math.min(distance, 2) * .24));
+    });
+  };
+  const tick = time => {
+    const paused = hovered || focused || cards.some(card => card.getAttribute('aria-pressed') === 'true');
+    if (previous && !paused) phase = (phase + Math.min(time - previous, 50) / 6500) % cards.length;
+    previous = time;
+    draw();
+    frame = requestAnimationFrame(tick);
+  };
+  const playback = () => {
+    cancelAnimationFrame(frame);
+    previous = 0;
+    container.classList.toggle('is-static', reduced.matches);
+    if (!reduced.matches) {
+      draw();
+      if (visible && !document.hidden) frame = requestAnimationFrame(tick);
+    }
+  };
+  container.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') hovered = true; });
+  container.addEventListener('pointerleave', () => { hovered = false; });
+  container.addEventListener('focusin', event => {
+    focused = true;
+    // A keyboard user can reach every card, including those at the faded loop edge.
+    if (event.target.matches(':focus-visible') && !reduced.matches) {
+      phase = cards.indexOf(event.target);
+      draw();
+    }
+  });
+  container.addEventListener('focusout', () => { focused = false; });
   cards.forEach(card => card.addEventListener('click', () => {
     const open = card.getAttribute('aria-pressed') !== 'true';
     clear();
@@ -129,6 +172,11 @@ function setupHeroCards() {
     if (!event.target.closest('.hero-scene')) clear();
   });
   document.addEventListener('keydown', event => { if (event.key === 'Escape') clear(); });
+  new ResizeObserver(() => { if (!reduced.matches) draw(); }).observe(container);
+  new IntersectionObserver(entries => { visible = entries[0].isIntersecting; playback(); }).observe(container);
+  document.addEventListener('visibilitychange', playback);
+  reduced.addEventListener('change', playback);
+  playback();
 }
 
 function setupHeroMapMotion() {
