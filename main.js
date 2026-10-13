@@ -117,17 +117,71 @@ function setupReveals() {
   items.forEach((item) => observer.observe(item));
 }
 
-function setupHeroMovement() {
-  const hero = document.querySelector('.hero');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (!window.matchMedia('(pointer:fine)').matches) return;
-  hero.addEventListener('pointermove', (event) => {
-    if (reducedMotion.matches) return;
-    const x = (event.clientX / window.innerWidth - .5) * 14;
-    hero.style.setProperty('--hero-shift', `${x.toFixed(1)}px`);
+function setupHeroCards() {
+  const cards = [...document.querySelectorAll('.hero-scene')];
+  const clear = () => cards.forEach(card => card.setAttribute('aria-pressed', 'false'));
+  cards.forEach(card => card.addEventListener('click', () => {
+    const open = card.getAttribute('aria-pressed') !== 'true';
+    clear();
+    card.setAttribute('aria-pressed', String(open));
+  }));
+  document.addEventListener('pointerdown', event => {
+    if (!event.target.closest('.hero-scene')) clear();
   });
-  hero.addEventListener('pointerleave', () => hero.style.setProperty('--hero-shift', '0px'));
-  reducedMotion.addEventListener('change', () => hero.style.setProperty('--hero-shift', '0px'));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') clear(); });
+}
+
+function setupHeroMapMotion() {
+  const hero = document.querySelector('.hero');
+  const maps = [...hero.querySelectorAll('.hero-map img')];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  // Figma component 245:15233: five Smart Animate states, in prototype order.
+  // Image coordinates are relative to the 446 × 315 clipped, gradient-masked frame.
+  const states = [[2, 0, 444, 333], [2, 0, 726, 545], [-25, -50, 726, 545],
+    [-280, -77, 726, 545], [-268, -239, 726, 545]];
+  const holds = [800, 10, 10, 10, 800];
+  const transition = 1022.0937728881836;
+  const duration = holds.reduce((sum, hold) => sum + hold + transition, 0);
+  const transform = ([x, y, w, h]) =>
+    `translate(${x / 444 * 100}%, ${y / 333 * 100}%) scale(${w / 444}, ${h / 333})`;
+  // Sample a gentle, lightly damped spring; preserve the recorded transition duration.
+  const spring = t => 1 - Math.exp(-7.5 * t) *
+    (Math.cos(Math.sqrt(43.75) * t) + 7.5 / Math.sqrt(43.75) * Math.sin(Math.sqrt(43.75) * t));
+  const frames = [{ offset: 0, transform: transform(states[0]) }];
+  let elapsed = 0;
+  states.forEach((state, index) => {
+    elapsed += holds[index];
+    frames.push({ offset: elapsed / duration, transform: transform(state) });
+    const next = states[(index + 1) % states.length];
+    for (let sample = 1; sample <= 64; sample++) {
+      const progress = sample === 64 ? 1 : spring(sample / 64 * transition / 1000);
+      frames.push({ offset: (elapsed + transition * sample / 64) / duration,
+        transform: transform(state.map((value, i) => value + (next[i] - value) * progress)) });
+    }
+    elapsed += transition;
+  });
+  let animations = [];
+  let visible = true;
+  const syncPlayback = () => animations.forEach(animation => {
+    if (visible && !document.hidden) animation.play();
+    else animation.pause();
+  });
+  const refresh = () => {
+    animations.forEach(animation => animation.cancel());
+    animations = [];
+    if (reduced.matches || !maps[0]?.animate) return;
+    animations = maps.map(map => map.animate(frames, { duration, iterations: Infinity, easing: 'linear' }));
+    const start = document.timeline.currentTime;
+    animations.forEach(animation => { animation.startTime = start; });
+    syncPlayback();
+  };
+  if ('IntersectionObserver' in window) new IntersectionObserver(entries => {
+    visible = entries[0].isIntersecting;
+    syncPlayback();
+  }).observe(hero);
+  document.addEventListener('visibilitychange', syncPlayback);
+  reduced.addEventListener('change', refresh);
+  refresh();
 }
 
 function setupScrollMotion() {
@@ -168,6 +222,7 @@ setupMenu();
 setupStories();
 setupMoments();
 setupReveals();
-setupHeroMovement();
+setupHeroCards();
+setupHeroMapMotion();
 setupScrollMotion();
 document.getElementById('year').textContent = new Date().getFullYear();
