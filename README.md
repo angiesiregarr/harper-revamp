@@ -9,7 +9,7 @@ npm run build
 npm run preview
 ```
 
-Open <http://localhost:4173>. The site has no runtime dependencies. `npm run build` copies the static files to `dist/` for GitHub Pages.
+Open <http://localhost:4173>. The site has no runtime dependencies. `npm run build` copies the static files to `dist/` for local preview or other static hosts.
 
 ## Routes and interactions
 
@@ -21,4 +21,4 @@ Open <http://localhost:4173>. The site has no runtime dependencies. `npm run bui
 
 ## Deployment
 
-Pushing to `main` triggers `.github/workflows/pages.yml`, which builds and deploys `dist/` with GitHub Actions. In repository **Settings → Pages**, select **GitHub Actions** as the build and deployment source if Pages has not already been enabled.
+GitHub Pages serves the static files from the root of `main`. In repository **Settings → Pages**, select **Deploy from a branch**, then choose **main** and **/(root)**. The site URL is <https://angiesiregarr.github.io/harper-revamp/>.
