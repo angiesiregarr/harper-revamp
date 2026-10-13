@@ -234,34 +234,63 @@ function setupHeroMapMotion() {
 
 function setupScrollMotion() {
   const nav = document.getElementById('site-nav');
-  const photo = document.querySelector('.membership-photo');
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const finePointer = window.matchMedia('(pointer:fine)');
-  let scheduled = false;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const clamp = value => Math.min(1, Math.max(0, value));
+  const groups = [
+    ['.hero', '--hero-scroll', 0, 24, 'px'],
+    ['.hotels', '--hotel-zoom', 1.06, 1, ''],
+    ['.offer-image', '--offer-drift', -8, 8, 'px'],
+    ['.offers', '--offer-turn', -12, 24, 'deg'],
+    ['.story-media', '--journal-lift', 12, -12, 'px'],
+    ['.moments', '--moments-lift', 18, -18, 'px'],
+    ['.membership-photo', '--member-shift', -16, 16, 'px'],
+    ['.membership-points', '--benefit-lift', 10, 0, 'px'],
+    ['.footer', '--footer-lift', 18, 0, 'px'],
+    ['.footer', '--footer-brand-lift', 10, -6, 'px'],
+  ];
+  const items = groups.flatMap(([selector, property, from, to, unit]) =>
+    [...document.querySelectorAll(selector)].map(element => ({ element, property, from, to, unit })));
+  let frame = 0;
+  let touching = false;
 
   const update = () => {
-    scheduled = false;
-    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-    nav.style.setProperty('--scroll-progress', scrollable > 0 ? String(Math.min(1, window.scrollY / scrollable)) : '0');
-
-    if (reducedMotion.matches || !finePointer.matches || window.innerWidth <= 600) {
-      photo.style.setProperty('--member-shift', '0px');
+    frame = 0;
+    const height = window.innerHeight;
+    const scrollable = document.documentElement.scrollHeight - height;
+    nav.style.setProperty('--scroll-progress', String(scrollable > 0 ? clamp(window.scrollY / scrollable) : 0));
+    if (reduced.matches) {
+      items.forEach(({ element, property }) => element.style.removeProperty(property));
       return;
     }
-    const bounds = photo.getBoundingClientRect();
-    if (bounds.bottom < 0 || bounds.top > window.innerHeight) return;
-    const progress = (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height);
-    photo.style.setProperty('--member-shift', `${((progress - .5) * 40).toFixed(1)}px`);
+    const strength = window.innerWidth <= 800 ? .45 : 1;
+    // Read geometry before writing styles. One frame per scroll event batch.
+    const readings = items.map(item => ({ ...item, bounds: item.element.getBoundingClientRect() }));
+    readings.forEach(({ element, property, from, to, unit, bounds }) => {
+      if (bounds.bottom < 0 || bounds.top > height) return;
+      // Freeze the moments frame while its links are being explored.
+      if (property === '--moments-lift' &&
+          (touching || element.matches(':hover, :focus-within'))) return;
+      const progress = property === '--hero-scroll'
+        ? clamp(-bounds.top / Math.max(1, bounds.height))
+        : clamp((height - bounds.top) / (height + bounds.height));
+      const eased = progress * progress * (3 - 2 * progress);
+      let value = from + (to - from) * eased;
+      value = unit === '' ? 1 + (value - 1) * strength : value * strength;
+      element.style.setProperty(property, value.toFixed(4) + unit);
+    });
   };
   const schedule = () => {
-    if (scheduled) return;
-    scheduled = true;
-    window.requestAnimationFrame(update);
+    if (!frame && !document.hidden) frame = window.requestAnimationFrame(update);
   };
+  const moments = document.querySelector('.moments-window');
+  moments?.addEventListener('pointerdown', () => { touching = true; }, { passive: true });
+  window.addEventListener('pointerup', () => { touching = false; schedule(); }, { passive: true });
+  window.addEventListener('pointercancel', () => { touching = false; schedule(); }, { passive: true });
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
-  reducedMotion.addEventListener('change', schedule);
-  finePointer.addEventListener('change', schedule);
+  window.addEventListener('load', schedule, { once: true });
+  document.addEventListener('visibilitychange', schedule);
+  reduced.addEventListener('change', schedule);
   schedule();
 }
 
