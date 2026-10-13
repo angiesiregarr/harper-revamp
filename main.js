@@ -119,12 +119,48 @@ function setupReveals() {
 
 function setupHeroMovement() {
   const hero = document.querySelector('.hero');
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(pointer:fine)').matches) return;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!window.matchMedia('(pointer:fine)').matches) return;
   hero.addEventListener('pointermove', (event) => {
+    if (reducedMotion.matches) return;
     const x = (event.clientX / window.innerWidth - .5) * 14;
     hero.style.setProperty('--hero-shift', `${x.toFixed(1)}px`);
   });
   hero.addEventListener('pointerleave', () => hero.style.setProperty('--hero-shift', '0px'));
+  reducedMotion.addEventListener('change', () => hero.style.setProperty('--hero-shift', '0px'));
+}
+
+function setupScrollMotion() {
+  const nav = document.getElementById('site-nav');
+  const photo = document.querySelector('.membership-photo');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(pointer:fine)');
+  let scheduled = false;
+
+  const update = () => {
+    scheduled = false;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    nav.style.setProperty('--scroll-progress', scrollable > 0 ? String(Math.min(1, window.scrollY / scrollable)) : '0');
+
+    if (reducedMotion.matches || !finePointer.matches || window.innerWidth <= 600) {
+      photo.style.setProperty('--member-shift', '0px');
+      return;
+    }
+    const bounds = photo.getBoundingClientRect();
+    if (bounds.bottom < 0 || bounds.top > window.innerHeight) return;
+    const progress = (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height);
+    photo.style.setProperty('--member-shift', `${((progress - .5) * 40).toFixed(1)}px`);
+  };
+  const schedule = () => {
+    if (scheduled) return;
+    scheduled = true;
+    window.requestAnimationFrame(update);
+  };
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
+  reducedMotion.addEventListener('change', schedule);
+  finePointer.addEventListener('change', schedule);
+  schedule();
 }
 
 renderCity();
@@ -133,4 +169,5 @@ setupStories();
 setupMoments();
 setupReveals();
 setupHeroMovement();
+setupScrollMotion();
 document.getElementById('year').textContent = new Date().getFullYear();
