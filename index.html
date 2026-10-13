@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fff4e8" />
+    <meta name="description" content="Come home to harmony at Harper Hotels. Discover places to stay, thoughtful offers, stories, and moments worth coming back for." />
+    <title>Harper Hotels — Come Home to Harmony</title>
+    <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./styles.css" />
+    <script>document.documentElement.classList.add('js');</script>
+    <script src="./main.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-heading reveal">
+          <p class="eyebrow hero-eyebrow">A warmer welcome, wherever you go</p>
+          <h1 id="hero-title">Come home to harmony</h1>
+        </div>
+        <img class="hero-map hero-map-left" src="./assets/dotted-map.png" alt="" aria-hidden="true" />
+        <img class="hero-map hero-map-right" src="./assets/dotted-map.png" alt="" aria-hidden="true" />
+        <div class="hero-copy reveal">
+          <p>Comfortable spaces, thoughtful details, and everything you need for an effortless stay.</p>
+          <a class="button button-primary" href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Book Now <span aria-hidden="true">↗</span></a>
+        </div>
+        <img class="hero-building" src="./assets/hero-building.png" alt="Harper hotel building at dusk, shown as a transparent cutout" fetchpriority="high" />
+        <div class="hero-scenes" aria-label="A glimpse of Harper">
+          <img src="./assets/hero-exterior.png" alt="Harper hotel exterior illuminated at night" />
+          <img src="./assets/hero-room.png" alt="Warmly lit guest room" />
+          <img src="./assets/hero-dining.png" alt="Harper dining space" />
+        </div>
+      </section>
+
+      <div class="site-nav" id="site-nav">
+        <a class="brand" href="#main" aria-label="Harper Hotels, back to top"><img src="./assets/harper-logo-white.png" alt="Harper by Aston" /></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-links" aria-label="Open navigation menu"><span></span><span></span><span></span></button>
+        <nav class="primary-links" id="primary-links" aria-label="Main navigation">
+          <a href="#hotels">Our hotels</a>
+          <a href="#offers">Offers</a>
+          <a href="#journal">Journal</a>
+          <a href="#membership">Membership</a>
+        </nav>
+        <a class="nav-book" href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Book Now <span aria-hidden="true">↗</span></a>
+      </div>
+
+      <section class="hotels section-pad" id="hotels" aria-labelledby="hotels-title">
+        <div class="section-heading reveal">
+          <p class="section-kicker"><span>✣</span> Your stay, with soul <span>✣</span></p>
+          <h2 id="hotels-title">A place for <em>every rhythm.</em></h2>
+          <a class="outline-link" href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">More hotels <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hotel-content reveal">
+          <nav class="city-tabs" aria-label="Explore cities">
+            <a href="?city=jakarta#hotels" data-city="jakarta"><span>01</span> Jakarta</a>
+            <a href="?city=bali#hotels" data-city="bali"><span>02</span> Bali</a>
+            <a href="?city=yogyakarta#hotels" data-city="yogyakarta"><span>03</span> Yogyakarta</a>
+            <a href="?city=makassar#hotels" data-city="makassar"><span>04</span> Makassar</a>
+          </nav>
+          <div class="city-view" id="city-view" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="offers section-pad" id="offers" aria-labelledby="offers-title">
+        <div class="offers-decoration offers-decoration-a" aria-hidden="true">✳</div>
+        <div class="offers-decoration offers-decoration-b" aria-hidden="true">✳</div>
+        <div class="offers-layout">
+          <div class="offers-intro reveal">
+            <p class="section-kicker light"><span>✣</span> Exclusive offers <span>✣</span></p>
+            <span class="offers-illustration" aria-hidden="true">✺</span>
+            <h2 id="offers-title">Little extras.<br />More reasons<br />to stay.</h2>
+            <p>Thoughtful offers for meaningful getaways, whether near or far.</p>
+            <span class="scroll-cue">Scroll to discover ↓</span>
+          </div>
+          <div class="offer-list">
+            <article class="offer-card reveal">
+              <div class="offer-image"><img src="./assets/offer-teacher.png" alt="Teacher’s Appreciation Discount promotion" loading="lazy" /><span>12 hotels</span></div>
+              <div class="offer-body"><p class="card-kicker">A little thank you</p><h3>Teacher’s Appreciation Discount</h3><p>Explore the featured Harper offer and check current details before you travel.</p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Explore offer <span aria-hidden="true">↗</span></a></div>
+            </article>
+            <article class="offer-card reveal">
+              <div class="offer-image"><img src="./assets/hero-room.png" alt="Comfortable Harper guest room" loading="lazy" /></div>
+              <div class="offer-body"><p class="card-kicker">Room to unwind</p><h3>Stay a little longer</h3><p>Find the right space and pace for your next visit.</p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">See current offers <span aria-hidden="true">↗</span></a></div>
+            </article>
+            <article class="offer-card reveal">
+              <div class="offer-image"><img src="./assets/hero-dining.png" alt="Harper dining room ready for guests" loading="lazy" /></div>
+              <div class="offer-body"><p class="card-kicker">Time together</p><h3>Make more of the moment</h3><p>Discover what’s happening across Harper stays.</p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">See current offers <span aria-hidden="true">↗</span></a></div>
+            </article>
+            <article class="offer-card reveal">
+              <div class="offer-image"><img src="./assets/hotel-perintis.png" alt="Quiet poolside setting at Harper" loading="lazy" /></div>
+              <div class="offer-body"><p class="card-kicker">A change of pace</p><h3>Space to slow down</h3><p>Make time for the moments you came away for.</p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">See current offers <span aria-hidden="true">↗</span></a></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="journal section-pad" id="journal" aria-labelledby="journal-title">
+        <div class="section-heading reveal">
+          <p class="section-kicker"><span>✣</span> News inside Harper <span>✣</span></p>
+          <h2 id="journal-title">The Journal</h2>
+        </div>
+        <div class="journal-grid">
+          <article class="story story-feature reveal">
+            <img src="./assets/journal-table.png" alt="An Indonesian meal arranged for sharing" loading="lazy" />
+            <div class="story-copy"><p class="card-kicker">Food &amp; culture · 03 Mar 2026</p><h3>Gather around<br />the table</h3><p>At Harper, the moments around a table are often the ones we remember most.</p><button class="text-link story-open" type="button" data-story="table">Read story <span aria-hidden="true">↗</span></button></div>
+          </article>
+          <article class="story story-offset reveal">
+            <img src="./assets/journal-award.png" alt="A Harper team photographed at an awards event" loading="lazy" />
+            <div class="story-copy"><p class="card-kicker">People · 24 Jun 2026</p><h3>Recognition, shared with you</h3><button class="text-link story-open" type="button" data-story="recognition">Read story <span aria-hidden="true">↗</span></button></div>
+          </article>
+          <article class="story story-bottom reveal">
+            <img src="./assets/journal-chef.png" alt="Chef preparing a dish in the kitchen" loading="lazy" />
+            <div class="story-copy"><p class="card-kicker">Food &amp; culture · 18 Feb 2026</p><h3>A taste of togetherness</h3><button class="text-link story-open" type="button" data-story="taste">Read story <span aria-hidden="true">↗</span></button></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="moments section-pad" id="moments" aria-labelledby="moments-title">
+        <div class="section-heading reveal">
+          <p class="section-kicker"><span>✣</span> Unscripted Harper <span>✣</span></p>
+          <h2 id="moments-title">Your moments.<br />Our inspiration.</h2>
+        </div>
+        <p class="moments-hint">A little of life at Harper. Hover or focus to pause, or swipe to explore.</p>
+        <div class="moments-window" aria-label="Harper moments gallery">
+          <div class="moments-track" id="moments-track">
+            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper moments on Instagram"><img src="./assets/moment-1.png" alt="Guest enjoying a quiet moment" loading="lazy" /></a>
+            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper dining moments on Instagram"><img src="./assets/moment-2.png" alt="Guests dining together" loading="lazy" /></a>
+            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper stay moments on Instagram"><img src="./assets/moment-3.png" alt="Friends enjoying their hotel room" loading="lazy" /></a>
+            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See more Harper moments on Instagram"><img src="./assets/moment-4.png" alt="Guest relaxing by a window" loading="lazy" /></a>
+            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper team moments on Instagram"><img src="./assets/moment-5.png" alt="Harper team member smiling" loading="lazy" /></a>
+          </div>
+        </div>
+        <a class="moments-more" href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer">Follow along @harperhotels <span aria-hidden="true">↗</span></a>
+      </section>
+
+      <section class="membership section-pad" id="membership" aria-labelledby="membership-title">
+        <div class="membership-photo reveal"><img src="./assets/hotel-perintis.png" alt="An inviting poolside setting at Harper" loading="lazy" /><span class="photo-caption">A little more room to feel at home.</span></div>
+        <div class="membership-copy reveal">
+          <p class="section-kicker"><span>✣</span> The Harper feeling <span>✣</span></p>
+          <h2 id="membership-title">A familiar welcome.<br /><em>A little more.</em></h2>
+          <p>Good stays are worth coming back to. MY Archipelago membership brings member room rates, loyalty rewards, and dining benefits together in one place.</p>
+          <div class="membership-points"><span>Member room rates</span><span>Loyalty rewards</span><span>Dining benefits</span></div>
+          <a class="button button-dark" href="https://archipelagohotels.com/membership" target="_blank" rel="noopener noreferrer">Explore membership <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+    </main>
+    <footer class="footer" id="contact">
+        <div class="footer-invite"><div><p class="section-kicker light">✣ Get in touch</p><h2>Let’s plan your stay.</h2><p>Find the Harper stay that feels right for your next journey.</p></div><a class="button button-light" href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Check availability <span aria-hidden="true">↗</span></a></div>
+        <div class="footer-main"><a class="footer-brand" href="#main" aria-label="Harper Hotels, back to top"><img src="./assets/harper-logo-white.png" alt="Harper by Aston" /></a><div class="footer-links"><div><p>Stay</p><a href="#hotels">Our hotels</a><a href="#offers">Offers</a></div><div><p>Explore</p><a href="#journal">Journal</a><a href="#moments">Moments</a></div><div><p>Connect</p><a href="#membership">Membership</a><a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer">Instagram</a></div></div></div>
+        <div class="footer-bottom"><span>© <span id="year">2026</span> Harper Hotels</span><span>Come home to harmony.</span></div>
+    </footer>
+
+    <dialog class="story-dialog" id="story-dialog" aria-labelledby="story-dialog-title"><button class="dialog-close" type="button" aria-label="Close story">×</button><p class="section-kicker">The Harper Journal</p><h2 id="story-dialog-title"></h2><p id="story-dialog-body"></p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Explore Harper <span aria-hidden="true">↗</span></a></dialog>
+  </body>
+</html>
