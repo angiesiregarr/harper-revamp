@@ -49,6 +49,7 @@
     const height = nav.getBoundingClientRect().height;
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
     if (mobile.matches) { document.documentElement.style.setProperty('--booking-offset','44px'); return; }
+    slot.style.setProperty('--booking-height', `${form.offsetHeight}px`);
     const top = slot.getBoundingClientRect().top;
     const docked = top <= height;
     form.classList.toggle('is-docked',docked);

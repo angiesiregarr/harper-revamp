@@ -359,3 +359,14 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .site-nav{background:rgb(255 244 232)}
 .booking-bar .booking-field,.booking-bar .booking-field:hover,.booking-bar .booking-field[aria-expanded=true]{background:transparent}
 .booking-bar .booking-field strong{font-family:var(--serif);font-size:12pt;font-weight:400;line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip}
+
+/* Larger hero imagery with breathing room between the moving cards. */
+.hero-building{height:calc(var(--building-height)*2.36);top:calc(var(--title-end) - 20px - var(--building-height)*.276)}
+.hero-scenes{width:min(27vw,37.5svh);overflow:clip;mask-image:linear-gradient(transparent,#000 9%,#000 91%,transparent);-webkit-mask-image:linear-gradient(transparent,#000 9%,#000 91%,transparent)}
+.hero-scenes.is-static{overflow-y:auto;mask-image:none;-webkit-mask-image:none}
+.booking-bar,.booking-bar.is-docked{padding-top:20px;padding-bottom:20px}
+.booking-bar{top:calc(100svh - 102px)}
+.booking-slot{height:var(--booking-height,102px);margin:calc(-1 * var(--booking-height,102px)) 0 0}
+@media(max-width:800px){.hero-building{height:calc(var(--mobile-building)*2);top:calc(var(--stage-top) + (100% - var(--stage-top))/2 - var(--mobile-building)*.617)}.hero-scenes{width:42%}.booking-sheet .booking-bar{padding-top:20px;padding-bottom:20px}}
+@media(max-width:800px) and (max-height:650px){.hero-scenes{width:37.5%}}
+.hero-scene:focus-visible{outline-offset:-3px}
