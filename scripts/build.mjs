@@ -1,10 +1,22 @@
-import { cp, mkdir, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 
-const output = new URL('../dist/', import.meta.url);
-await mkdir(output, { recursive: true });
-for (const name of ['index.html', 'styles.css', 'main.js', 'booking.js']) {
-  await cp(new URL(`../${name}`, import.meta.url), new URL(name, output));
+const root = new URL('../', import.meta.url);
+const output = new URL('dist/', root);
+const assets = ['styles.css', 'main.js', 'booking.js'];
+let html = await readFile(new URL('index.html', root), 'utf8');
+for (const name of assets) {
+  const content = await readFile(new URL(name, root));
+  const version = createHash('sha256').update(content).digest('hex').slice(0, 12);
+  const escaped = name.replaceAll('.', '\\.');
+  html = html.replace(new RegExp(`(\\./${escaped})(?:\\?v=[a-zA-Z0-9_-]+)?`, 'g'), `$1?v=${version}`);
 }
-await cp(new URL('../assets/', import.meta.url), new URL('assets/', output), { recursive: true });
+// Pages publishes the repository root; keep it and dist on the same asset versions.
+await writeFile(new URL('index.html', root), html);
+await mkdir(output, { recursive: true });
+for (const name of ['index.html', ...assets]) {
+  await cp(new URL(name, root), new URL(name, output));
+}
+await cp(new URL('assets/', root), new URL('assets/', output), { recursive: true });
 await writeFile(new URL('.nojekyll', output), '');
-console.log('Built static site in dist/');
+console.log('Built static site with content-versioned CSS and JavaScript in dist/');
