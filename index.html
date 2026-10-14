@@ -14,6 +14,18 @@
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+      <div class="site-nav" id="site-nav">
+        <a class="brand" href="#main" aria-label="Harper Hotels, back to top"><img src="./assets/harper-logo-white.png" alt="Harper by Aston" /></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-links" aria-label="Open navigation menu"><span></span><span></span><span></span></button>
+        <nav class="primary-links" id="primary-links" aria-label="Main navigation">
+          <a href="#hotels">Our hotels</a>
+          <a href="#offers">Offers</a>
+          <a href="#journal">Journal</a>
+          <a href="#membership">Membership</a>
+        </nav>
+        <a class="nav-book" href="#booking-form" data-booking-open>Book Now <span aria-hidden="true">↗</span></a>
+      </div>
+    <button class="booking-mobile-trigger" type="button" data-booking-open>Find your Harper stay <span>Book a stay</span></button>
     <main id="main">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-heading reveal">
@@ -24,7 +36,7 @@
         <div class="hero-map hero-map-right" aria-hidden="true"><img src="./assets/dotted-map.png" alt="" /></div>
         <div class="hero-copy reveal">
           <p>Comfortable spaces, thoughtful details, and everything you need for an effortless stay.</p>
-          <a class="button button-primary" href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Book Now <span aria-hidden="true">↗</span></a>
+          <a class="button button-primary" href="#booking-form" data-booking-open>Book Now <span aria-hidden="true">↗</span></a>
         </div>
         <img class="hero-building" src="./assets/hero-building.png" alt="Harper hotel building at dusk, shown as a transparent cutout" fetchpriority="high" />
         <div class="hero-scenes is-static" aria-label="A glimpse of Harper">
@@ -51,16 +63,21 @@
         </div>
       </section>
 
-      <div class="site-nav" id="site-nav">
-        <a class="brand" href="#main" aria-label="Harper Hotels, back to top"><img src="./assets/harper-logo-white.png" alt="Harper by Aston" /></a>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-links" aria-label="Open navigation menu"><span></span><span></span><span></span></button>
-        <nav class="primary-links" id="primary-links" aria-label="Main navigation">
-          <a href="#hotels">Our hotels</a>
-          <a href="#offers">Offers</a>
-          <a href="#journal">Journal</a>
-          <a href="#membership">Membership</a>
-        </nav>
-        <a class="nav-book" href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Book Now <span aria-hidden="true">↗</span></a>
+
+
+      <div class="booking-slot" id="booking-slot">
+        <form class="booking-bar" id="booking-form" aria-label="Find your Harper stay" novalidate>
+          <div class="booking-sheet-heading"><h2 id="booking-title">Find your Harper stay</h2><button type="button" class="booking-close" aria-label="Close booking">×</button></div>
+          <div class="booking-fields">
+            <button class="booking-field" type="button" data-field="destination" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Hotel or city</span><strong id="destination-value">Where feels like home?</strong></button>
+            <button class="booking-field" type="button" data-field="checkin" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Check-in</span><strong id="checkin-value">Select date</strong></button>
+            <button class="booking-field" type="button" data-field="checkout" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Check-out</span><strong id="checkout-value">Select date</strong></button>
+            <button class="booking-field" type="button" data-field="guests" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Rooms &amp; guests</span><strong id="guests-value">1 room · 2 guests</strong></button>
+            <button class="booking-search" type="submit">Search Stays <span aria-hidden="true">↗</span></button>
+          </div>
+          <p class="booking-error" id="booking-error" role="alert"></p>
+          <div id="booking-popover" class="booking-popover" role="dialog" aria-modal="false" hidden></div>
+        </form>
       </div>
 
       <section class="hotels section-pad" id="hotels" aria-labelledby="hotels-title">
@@ -169,6 +186,9 @@
         <div class="footer-bottom"><span>© <span id="year">2026</span> Harper Hotels</span><span>Come home to harmony.</span></div>
     </footer>
 
+    <dialog id="booking-sheet" class="booking-sheet" aria-labelledby="booking-title"></dialog>
+    <dialog id="booking-results" class="booking-results" aria-labelledby="booking-results-title"><button type="button" class="booking-close" aria-label="Close search results">×</button><p class="eyebrow">Your next Harper stay</p><h2 id="booking-results-title">A place to come home to.</h2><p id="booking-summary"></p><p class="booking-results-note">Explore your matching stays below. Confirm live availability, rates and your stay details on the official booking site.</p><div id="booking-matches"></div></dialog>
+    <script src="./booking.js" defer></script>
     <dialog class="story-dialog" id="story-dialog" aria-labelledby="story-dialog-title"><button class="dialog-close" type="button" aria-label="Close story">×</button><p class="section-kicker">The Harper Journal</p><h2 id="story-dialog-title"></h2><p id="story-dialog-body"></p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Explore Harper <span aria-hidden="true">↗</span></a></dialog>
   </body>
 </html>
