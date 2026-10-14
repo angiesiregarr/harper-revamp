@@ -18,5 +18,6 @@ for (const name of ['index.html', ...assets]) {
   await cp(new URL(name, root), new URL(name, output));
 }
 await cp(new URL('assets/', root), new URL('assets/', output), { recursive: true });
+await cp(new URL('news/', root), new URL('news/', output), { recursive: true });
 await writeFile(new URL('.nojekyll', output), '');
 console.log('Built static site with content-versioned CSS and JavaScript in dist/');

@@ -8,9 +8,9 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=9eb98153e0d0" />
+    <link rel="stylesheet" href="./styles.css?v=3c51ded7472c" />
     <script>document.documentElement.classList.add('js');</script>
-    <script src="./main.js?v=9741e7a261a0" defer></script>
+    <script src="./main.js?v=24b7467c94d1" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -128,25 +128,45 @@
         </div>
       </section>
 
-      <section class="journal section-pad" id="journal" aria-labelledby="journal-title">
-        <div class="section-heading reveal">
-          <p class="section-kicker"><span>✣</span> News inside Harper <span>✣</span></p>
-          <h2 id="journal-title">The Journal</h2>
+      <section class="journal news-section" id="journal" aria-labelledby="journal-title">
+        <div class="news-heading">
+          <div><p class="section-kicker">News inside Harper</p><h2 id="journal-title">The Journal</h2></div>
+          <div class="news-controls" aria-label="News navigation">
+            <button type="button" data-news-direction="-1" aria-label="Previous news" aria-controls="news-track">←</button>
+            <button type="button" data-news-direction="1" aria-label="Next news" aria-controls="news-track">→</button>
+          </div>
         </div>
-        <div class="journal-grid">
-          <article class="story story-feature reveal">
-            <div class="story-media"><img src="./assets/journal-table.png" alt="An Indonesian meal arranged for sharing" loading="lazy" /></div>
-            <div class="story-copy"><p class="card-kicker">Food &amp; culture · 03 Mar 2026</p><h3>Gather around<br />the table</h3><p>At Harper, the moments around a table are often the ones we remember most.</p><button class="text-link story-open" type="button" data-story="table">Read story <span aria-hidden="true">↗</span></button></div>
-          </article>
-          <article class="story story-offset reveal">
-            <div class="story-media"><img src="./assets/journal-award.png" alt="A Harper team photographed at an awards event" loading="lazy" /></div>
-            <div class="story-copy"><p class="card-kicker">People · 24 Jun 2026</p><h3>Recognition, shared with you</h3><button class="text-link story-open" type="button" data-story="recognition">Read story <span aria-hidden="true">↗</span></button></div>
-          </article>
-          <article class="story story-bottom reveal">
-            <div class="story-media"><img src="./assets/journal-chef.png" alt="Chef preparing a dish in the kitchen" loading="lazy" /></div>
-            <div class="story-copy"><p class="card-kicker">Food &amp; culture · 18 Feb 2026</p><h3>A taste of togetherness</h3><button class="text-link story-open" type="button" data-story="taste">Read story <span aria-hidden="true">↗</span></button></div>
-          </article>
+        <div class="news-track" id="news-track" role="region" aria-roledescription="carousel" aria-label="Harper news. Use left and right arrow keys to browse." tabindex="0">
+          <a class="news-card" href="./news/recognition.html" aria-labelledby="news-recognition-title">
+            <div class="news-photo"><img src="./assets/journal-award.png" alt="A Harper team photographed at an awards event" loading="lazy" /></div>
+            <div class="news-copy">
+              <p class="news-meta"><span>People</span><time datetime="2026-06-24">24 Jun 2026</time></p>
+              <h3 id="news-recognition-title">Recognition, shared with you</h3>
+              <p class="news-subtitle">Every warm welcome begins with the people behind it.</p>
+              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+          <a class="news-card" href="./news/table.html" aria-labelledby="news-table-title">
+            <div class="news-photo"><img src="./assets/journal-table.png" alt="An Indonesian meal arranged for sharing" loading="lazy" /></div>
+            <div class="news-copy">
+              <p class="news-meta"><span>Food &amp; culture</span><time datetime="2026-03-03">03 Mar 2026</time></p>
+              <h3 id="news-table-title">Gather around the table</h3>
+              <p class="news-subtitle">At Harper, the moments around a table are often the ones we remember most.</p>
+              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
+          <a class="news-card" href="./news/taste.html" aria-labelledby="news-taste-title">
+            <div class="news-photo"><img src="./assets/journal-chef.png" alt="Chef preparing a dish in the kitchen" loading="lazy" /></div>
+            <div class="news-copy">
+              <p class="news-meta"><span>Food &amp; culture</span><time datetime="2026-02-18">18 Feb 2026</time></p>
+              <h3 id="news-taste-title">A taste of togetherness</h3>
+              <p class="news-subtitle">Food is one of the simplest ways to feel at home somewhere new.</p>
+              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
+            </div>
+          </a>
         </div>
+        <p class="news-position" aria-hidden="true"><span id="news-current">02</span> <span class="news-position-line"></span> 03</p>
+        <p class="sr-only" id="news-status" aria-live="polite" aria-atomic="true"></p>
       </section>
 
       <section class="moments section-pad" id="moments" aria-labelledby="moments-title">

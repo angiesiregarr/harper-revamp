@@ -72,22 +72,48 @@ function setupMenu() {
   window.matchMedia('(min-width: 801px)').addEventListener('change', close);
 }
 
-function setupStories() {
-  const stories = {
-    table: { title: 'Gather around the table', body: 'A shared meal gives every journey a place to pause. Come together over familiar flavours and make space for a conversation that lasts longer than dinner.' },
-    recognition: { title: 'Recognition, shared with you', body: 'Every warm welcome begins with the people behind it. This moment belongs to the teams who bring care and attention to each stay.' },
-    taste: { title: 'A taste of togetherness', body: 'Food is one of the simplest ways to feel at home somewhere new. Pull up a chair and enjoy the moments that happen around the table.' },
-  };
-  const dialog = document.getElementById('story-dialog');
-  const closeButton = dialog.querySelector('.dialog-close');
-  document.querySelectorAll('.story-open').forEach((button) => button.addEventListener('click', () => {
-    const story = stories[button.dataset.story];
-    document.getElementById('story-dialog-title').textContent = story.title;
-    document.getElementById('story-dialog-body').textContent = story.body;
-    dialog.showModal();
-  }));
-  closeButton.addEventListener('click', () => dialog.close());
-  dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+function setupNews() {
+  const track = document.getElementById('news-track');
+  const cards = [...track.querySelectorAll('.news-card')];
+  const controls = [...document.querySelectorAll('[data-news-direction]')];
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let active = 1, pending = 1, settleTimer, frame;
+  const target = index => cards[index].offsetLeft - track.offsetLeft - (track.clientWidth - cards[index].offsetWidth) / 2;
+  function highlight(index, announce = false) {
+    active = index;
+    cards.forEach((card, i) => card.classList.toggle('is-active', i === index));
+    controls[0].disabled = index === 0;
+    controls[1].disabled = index === cards.length - 1;
+    document.getElementById('news-current').textContent = String(index + 1).padStart(2, '0');
+    if (announce) document.getElementById('news-status').textContent = `Story ${index + 1} of ${cards.length}: ${cards[index].querySelector('h3').textContent}`;
+  }
+  function go(index, instant = false) {
+    pending = Math.max(0, Math.min(cards.length - 1, index));
+    track.scrollTo({left: target(pending), behavior: instant || reduced.matches ? 'instant' : 'smooth'});
+    if (instant) highlight(pending);
+  }
+  controls.forEach(button => button.addEventListener('click', () => go(pending + Number(button.dataset.newsDirection))));
+  track.addEventListener('keydown', event => {
+    const keys = {ArrowLeft: active - 1, ArrowRight: active + 1, Home: 0, End: cards.length - 1};
+    if (!(event.key in keys) || event.altKey || event.metaKey || event.ctrlKey) return;
+    event.preventDefault();
+    const index = Math.max(0, Math.min(cards.length - 1, keys[event.key]));
+    if (document.activeElement.matches('.news-card')) cards[index].focus({preventScroll:true});
+    go(index);
+  });
+  cards.forEach((card,index) => card.addEventListener('focus', () => go(index)));
+  track.addEventListener('scroll', () => {
+    if (!frame) frame = requestAnimationFrame(() => {
+      frame = 0;
+      const index = cards.reduce((best,card,i) => Math.abs(target(i)-track.scrollLeft) < Math.abs(target(best)-track.scrollLeft) ? i : best, 0);
+      highlight(index);
+    });
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => { pending = active; highlight(active, true); }, 180);
+  }, {passive:true});
+  // Native scrolling supplies touch swipes and momentum; no drag interception.
+  new ResizeObserver(() => go(active, true)).observe(track);
+  go(active, true);
 }
 
 function setupMoments() {
@@ -296,7 +322,7 @@ function setupScrollMotion() {
 
 renderCity();
 setupMenu();
-setupStories();
+setupNews();
 setupMoments();
 setupReveals();
 setupHeroCards();
