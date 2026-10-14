@@ -124,7 +124,7 @@ function setupHeroCards() {
   let phase = 0, previous = 0, frame = 0, hovered = false, focused = false, visible = true;
   const clear = () => cards.forEach(card => card.setAttribute('aria-pressed', 'false'));
   const draw = () => {
-    const step = Math.max(container.clientHeight / 5.6, cards[0].offsetHeight * .94 + 12);
+    const step = Math.min(container.clientHeight / 5.6, cards[0].offsetHeight * .48) + 8;
     cards.forEach((card, index) => {
       // Wrap only at the fully faded ends; the middle card stays bright and foremost.
       const position = ((index - phase + 2.5 + cards.length * 100) % cards.length) - 2.5;
