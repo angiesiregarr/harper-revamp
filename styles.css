@@ -370,3 +370,29 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 @media(max-width:800px){.hero-building{height:var(--mobile-building);top:calc(var(--stage-top) + (100% - var(--stage-top))/2 - var(--mobile-building)/2)}.hero-scenes{width:37.8%}.booking-sheet .booking-bar{padding-top:20px;padding-bottom:20px}}
 @media(max-width:800px) and (max-height:650px){.hero-scenes{width:33.75%}}
 .hero-scene:focus-visible{outline-offset:-3px}
+
+/* Refined façade, readable overlapping cards, and a compact continuous dock. */
+@media(min-width:801px){
+ .hero-building{height:calc(var(--building-height)*1.3924);top:calc(var(--title-end) - 20px - var(--building-height)*.16284)}
+ .booking-bar{transition:padding .28s ease,width .28s ease,left .28s ease,border-radius .28s ease}
+ .booking-field{transition:min-height .28s ease}
+ .booking-search{transition:height .28s ease,min-height .28s ease}
+ .booking-bar.is-docked{left:0;width:100%;padding:8px 4%;border-radius:0}
+ .booking-bar.is-docked .booking-field{min-height:48px}
+ .booking-bar.is-docked .booking-search{height:44px;min-height:44px}
+ /* Expanded measurements remain stable even during the return transition. */
+ .booking-bar.is-measuring{left:4%;width:92%;padding:20px 24px;transition:none}
+ .booking-bar.is-measuring .booking-field{min-height:60px;transition:none}
+ .booking-bar.is-measuring .booking-search{height:50px;min-height:50px;transition:none}
+}
+@media(min-width:801px) and (max-width:1100px){
+ .booking-bar.is-measuring{left:2%;width:96%;padding:20px 16px}
+}
+@media(max-width:800px){
+ .hero-building{height:calc(var(--mobile-building)*1.18);top:calc(var(--stage-top) + (100% - var(--stage-top))/2 - var(--mobile-building)*.521)}
+}
+@media(prefers-reduced-motion:reduce){.booking-bar,.booking-field,.booking-search{transition:none}}
+/* Portrait tablets keep the subtitle and rooftop sign clear of the side stack. */
+@media(min-width:801px) and (max-width:1100px) and (orientation:portrait){
+ .hero-building{height:104vw;left:40%;top:auto;bottom:-130px}
+}

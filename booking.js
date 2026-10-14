@@ -44,12 +44,21 @@
     popup.style.left = `${Math.max(12,Math.min(rect.left,innerWidth-width-12))}px`;
     popup.style.top = `${above ? Math.max(12,bar.top-popup.offsetHeight-10) : bar.bottom+10}px`;
   }
+  let expandedHeight = 0, measuredWidth = 0;
   function placeForm() {
     frame = 0;
     const height = nav.getBoundingClientRect().height;
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
     if (mobile.matches) { document.documentElement.style.setProperty('--booking-offset','44px'); return; }
-    slot.style.setProperty('--booking-height', `${form.offsetHeight}px`);
+    // Keep the floating anchor independent of the animated dock height.
+    // Measure the same form synchronously; no duplicate controls or layout shift.
+    if (!expandedHeight || measuredWidth !== innerWidth) {
+      form.classList.add('is-measuring');
+      expandedHeight = form.offsetHeight;
+      form.classList.remove('is-measuring');
+      measuredWidth = innerWidth;
+    }
+    slot.style.setProperty('--booking-height', `${expandedHeight}px`);
     const top = slot.getBoundingClientRect().top;
     const docked = top <= height;
     form.classList.toggle('is-docked',docked);
@@ -154,5 +163,5 @@
   });
   window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule);mobile.addEventListener('change',presentation);
   new ResizeObserver(schedule).observe(nav);new ResizeObserver(schedule).observe(form);
-  document.fonts?.ready.then(schedule);presentation();
+  document.fonts?.ready.then(() => { expandedHeight = 0; schedule(); });presentation();
 })();
