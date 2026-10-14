@@ -76,6 +76,7 @@ function setupNews() {
   const track = document.getElementById('news-track');
   const cards = [...track.querySelectorAll('.news-card')];
   const controls = [...document.querySelectorAll('[data-news-direction]')];
+  document.getElementById('news-total').textContent = String(cards.length).padStart(2, '0');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let active = 1, pending = 1, settleTimer, frame;
   const target = index => cards[index].offsetLeft - track.offsetLeft - (track.clientWidth - cards[index].offsetWidth) / 2;
