@@ -346,7 +346,7 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .booking-slot{height:82px;margin:-82px 0 0}
 .booking-field{min-height:60px;border-right-color:#89755b80}
 .booking-field>span{color:#575047}.booking-field strong{color:#24201b}
-.booking-bar.is-docked .booking-field{background:rgb(255 250 242 / 94%)}
+.booking-bar.is-docked .booking-field{background:transparent}
 .booking-search{display:inline-flex;align-items:center;justify-content:center;gap:12px;align-self:center;min-height:50px;height:50px;padding:12px 22px;line-height:1.2;background:var(--orange);color:#25190d;font-size:14px;font-weight:700}
 .booking-search span{margin:0;flex:none;transform:none}
 @media(min-width:801px){.hero{--building-height:min(88vw,calc((100svh - var(--top-nav-height) - var(--title-end) - 70px)/.9));min-height:500px}}
@@ -354,3 +354,8 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 @media(max-width:800px){.site-nav .menu-toggle{order:0}.site-nav .nav-book{order:3;min-width:115px;padding:10px 16px;font-size:12px}.booking-sheet{border-radius:18px 18px 0 0}.booking-sheet .booking-bar{background:transparent;border-radius:18px 18px 0 0;padding:18px 22px}.booking-search{width:100%;margin:4px 0 0;min-height:50px}}
 @media(max-width:360px){.site-nav .nav-book{min-width:104px;padding:10px 12px}.site-nav{gap:6px}}
 @media(min-width:801px){.booking-bar:not(.is-docked) .booking-error:not(:empty){position:absolute;bottom:calc(100% + 8px);left:24px;margin:0;padding:6px 12px;background:#fff8ef;border:1px solid #d8b8a8;max-width:calc(100% - 48px)}}
+
+/* Warm navigation and unfilled booking fields in both floating and docked states. */
+.site-nav{background:rgb(255 244 232)}
+.booking-bar .booking-field,.booking-bar .booking-field:hover,.booking-bar .booking-field[aria-expanded=true]{background:transparent}
+.booking-bar .booking-field strong{font-family:var(--serif);font-size:12pt;font-weight:400;line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip}
