@@ -128,21 +128,48 @@ function setupNews() {
   go(active, true);
 }
 
-function setupJournalAnchor() {
-  const section = document.getElementById('journal');
+function setupSectionAnchors() {
   const nav = document.getElementById('site-nav');
   const booking = document.getElementById('booking-form');
   const mobileTrigger = document.querySelector('.booking-mobile-trigger');
-  document.querySelectorAll('a[href="#journal"]').forEach(link => link.addEventListener('click', event => {
+  document.querySelectorAll('a[href="#journal"], a[href="#membership"]').forEach(link => link.addEventListener('click', event => {
     event.preventDefault();
+    const section = document.querySelector(link.getAttribute('href'));
     const small = matchMedia('(max-width:800px)').matches;
     // Use the compact form's height even when the visitor starts in the hero.
-    const dockHeight = booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 74;
+    const dockHeight = booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : (innerWidth <= 1100 ? 94 : 74);
     const clearance = nav.getBoundingClientRect().height + (small ? mobileTrigger.getBoundingClientRect().height : dockHeight) + 16;
     const top = window.scrollY + section.getBoundingClientRect().top - clearance;
-    history.pushState(null, '', '#journal');
+    history.pushState(null, '', link.getAttribute('href'));
     window.scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   }));
+}
+
+function setupMembershipMotion() {
+  const section = document.getElementById('membership');
+  const gallery = section.querySelector('.membership-gallery');
+  const app = section.querySelector('.membership-app');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const clamp = value => Math.max(0, Math.min(1, value));
+  let frame = 0;
+  function update() {
+    frame = 0;
+    if (reduced.matches) {
+      section.style.setProperty('--expand-progress', 1);
+      section.style.setProperty('--app-progress', 1);
+      return;
+    }
+    const height = innerHeight;
+    const galleryTop = gallery.getBoundingClientRect().top;
+    const appTop = app.getBoundingClientRect().top;
+    section.style.setProperty('--expand-progress', clamp((height * .78 - galleryTop) / (height * .7)).toFixed(3));
+    section.style.setProperty('--app-progress', clamp((height * .86 - appTop) / (height * .55)).toFixed(3));
+  }
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  window.addEventListener('scroll', schedule, {passive:true});
+  window.addEventListener('resize', schedule);
+  reduced.addEventListener('change', schedule);
+  update();
 }
 
 function setupMoments() {
@@ -352,7 +379,8 @@ function setupScrollMotion() {
 renderCity();
 setupMenu();
 setupNews();
-setupJournalAnchor();
+setupSectionAnchors();
+setupMembershipMotion();
 setupMoments();
 setupReveals();
 setupHeroCards();

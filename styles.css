@@ -496,3 +496,77 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
  .news-heading,.news-track,.news-position,.news-card,.news-photo img,.news-read{transition:none}
  .news-track{scroll-behavior:auto}
 }
+
+/* Archipelago Membership: Harper gallery expanding into an app introduction. */
+.membership{display:block;min-height:0;padding:0;background:#fff4e8;overflow:hidden;scroll-margin-top:90px;--expand-progress:0;--app-progress:1}
+.membership::after{display:none}
+.membership-intro{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:100px 40px 30px;text-align:center}
+.membership-intro .section-kicker,.membership-app .section-kicker{color:#aa5200}
+.membership-intro h2{margin:18px 0;font-size:clamp(40px,4.3vw,66px)}
+.membership-intro>p:last-child{margin:0 auto;max-width:48ch;font-size:17px;color:#5a5a58}
+.membership-gallery{position:relative;width:min(1500px,100%);height:clamp(550px,76svh,760px);margin:20px auto 0;isolation:isolate}
+.membership-tile{position:absolute;z-index:1;margin:0;overflow:hidden;background:#d9cab8;opacity:calc(1 - var(--expand-progress)*.8);transition:box-shadow .35s ease}
+.membership-tile img,.membership-feature img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .65s cubic-bezier(.22,1,.36,1)}
+.membership-tile:hover img{transform:scale(1.035)}
+.membership-tile-one{left:1%;top:7%;width:17%;height:29%;transform:translateY(calc(var(--expand-progress)*-22px))}
+.membership-tile-two{right:1%;top:4%;width:15%;height:35%;transform:translateY(calc(var(--expand-progress)*-35px))}
+.membership-tile-three{left:3%;bottom:3%;width:20%;height:27%;transform:translateY(calc(var(--expand-progress)*25px))}
+.membership-tile-four{right:2%;bottom:5%;width:20%;height:27%;transform:translateY(calc(var(--expand-progress)*32px))}
+.membership-feature{position:absolute;z-index:2;display:block;overflow:hidden;left:calc((100% - (58% + var(--expand-progress)*42%))/2);top:calc(18% - var(--expand-progress)*18%);width:calc(58% + var(--expand-progress)*42%);height:calc(64% + var(--expand-progress)*36%);border-radius:calc(8px - var(--expand-progress)*8px);background:#ceb495;box-shadow:0 22px 55px #51412c1c}
+.membership-feature img{transform:scale(calc(1.045 + var(--expand-progress)*.035)) translateY(calc(var(--expand-progress)*-1.5%))}
+.membership-feature:hover img,.membership-feature:focus-visible img{transform:scale(calc(1.075 + var(--expand-progress)*.035)) translateY(calc(var(--expand-progress)*-1.5%))}
+.membership-feature>span{position:absolute;left:clamp(22px,4vw,68px);bottom:clamp(18px,4vw,54px);max-width:20ch;color:white;text-shadow:0 2px 14px #0009;font:400 clamp(22px,2.7vw,42px)/1.15 var(--serif)}
+.membership-feature>span span{font:400 .65em var(--sans);vertical-align:top}
+.membership-app{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr);align-items:center;gap:clamp(70px,10vw,180px);min-height:750px;padding:100px max(7vw,36px) 115px;background:linear-gradient(125deg,#f7f0e7,#fff9f0);border-top:1px solid #d7c8b577;scroll-margin-top:calc(var(--top-nav-height) + var(--booking-offset) + 20px)}
+.membership-phone-wrap{display:flex;flex-direction:column;align-items:center;gap:30px;opacity:calc(.25 + var(--app-progress)*.75);translate:0 calc((1 - var(--app-progress))*36px)}
+.membership-phone{position:relative;width:min(290px,75vw);aspect-ratio:9/18.5;padding:12px;border:5px solid #777b7d;border-radius:48px;background:#4b5052;box-shadow:24px 30px 55px #5b4b3a30,6px 7px 12px #372c2320;transform:rotate(-6deg)}
+.membership-phone-camera{position:absolute;z-index:2;top:17px;left:50%;width:34%;height:15px;transform:translateX(-50%);border-radius:0 0 13px 13px;background:#3a3d3e}
+.membership-screen{width:100%;height:100%;display:grid;place-items:center;overflow:hidden;border-radius:32px;background:#071b3d}
+.membership-screen img{width:100%;height:auto;aspect-ratio:1;object-fit:contain}
+.membership-phone-note{color:#66696b;font-size:13px;letter-spacing:.04em;text-align:center}
+.membership-copy{max-width:610px;opacity:calc(.25 + var(--app-progress)*.75);translate:0 calc((1 - var(--app-progress))*36px)}
+.membership-copy .section-kicker{justify-content:flex-start}
+.membership-copy h3{font:400 clamp(34px,4vw,58px)/1.16 var(--serif);text-transform:uppercase;letter-spacing:-.035em;margin:18px 0 24px}
+.membership-copy>p:not(.section-kicker){font-size:18px;line-height:1.6;color:#50565b;max-width:50ch}
+.membership-points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:36px 0}
+.membership-points span{border:0;border-top:1px solid #aeb0af;border-radius:0;padding:16px 0;font-size:14px;color:#45494b}
+.membership-copy .button{min-height:54px}
+.membership-copy .button:hover,.membership-copy .button:focus-visible{filter:brightness(.98);transform:translateY(-2px)}
+@media(max-width:900px){
+ .membership-intro{padding:85px 26px 25px}
+ .membership-gallery{height:clamp(490px,65svh,620px)}
+ .membership-app{gap:45px;padding:85px 5vw;min-height:660px}
+ .membership-points{gap:9px}
+}
+@media(max-width:800px){
+ .membership-intro{padding-top:80px}
+ .membership-intro h2{font-size:clamp(34px,8vw,50px)}
+ .membership-gallery{height:460px;margin-top:22px}
+ .membership-tile-one{width:23%;height:29%;left:2%}
+ .membership-tile-two{width:20%;height:31%;right:2%}
+ .membership-tile-three,.membership-tile-four{display:none}
+ .membership-feature{left:calc((100% - (72% + var(--expand-progress)*28%))/2);width:calc(72% + var(--expand-progress)*28%);top:calc(22% - var(--expand-progress)*22%);height:calc(66% + var(--expand-progress)*34%)}
+ .membership-app{display:flex;flex-direction:column;gap:62px;min-height:0;padding:85px 7vw 95px}
+ .membership-phone{width:min(270px,70vw)}
+ .membership-copy{text-align:left;width:100%}
+ .membership-copy h3{font-size:clamp(34px,7vw,48px)}
+}
+@media(max-width:500px){
+ .membership-intro{padding:72px 22px 18px}
+ .membership-intro>p:last-child{font-size:15px}
+ .membership-gallery{height:370px}
+ .membership-feature>span{font-size:20px;bottom:20px;left:20px}
+ .membership-app{padding:75px 24px 85px;gap:55px}
+ .membership-points{grid-template-columns:1fr;gap:0;margin:26px 0}
+ .membership-points span{padding:12px 0}
+ .membership-copy>p:not(.section-kicker){font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ .membership{--expand-progress:1!important;--app-progress:1!important}
+ .membership-feature img,.membership-tile img,.membership-phone-wrap,.membership-copy{transition:none!important;translate:none!important}
+}
+.membership-feature>span span{position:relative;display:inline-block;width:13px;height:13px;margin-left:6px;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor;font-size:0;vertical-align:middle}
+.membership-feature>span span::after{content:'';position:absolute;right:-1px;top:-1px;width:18px;height:1.5px;background:currentColor;transform:rotate(-45deg);transform-origin:right center}
+/* The document already reserves the sticky header for hash navigation. */
+.membership-app{scroll-margin-top:0}
+.membership-screen img[hidden]{display:none}
