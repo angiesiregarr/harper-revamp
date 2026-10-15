@@ -117,6 +117,23 @@ function setupNews() {
   go(active, true);
 }
 
+function setupJournalAnchor() {
+  const section = document.getElementById('journal');
+  const nav = document.getElementById('site-nav');
+  const booking = document.getElementById('booking-form');
+  const mobileTrigger = document.querySelector('.booking-mobile-trigger');
+  document.querySelectorAll('a[href="#journal"]').forEach(link => link.addEventListener('click', event => {
+    event.preventDefault();
+    const small = matchMedia('(max-width:800px)').matches;
+    // Use the compact form's height even when the visitor starts in the hero.
+    const dockHeight = booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 74;
+    const clearance = nav.getBoundingClientRect().height + (small ? mobileTrigger.getBoundingClientRect().height : dockHeight) + 16;
+    const top = window.scrollY + section.getBoundingClientRect().top - clearance;
+    history.pushState(null, '', '#journal');
+    window.scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+  }));
+}
+
 function setupMoments() {
   const track = document.getElementById('moments-track');
   [...track.children].forEach((item) => {
@@ -324,6 +341,7 @@ function setupScrollMotion() {
 renderCity();
 setupMenu();
 setupNews();
+setupJournalAnchor();
 setupMoments();
 setupReveals();
 setupHeroCards();

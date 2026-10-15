@@ -443,3 +443,16 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 
 /* Long sample headlines and summaries retain a consistent two-line frame. */
 .news-copy h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;height:2.5em;min-height:2.5em}
+
+/* Fit the Journal within the usable desktop area below the docked header. */
+@media(min-width:801px){
+ .news-section{padding-top:20px;padding-bottom:28px;scroll-margin-top:90px}
+ .news-heading{margin-bottom:24px}
+ .news-track{padding-top:12px;padding-bottom:14px}
+ .news-photo{height:195px}
+ .news-copy{padding:22px 28px 18px}
+ .news-meta{margin-bottom:12px}
+ .news-copy h3{margin-bottom:12px}
+ .news-read{margin-top:18px}
+ .news-position{margin-top:4px}
+}
