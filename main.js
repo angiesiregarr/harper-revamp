@@ -147,23 +147,32 @@ function setupSectionAnchors() {
 
 function setupMembershipMotion() {
   const section = document.getElementById('membership');
-  const gallery = section.querySelector('.membership-gallery');
+  const stage = section.querySelector('.membership-stage');
   const app = section.querySelector('.membership-app');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = value => Math.max(0, Math.min(1, value));
+  const smooth = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
   let frame = 0;
   function update() {
     frame = 0;
     if (reduced.matches) {
-      section.style.setProperty('--expand-progress', 1);
+      section.style.setProperty('--expand-progress', 0);
       section.style.setProperty('--app-progress', 1);
+      app.inert = false;
+      app.classList.add('is-interactive');
       return;
     }
-    const height = innerHeight;
-    const galleryTop = gallery.getBoundingClientRect().top;
-    const appTop = app.getBoundingClientRect().top;
-    section.style.setProperty('--expand-progress', clamp((height * .78 - galleryTop) / (height * .7)).toFixed(3));
-    section.style.setProperty('--app-progress', clamp((height * .86 - appTop) / (height * .55)).toFixed(3));
+    const header = parseFloat(getComputedStyle(section).getPropertyValue('--header-space')) ||
+      document.getElementById('site-nav').getBoundingClientRect().height +
+      (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--booking-offset')) || 0);
+    const distance = Math.max(1, section.getBoundingClientRect().height - stage.getBoundingClientRect().height);
+    const progress = clamp((header - section.getBoundingClientRect().top) / distance);
+    const expand = smooth((progress - .25) / .4);
+    const reveal = smooth((progress - .65) / .25);
+    section.style.setProperty('--expand-progress', expand.toFixed(4));
+    section.style.setProperty('--app-progress', reveal.toFixed(4));
+    app.inert = progress < .69;
+    app.classList.toggle('is-interactive', progress >= .69);
   }
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
   window.addEventListener('scroll', schedule, {passive:true});
