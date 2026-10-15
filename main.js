@@ -130,15 +130,10 @@ function setupNews() {
 
 function setupSectionAnchors() {
   const nav = document.getElementById('site-nav');
-  const booking = document.getElementById('booking-form');
-  const mobileTrigger = document.querySelector('.booking-mobile-trigger');
   document.querySelectorAll('a[href="#journal"], a[href="#membership"]').forEach(link => link.addEventListener('click', event => {
     event.preventDefault();
     const section = document.querySelector(link.getAttribute('href'));
-    const small = matchMedia('(max-width:800px)').matches;
-    // Use the compact form's height even when the visitor starts in the hero.
-    const dockHeight = booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : (innerWidth <= 1100 ? 94 : 74);
-    const clearance = nav.getBoundingClientRect().height + (small ? mobileTrigger.getBoundingClientRect().height : dockHeight) + 16;
+    const clearance = nav.getBoundingClientRect().height + 16;
     const top = window.scrollY + section.getBoundingClientRect().top - clearance;
     history.pushState(null, '', link.getAttribute('href'));
     window.scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});

@@ -8,9 +8,9 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=288005a6270f" />
+    <link rel="stylesheet" href="./styles.css?v=dfeb4ef404bf" />
     <script>document.documentElement.classList.add('js');</script>
-    <script src="./main.js?v=7366c8e94c4a" defer></script>
+    <script src="./main.js?v=636892c4afa2" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -223,15 +223,20 @@
         </div>
         <div class="membership-gallery" aria-label="Moments from a Harper stay">
           <figure class="membership-tile membership-tile-one"><img src="./assets/hero-room.png" alt="A restful Harper guest room" loading="lazy" /></figure>
-          <figure class="membership-tile membership-tile-two"><img src="./assets/journal-table.png" alt="A meal prepared for sharing" loading="lazy" /></figure>
+          <figure class="membership-tile membership-tile-two"><img src="./assets/journal-chef.png" alt="A chef preparing a Harper meal" loading="lazy" /></figure>
           <figure class="membership-tile membership-tile-three"><img src="./assets/hero-dining.png" alt="Warmly lit Harper dining space" loading="lazy" /></figure>
           <figure class="membership-tile membership-tile-four"><img src="./assets/moment-2.png" alt="Friends enjoying a meal together" loading="lazy" /></figure>
           <div class="membership-feature">
-            <img src="./assets/hotel-perintis.png" alt="Harper poolside, ready for your next stay" loading="lazy" />
+            <img src="./assets/membership-moment.webp" alt="A guest enjoying a relaxed breakfast and planning the day" loading="lazy" />
             <span>Stay a little longer. Feel a little closer.</span>
           </div>
         </div>
         <div class="membership-app" id="membership-app">
+          <div class="membership-product">
+            <div class="membership-perk membership-perk-one" aria-hidden="true"><span>01 / STAY</span><strong>More room for<br />your rhythm.</strong><small>Member room rates</small></div>
+            <div class="membership-perk membership-perk-two" aria-hidden="true"><span>02 / RETURN</span><strong>Every stay adds up.</strong><small>Loyalty rewards</small></div>
+            <div class="membership-perk membership-perk-three" aria-hidden="true"><span>03 / SAVOUR</span><strong>A little extra<br />at the table.</strong><small>Dining benefits</small></div>
+            <img class="membership-accent membership-accent-one" src="./assets/membership-accent.png" alt="" aria-hidden="true" loading="lazy" />
           <div class="membership-phone-wrap">
             <div class="membership-phone" role="img" aria-label="Archipelago Membership app splash screen with the official Archipelago Membership logo">
               <div class="membership-phone-camera" aria-hidden="true"></div>
@@ -239,14 +244,13 @@
                 <img src="./assets/membership-logo.png" alt="" loading="lazy" />
               </div>
             </div>
-            <span class="membership-phone-note">One little place for more of what matters.</span>
+          </div>
+            <img class="membership-accent membership-accent-two" src="./assets/membership-accent.png" alt="" aria-hidden="true" loading="lazy" />
           </div>
           <div class="membership-copy">
             <p class="section-kicker">Archipelago Membership</p>
             <h3>Your stays, with a little more to love.</h3>
             <p>Good stays are worth coming back to. Archipelago Membership brings member room rates, loyalty rewards, and dining benefits together in one place.</p>
-            <div class="membership-points"><span>Member room rates</span><span>Loyalty rewards</span><span>Dining benefits</span></div>
-            <a class="button button-dark" href="https://www.archipelagohotels.com/membership/" target="_blank" rel="noopener noreferrer">Explore membership <span aria-hidden="true">↗</span></a>
             <div class="membership-stores" aria-label="Download Archipelago Membership">
               <a href="https://play.google.com/store/apps/details?id=com.archipelagointernational.hotels" target="_blank" rel="noopener noreferrer" aria-label="Get Archipelago Membership on Google Play"><img src="./assets/google-store.png" alt="Get it on Google Play" /></a>
               <a href="https://apps.apple.com/id/app/archipelago-membership/id1099092329" target="_blank" rel="noopener noreferrer" aria-label="Download Archipelago Membership on the App Store"><img src="./assets/download.png" alt="Download on the App Store" /></a>
@@ -265,7 +269,7 @@
 
     <dialog id="booking-sheet" class="booking-sheet" aria-labelledby="booking-title"></dialog>
     <dialog id="booking-results" class="booking-results" aria-labelledby="booking-results-title"><button type="button" class="booking-close" aria-label="Close search results">×</button><p class="eyebrow">Your next Harper stay</p><h2 id="booking-results-title">A place to come home to.</h2><p id="booking-summary"></p><p class="booking-results-note">Explore your matching stays below. Confirm live availability, rates and your stay details on the official booking site.</p><div id="booking-matches"></div></dialog>
-    <script src="./booking.js?v=171ff1ba230e" defer></script>
+    <script src="./booking.js?v=d5584686bac5" defer></script>
     <dialog class="story-dialog" id="story-dialog" aria-labelledby="story-dialog-title"><button class="dialog-close" type="button" aria-label="Close story">×</button><p class="section-kicker">The Harper Journal</p><h2 id="story-dialog-title"></h2><p id="story-dialog-body"></p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Explore Harper <span aria-hidden="true">↗</span></a></dialog>
   </body>
 </html>

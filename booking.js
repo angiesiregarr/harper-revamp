@@ -44,26 +44,13 @@
     popup.style.left = `${Math.max(12,Math.min(rect.left,innerWidth-width-12))}px`;
     popup.style.top = `${above ? Math.max(12,bar.top-popup.offsetHeight-10) : bar.bottom+10}px`;
   }
-  let expandedHeight = 0, measuredWidth = 0;
   function placeForm() {
     frame = 0;
+    nav.classList.toggle('is-compact', window.scrollY > 48);
     const height = nav.getBoundingClientRect().height;
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
-    if (mobile.matches) { document.documentElement.style.setProperty('--booking-offset','44px'); return; }
-    // Keep the floating anchor independent of the animated dock height.
-    // Measure the same form synchronously; no duplicate controls or layout shift.
-    if (!expandedHeight || measuredWidth !== innerWidth) {
-      form.classList.add('is-measuring');
-      expandedHeight = form.offsetHeight;
-      form.classList.remove('is-measuring');
-      measuredWidth = innerWidth;
-    }
-    slot.style.setProperty('--booking-height', `${expandedHeight}px`);
-    const top = slot.getBoundingClientRect().top;
-    const docked = top <= height;
-    form.classList.toggle('is-docked',docked);
-    form.style.top = `${Math.max(height,top)}px`;
-    document.documentElement.style.setProperty('--booking-offset',docked?`${form.offsetHeight}px`:'0px');
+    document.documentElement.style.setProperty('--booking-offset','0px');
+    if (!mobile.matches) slot.style.setProperty('--booking-height', `${form.offsetHeight}px`);
     positionPopup();
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
@@ -76,6 +63,7 @@
   function openBooking(event) {
     event?.preventDefault(); opener = event?.currentTarget || document.activeElement;
     if (mobile.matches) { if (!sheet.open) sheet.showModal(); }
+    else if (form.getBoundingClientRect().bottom < nav.getBoundingClientRect().bottom) window.scrollTo({top:0,behavior:'instant'});
     openField('destination');
   }
   function openField(name) {
@@ -163,5 +151,5 @@
   });
   window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule);mobile.addEventListener('change',presentation);
   new ResizeObserver(schedule).observe(nav);new ResizeObserver(schedule).observe(form);
-  document.fonts?.ready.then(() => { expandedHeight = 0; schedule(); });presentation();
+  document.fonts?.ready.then(schedule);presentation();
 })();
