@@ -73,11 +73,22 @@ function setupMenu() {
 }
 
 function setupNews() {
+  const section = document.getElementById('journal');
   const track = document.getElementById('news-track');
   const cards = [...track.querySelectorAll('.news-card')];
   const controls = [...document.querySelectorAll('[data-news-direction]')];
   document.getElementById('news-total').textContent = String(cards.length).padStart(2, '0');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  if (!reduced.matches && 'IntersectionObserver' in window) {
+    section.classList.add('is-entering');
+    const reveal = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        section.classList.remove('is-entering');
+        reveal.disconnect();
+      }
+    }, { threshold: 0.12 });
+    reveal.observe(section);
+  }
   let active = 1, pending = 1, settleTimer, frame;
   const target = index => cards[index].offsetLeft - track.offsetLeft - (track.clientWidth - cards[index].offsetWidth) / 2;
   function highlight(index, announce = false) {
