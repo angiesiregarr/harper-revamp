@@ -86,7 +86,7 @@ const PRESETS = {
     tilt: -16,
     perspective: 1500,
     curve: 0,
-    spread: 1.45,
+    spread: 1,
     inward: false,
     billboard: true,
     backfaces: false,
@@ -446,7 +446,10 @@ const CircularCarousel = ({
       }
       const spanX = Math.max(maxX - minX, 1);
       const spanY = Math.max(maxY - minY, 1);
-      const fit = Math.min(1, width / spanX, height / spanY);
+      const naturalFit = Math.min(1, width / spanX, height / spanY);
+      // On narrow screens show the front portrait at a usable size while the
+      // outer orbit cards are intentionally clipped by the carousel viewport.
+      const fit = s.cardW <= 170 ? 1 : naturalFit;
       state.fit = fit;
       state.shift = -((minY + maxY) / 2) * fit - room / 2;
       state.drop = s.axis === 'x' ? (rect.width / fit) * 0.55 + s.cardW : (rect.height / fit) * 0.55 + s.cardH;
@@ -574,6 +577,8 @@ const CircularCarousel = ({
         const base = index * s.step;
         const mod = introCard(elapsed, base);
         const r = R * mod.radius;
+        const world = wrap(base + angle);
+        const facing = Math.cos(world * TO_RAD);
         let transform;
         if (s.axis === 'x') {
           transform = `rotateX(${-base}deg) translateZ(${r}px)`;
@@ -583,17 +588,20 @@ const CircularCarousel = ({
           transform = `rotateY(${base}deg) translateZ(${r}px)`;
           if (s.layout.billboard) transform += ` rotateY(${-(base + angle)}deg)`;
         }
+        // Lift distant orbit cards to open a clear, elliptical space around the title.
+        if (s.layout.billboard) transform += ` translateY(${(-58 * (1 - facing)).toFixed(1)}px)`;
         if (mod.lift) transform += s.axis === 'x' ? ` translateX(${mod.lift}px)` : ` translateY(${mod.lift}px)`;
         card.style.transform = transform;
 
-        const world = wrap(base + angle);
-        const facing = Math.cos(world * TO_RAD);
         if (s.layout.inward) card.style.visibility = Math.abs(world) > 86 ? 'hidden' : '';
+        const muted = clamp((1 - facing) / 0.18, 0, 1);
         const fade = s.depthFade * Math.pow((1 - facing) / 2, 1.25);
         card.style.setProperty('--cc-depth', fade.toFixed(3));
+        card.style.setProperty('--cc-muted', muted.toFixed(3));
       }
 
       const index = ((Math.round(-state.angle / s.step) % s.count) + s.count) % s.count || 0;
+      cardRefs.current.forEach((card, cardIndex) => card?.toggleAttribute('data-current', cardIndex === index));
       if (index !== activeRef.current) {
         activeRef.current = index;
         setActive(index);
@@ -692,6 +700,11 @@ const CircularCarousel = ({
     let target = -index * s.step;
     target += 360 * Math.round((state.angle - target) / 360);
     state.target = target;
+    if (s.reduced) {
+      state.angle = target;
+      state.velocity = 0;
+      state.target = null;
+    }
     state.holdUntil = performance.now() + 2800;
     wakeRef.current();
   }, []);
@@ -701,6 +714,11 @@ const CircularCarousel = ({
     const s = settingsRef.current;
     const base = state.target ?? Math.round(state.angle / s.step) * s.step;
     state.target = base - delta * s.step * (s.layout.inward ? -1 : 1);
+    if (s.reduced) {
+      state.angle = state.target;
+      state.velocity = 0;
+      state.target = null;
+    }
     state.holdUntil = performance.now() + 2800;
     wakeRef.current();
   }, []);
@@ -882,7 +900,7 @@ const CircularCarousel = ({
             alt=""
             draggable={false}
             decoding="async"
-            style={photoStyle}
+            style={{ ...photoStyle, objectPosition: item.position || 'center' }}
           />
           {gone && (
             <img
@@ -946,7 +964,7 @@ const CircularCarousel = ({
                   data-cc-index={index}
                   role="group"
                   aria-roledescription="slide"
-                  aria-label={`${item.title || item.alt || `Image ${index + 1}`}, ${index + 1} of ${count}`}
+                  aria-label={`${item.title || item.alt || `Image ${index + 1}`}, ${item.subtitle || ''}, ${index + 1} of ${count}`}
                 >
                   {tiles.map(tile => renderTile(item, tile, false, index))}
                   {layout.backfaces && tiles.map(tile => renderTile(item, tile, true, index))}
@@ -959,8 +977,8 @@ const CircularCarousel = ({
       {captions && current && (
         <div className="circular-carousel__caption" aria-hidden="true">
           <span key={active} className="circular-carousel__title">
-            {current.title || current.alt}
             {current.subtitle && <span className="circular-carousel__subtitle">{current.subtitle}</span>}
+            <span className="circular-carousel__hotel">{current.title || current.alt}</span>
           </span>
           <span className="circular-carousel__count">
             <Digits value={active + 1} />
@@ -970,7 +988,7 @@ const CircularCarousel = ({
         </div>
       )}
       <div className="circular-carousel__live" aria-live="polite" aria-atomic="true">
-        {`${label}, ${active + 1} of ${count}`}
+        {`${current?.title || label}, ${current?.subtitle || ''}, ${active + 1} of ${count}`}
       </div>
     </div>
   );

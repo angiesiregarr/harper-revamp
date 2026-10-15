@@ -100,6 +100,7 @@
   pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;
+  filter: grayscale(var(--cc-muted, 0)) saturate(calc(1 - var(--cc-muted, 0) * .52)) blur(calc(var(--cc-muted, 0) * 1.15px));
 }
 
 .circular-carousel__photo--leaving {

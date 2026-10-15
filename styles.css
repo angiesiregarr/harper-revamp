@@ -678,15 +678,23 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 @media(max-width:600px){.hero-building{top:clamp(76px,10svh,105px)}.hero-orbit{inset:clamp(70px,8svh,100px) 0 25px}}
 
 /* Two-line title surrounded by the React Bits orbit on the supplied gradient. */
-.hero.hero-orbit-stage{height:calc(100svh - var(--top-nav-height));min-height:520px;margin:0;background:#f4a220 url('./assets/gradient-1.webp') center center/cover no-repeat;overflow:hidden;isolation:isolate}
-.hero-orbit-stage .hero-heading{position:absolute;inset:0;display:grid;place-items:center;z-index:8;text-align:center;pointer-events:none;transform:none}
-.hero-orbit-stage h1{margin:0;display:grid;gap:.04em;max-width:90%;font:400 clamp(54px,7.8vw,126px)/.98 var(--serif);letter-spacing:-.045em;text-transform:uppercase;white-space:normal;color:#28221d;text-shadow:0 2px 22px rgb(255 235 197 / 90%),0 0 3px rgb(255 244 228 / 65%)}
+.hero.hero-orbit-stage{height:calc(100svh - var(--top-nav-height));min-height:520px;margin:0;background:#f08b1d url('./assets/gradient-1.webp') center center/cover no-repeat;overflow:hidden;isolation:isolate}
+.hero-grainient{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.82;mix-blend-mode:multiply}
+.hero-grainient .grainient-container{width:100%;height:100%}
+.hero-orbit-stage .hero-heading{position:absolute;inset:0;display:grid;place-items:center;z-index:8;text-align:center;pointer-events:none;transform:translateY(-110px)}
+.hero-orbit-stage h1{margin:0;display:grid;gap:.04em;max-width:90%;font:400 clamp(54px,6.5vw,104px)/.98 var(--serif);letter-spacing:-.045em;text-transform:uppercase;white-space:normal;color:#28221d;text-shadow:0 2px 22px rgb(255 235 197 / 95%),0 0 3px rgb(255 244 228 / 75%)}
 .hero-orbit-stage h1 span{display:block;white-space:nowrap}
-.hero-orbit-stage .hero-orbit{position:absolute;inset:5% 6% 4%;z-index:5}
-.hero-orbit-stage .circular-carousel__caption{bottom:2%;color:#31241b;text-shadow:0 1px 8px #ffdc9c}
-.hero-orbit-stage .circular-carousel__title{font-family:var(--serif);font-size:14px}
-.hero-orbit-stage .circular-carousel__subtitle{font-family:var(--sans);font-size:12px;opacity:.85}
+.hero-orbit-stage .hero-orbit{position:absolute;inset:3% 3% 2%;z-index:5}
+.hero-orbit-stage .circular-carousel__stage{translate:0 78px}
+.hero-orbit-stage .circular-carousel__caption{bottom:1%;color:#31241b;text-shadow:0 1px 8px #ffdc9c;gap:3px}
+.hero-orbit-stage .circular-carousel__title{font-family:var(--serif);font-size:16px;gap:5px;line-height:1.2}
+.hero-orbit-stage .circular-carousel__subtitle{font-family:var(--sans);font-size:12px;opacity:.9;letter-spacing:.08em;text-transform:uppercase}
+.hero-orbit-stage .circular-carousel__hotel{font-family:var(--serif)}
 .hero-orbit-stage .circular-carousel__count{font-size:11px;opacity:.75}
+.hero-orbit-stage .circular-carousel__photo{background:#c7b7a3}
+.hero-orbit-stage .circular-carousel__card{cursor:pointer}
+.hero-orbit-stage .circular-carousel:focus-visible{box-shadow:inset 0 0 0 3px #29211b}
+.hero-orbit-stage .circular-carousel:focus-visible .circular-carousel__card[data-current] .circular-carousel__frame{outline:3px solid #fff8e9;outline-offset:3px}
 .hero-accent{position:absolute;z-index:2;width:clamp(150px,21vw,310px);height:auto;pointer-events:none;filter:drop-shadow(0 15px 16px rgb(106 53 0 / 14%))}
 .hero-accent-left{left:-7%;top:9%;transform:rotate(132deg) scale(.82)}
 .hero-accent-right{right:-6%;bottom:3%;transform:rotate(-21deg) scale(1.08)}
@@ -697,18 +705,23 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .booking-sheet .booking-popover{position:static!important;inset:auto!important;width:min(100%,440px)!important;max-height:min(42svh,340px)!important;margin:16px 0 0;box-shadow:none}
 @media(max-width:800px){
  .hero.hero-orbit-stage{height:calc(100svh - var(--top-nav-height));min-height:500px}
- .hero-orbit-stage h1{font-size:clamp(46px,9.3vw,76px)!important;letter-spacing:-.045em}
- .hero-orbit-stage .hero-orbit{inset:6% 2% 5%}
+ .hero-orbit-stage h1{font-size:clamp(46px,8.2vw,70px)!important;letter-spacing:-.045em}
+ .hero-orbit-stage .hero-heading{transform:translateY(-74px)}
+ .hero-orbit-stage .circular-carousel__stage{translate:0 58px}
+ .hero-orbit-stage .hero-orbit{inset:3% 1% 3%}
  .hero-accent{width:clamp(125px,25vw,220px)}
  .hero-accent-left{left:-10%;top:16%}.hero-accent-right{right:-9%;bottom:10%}
  .booking-sheet{inset:auto 0 0;max-width:none;width:100%;border-radius:18px 18px 0 0}
 }
 @media(max-width:600px){
- .hero-orbit-stage h1{font-size:clamp(38px,10vw,56px)!important;max-width:96%;line-height:1.04}
- .hero-orbit-stage .hero-orbit{inset:5% 0 6%}
+ .hero-orbit-stage h1{font-size:clamp(36px,9vw,52px)!important;max-width:96%;line-height:1.04}
+ .hero-orbit-stage .hero-heading{transform:translateY(-90px)}
+ .hero-orbit-stage .circular-carousel__stage{translate:0 26px}
+ .hero-orbit-stage .hero-orbit{inset:2% 0 4%}
  .hero-accent{width:145px}.hero-accent-left{left:-58px;top:11%}.hero-accent-right{right:-55px;bottom:13%}
  .hero-orbit-stage .circular-carousel__title{font-size:12px}
  .hero-orbit-stage .circular-carousel__subtitle{font-size:10px}
+ .hero-orbit-stage .circular-carousel__caption{bottom:14%}
  .booking-sheet{padding:0}
  .booking-sheet .booking-bar{padding:20px!important}
 }
@@ -718,3 +731,6 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .hero-accent-left{left:-3%;top:7%;transform:rotate(132deg) scale(.95)}
 .hero-accent-right{right:-2%;bottom:2%;transform:rotate(-21deg) scale(1.08)}
 @media(max-width:600px){.hero-accent-left{left:-42px;top:9%}.hero-accent-right{right:-42px;bottom:9%}.hero-orbit-stage .hero-heading::before{width:97vw;height:230px}}
+@media(min-width:801px) and (max-height:800px){.hero-orbit-stage .hero-heading{transform:translateY(-155px)}.hero-orbit-stage .circular-carousel__stage{translate:0 40px}}
+@media(min-width:601px) and (max-width:800px) and (min-height:900px){.hero-orbit-stage .circular-carousel__caption{bottom:14%}}
+@media(prefers-reduced-motion:reduce){.hero-grainient{opacity:.7}}
