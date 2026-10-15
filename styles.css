@@ -652,7 +652,7 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .hero h1{margin:0;font-size:clamp(40px,5.8vw,96px);line-height:1.08;letter-spacing:-.02em;white-space:nowrap}
 .hero-building{left:50%;top:clamp(96px,13svh,145px);height:min(78svh,710px);max-width:none;transform:translateX(-50%);z-index:3;translate:none}
 .hero-orbit{position:absolute;inset:clamp(110px,15svh,155px) 4% 76px;z-index:5;isolation:isolate}
-.hero-orbit .circular-carousel__card{filter:drop-shadow(0 14px 20px rgb(61 42 22 / 22%))}
+.hero-orbit .circular-carousel__card{filter:drop-shadow(0 12px 18px rgb(61 42 22 / 20%));opacity:calc(.6 + var(--cc-nearness, 1) * .4)}
 .hero-orbit .circular-carousel__frame{border:1px solid rgb(255 255 255 / 75%)}
 .hero-orbit .circular-carousel__view{pointer-events:auto}
 .site-nav.is-compact .primary-links a{font-size:inherit}

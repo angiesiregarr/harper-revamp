@@ -404,11 +404,15 @@ const CircularCarousel = ({
       if (!rect.width || !rect.height) return;
       if (s.layout.billboard) {
         state.fit = 1;
-        state.orbitX = rect.width * (rect.width <= 600 ? 0.58 : rect.width > 900 ? 0.49 : 0.46);
-        state.orbitY = Math.min(255, (rect.height - (s.captions ? CAPTION_SPACE : 0)) * (rect.width <= 900 ? 0.39 : rect.height < 800 ? 0.36 : 0.34));
-        if (rect.width > 900 && rect.height < 800) state.orbitY -= 30;
-        state.backLift = rect.width > 900 && rect.height < 800 ? 100 : rect.width <= 600 && rect.height < 700 ? 18 : 10;
-        state.frontLift = rect.width > 900 && rect.height < 800 ? 8 : 0;
+        state.orbitX = rect.width * (rect.width <= 600 ? 0.58 : rect.width > 900 ? 0.54 : 0.46);
+        const farScale = 0.43;
+        const navHeight = Math.max(document.getElementById('site-nav')?.offsetHeight || 0, rect.width > 800 ? 75 : 69);
+        const navGap = rect.width > 900 ? 45 : rect.width > 600 ? 30 : 20;
+        const stageCenter = rect.top + window.scrollY + rect.height * 0.44;
+        const maxOrbitY = stageCenter - navHeight - navGap - s.cardH * farScale / 2;
+        const desiredOrbitY = rect.width <= 600 && rect.height < 700 ? 175 : rect.width <= 900 ? 255 : rect.height < 800 ? 185 : 220;
+        state.orbitY = Math.max(70, Math.min(desiredOrbitY, maxOrbitY));
+        state.frontLift = rect.width > 900 ? 24 : 0;
         state.drop = rect.height + s.cardH;
         stage.style.perspective = `${s.perspective}px`;
         stage.style.transform = `translate3d(0, ${-rect.height * 0.06}px, 0)`;
@@ -597,10 +601,12 @@ const CircularCarousel = ({
         let transform;
         if (s.layout.billboard) {
           const x = Math.sin(world * TO_RAD) * state.orbitX;
-          const y = facing * state.orbitY + state.frontLift * (1 + facing) / 2 - state.backLift * (1 - facing) / 2 + mod.lift;
+          const nearness = (facing + 1) / 2;
+          const y = facing * state.orbitY + state.frontLift * nearness + mod.lift;
           const z = (facing - 1) * 90;
-          const scale = 0.72 + 0.28 * (facing + 1) / 2;
+          const scale = 0.43 + 0.59 * nearness;
           transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+          card.style.setProperty('--cc-nearness', nearness.toFixed(3));
         } else if (s.axis === 'x') {
           transform = `rotateX(${-base}deg) translateZ(${r}px)`;
         } else if (s.layout.inward) {
@@ -614,7 +620,7 @@ const CircularCarousel = ({
 
         if (s.layout.inward) card.style.visibility = Math.abs(world) > 86 ? 'hidden' : '';
         const muted = clamp((1 - facing) / 0.18, 0, 1);
-        const fade = s.depthFade * Math.pow((1 - facing) / 2, 1.25);
+        const fade = s.layout.billboard ? 0.16 * (1 - facing) / 2 : s.depthFade * Math.pow((1 - facing) / 2, 1.25);
         card.style.setProperty('--cc-depth', fade.toFixed(3));
         card.style.setProperty('--cc-muted', muted.toFixed(3));
       }

@@ -13,7 +13,10 @@ const items = [
   { src: './assets/harper-room-07.jpg', alt: 'Twin guest room at Harper Banjarmasin', title: 'Harper Banjarmasin', subtitle: 'Banjarmasin, Indonesia', position: '52% center' },
   { src: './assets/harper-room-08.jpg', alt: 'Guest room at Harper Kupang', title: 'Harper Kupang', subtitle: 'Kupang, Indonesia', position: '50% center' },
   { src: './assets/harper-room-09.jpg', alt: 'Executive suite at Harper Perintis', title: 'Harper Perintis', subtitle: 'Makassar, Indonesia', position: '54% center' },
-  { src: './assets/harper-room-10.jpg', alt: 'Guest room at Harper MT Haryono', title: 'Harper MT Haryono', subtitle: 'Jakarta, Indonesia', position: '50% center' }
+  { src: './assets/harper-room-10.jpg', alt: 'Guest room at Harper MT Haryono', title: 'Harper MT Haryono', subtitle: 'Jakarta, Indonesia', position: '50% center' },
+  // Alternate framings of verified room photos keep all twelve stops tied to real properties.
+  { src: './assets/harper-room-06.jpg', alt: 'Harper Kuta Bali guest room and lounge', title: 'Harper Kuta Bali', subtitle: 'Kuta, Indonesia', position: '28% center' },
+  { src: './assets/harper-room-09.jpg', alt: 'Harper Perintis suite and seating area', title: 'Harper Perintis', subtitle: 'Makassar, Indonesia', position: '22% center' }
 ];
 
 const mount = document.getElementById('hero-orbit');
@@ -30,7 +33,7 @@ function HeroOrbit() {
       items={items}
       preset="orbit"
       intro="rise"
-      cardWidth={width <= 600 ? height <= 700 ? 125 : 150 : width <= 900 ? 190 : height <= 800 ? 190 : 225}
+      cardWidth={width <= 600 ? height <= 700 ? 125 : 150 : width <= 900 ? 190 : height <= 800 ? 170 : 225}
       aspectRatio={0.75}
       gap={width <= 600 ? 22 : 72}
       tilt={0}
