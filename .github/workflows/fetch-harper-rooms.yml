@@ -1,0 +1,27 @@
+name: Bundle Harper room photos
+on:
+  push:
+    paths:
+      - .github/workflows/fetch-harper-rooms.yml
+      - scripts/fetch_harper_rooms.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Download and validate the referenced room photos
+        run: python3 scripts/fetch_harper_rooms.py
+      - name: Commit bundled photos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/harper-room-*.jpg
+          if ! git diff --cached --quiet; then
+            git commit -m "Bundle authentic Harper room photos"
+            git push
+          fi
