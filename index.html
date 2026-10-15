@@ -8,11 +8,11 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=38102397dbaf" />
+    <link rel="stylesheet" href="./styles.css?v=4a92d431e529" />
     <link rel="stylesheet" href="./hero-carousel.css?v=b70cd581573c" />
     <script>document.documentElement.classList.add('js');</script>
     <script src="./main.js?v=eaee54f9fdff" defer></script>
-    <script src="./hero-carousel.js?v=a3857db3fba8" defer></script>
+    <script src="./hero-carousel.js?v=60689484c6ea" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -27,32 +27,13 @@
         </nav>
         <a class="nav-book" href="#booking-form" data-booking-open>Book Now <span aria-hidden="true">↗</span></a>
       </div>
-    <button class="booking-mobile-trigger" type="button" data-booking-open>Find your Harper stay <span>Book a stay</span></button>
     <main id="main">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-heading reveal">
-          <h1 id="hero-title">Come home to harmony</h1>
-        </div>
-        <img class="hero-building" src="./assets/hero-building.png" alt="Harper hotel building at dusk, shown as a transparent cutout" fetchpriority="high" />
+      <section class="hero hero-orbit-stage" aria-labelledby="hero-title">
+        <img class="hero-accent hero-accent-left" src="./assets/membership-accent.png" alt="" aria-hidden="true" fetchpriority="low" />
+        <img class="hero-accent hero-accent-right" src="./assets/membership-accent.png" alt="" aria-hidden="true" fetchpriority="low" />
         <div class="hero-orbit" id="hero-orbit" aria-label="Harper stay moments"></div>
+        <div class="hero-heading"><h1 id="hero-title"><span>Come Home</span><span>to Harmony</span></h1></div>
       </section>
-
-
-
-      <div class="booking-slot" id="booking-slot">
-        <form class="booking-bar" id="booking-form" aria-label="Find your Harper stay" novalidate>
-          <div class="booking-sheet-heading"><h2 id="booking-title">Find your Harper stay</h2><button type="button" class="booking-close" aria-label="Close booking">×</button></div>
-          <div class="booking-fields">
-            <button class="booking-field" type="button" data-field="destination" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Hotel or city</span><strong id="destination-value">Where feels like home?</strong></button>
-            <button class="booking-field" type="button" data-field="checkin" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Check-in</span><strong id="checkin-value">Select date</strong></button>
-            <button class="booking-field" type="button" data-field="checkout" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Check-out</span><strong id="checkout-value">Select date</strong></button>
-            <button class="booking-field" type="button" data-field="guests" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Rooms &amp; guests</span><strong id="guests-value">1 room · 2 guests</strong></button>
-            <button class="booking-search" type="submit">Search Stays <span aria-hidden="true">↗</span></button>
-          </div>
-          <p class="booking-error" id="booking-error" role="alert"></p>
-          <div id="booking-popover" class="booking-popover" role="dialog" aria-modal="false" hidden></div>
-        </form>
-      </div>
 
       <section class="hotels section-pad" id="hotels" aria-labelledby="hotels-title">
         <div class="section-heading reveal">
@@ -242,9 +223,22 @@
         <div class="footer-bottom"><span>© <span id="year">2026</span> Harper Hotels</span><span>Come home to harmony.</span></div>
     </footer>
 
-    <dialog id="booking-sheet" class="booking-sheet" aria-labelledby="booking-title"></dialog>
+    <dialog id="booking-sheet" class="booking-sheet" aria-labelledby="booking-title">
+      <form class="booking-bar" id="booking-form" aria-label="Find your Harper stay" novalidate>
+        <div class="booking-sheet-heading"><h2 id="booking-title">Find your Harper stay</h2><button type="button" class="booking-close" aria-label="Close booking">×</button></div>
+        <div class="booking-fields">
+          <button class="booking-field" type="button" data-field="destination" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Hotel or city</span><strong id="destination-value">Where feels like home?</strong></button>
+          <button class="booking-field" type="button" data-field="checkin" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Check-in</span><strong id="checkin-value">Select date</strong></button>
+          <button class="booking-field" type="button" data-field="checkout" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Check-out</span><strong id="checkout-value">Select date</strong></button>
+          <button class="booking-field" type="button" data-field="guests" aria-haspopup="dialog" aria-expanded="false" aria-controls="booking-popover"><span>Rooms &amp; guests</span><strong id="guests-value">1 room · 2 guests</strong></button>
+          <button class="booking-search" type="submit">Search Stays <span aria-hidden="true">↗</span></button>
+        </div>
+        <p class="booking-error" id="booking-error" role="alert"></p>
+        <div id="booking-popover" class="booking-popover" role="dialog" aria-modal="false" hidden></div>
+      </form>
+    </dialog>
     <dialog id="booking-results" class="booking-results" aria-labelledby="booking-results-title"><button type="button" class="booking-close" aria-label="Close search results">×</button><p class="eyebrow">Your next Harper stay</p><h2 id="booking-results-title">A place to come home to.</h2><p id="booking-summary"></p><p class="booking-results-note">Explore your matching stays below. Confirm live availability, rates and your stay details on the official booking site.</p><div id="booking-matches"></div></dialog>
-    <script src="./booking.js?v=d5584686bac5" defer></script>
+    <script src="./booking.js?v=43497d6068d3" defer></script>
     <dialog class="story-dialog" id="story-dialog" aria-labelledby="story-dialog-title"><button class="dialog-close" type="button" aria-label="Close story">×</button><p class="section-kicker">The Harper Journal</p><h2 id="story-dialog-title"></h2><p id="story-dialog-body"></p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Explore Harper <span aria-hidden="true">↗</span></a></dialog>
   </body>
 </html>

@@ -1,12 +1,10 @@
-/* One form, two presentations: a desktop dock and a native modal mobile sheet. */
+/* Booking stays available from the navbar without occupying the hero. */
 (() => {
   const form = document.getElementById('booking-form');
-  const slot = document.getElementById('booking-slot');
   const nav = document.getElementById('site-nav');
   const sheet = document.getElementById('booking-sheet');
   const popup = document.getElementById('booking-popover');
   const results = document.getElementById('booking-results');
-  const mobile = matchMedia('(max-width:800px)');
   const fields = [...form.querySelectorAll('[data-field]')];
   const hotels = [
     { name: 'Harper Malioboro', city: 'Yogyakarta', image: 'hero-exterior.png', url: 'https://malioboro.harperhotels.com/' },
@@ -33,37 +31,18 @@
     popup.hidden = true; fields.forEach(button => button.setAttribute('aria-expanded','false'));
     if (focus) anchor?.focus(); active = ''; anchor = null;
   }
-  function positionPopup() {
-    if (popup.hidden || !anchor || mobile.matches) return;
-    const rect = anchor.getBoundingClientRect(), bar = form.getBoundingClientRect();
-    const width = Math.min(340, innerWidth-24);
-    popup.style.width = `${width}px`;
-    const above = !form.classList.contains('is-docked') && bar.top > 280;
-    const space = above ? bar.top-24 : innerHeight-bar.bottom-24;
-    popup.style.maxHeight = `${Math.max(120,space)}px`;
-    popup.style.left = `${Math.max(12,Math.min(rect.left,innerWidth-width-12))}px`;
-    popup.style.top = `${above ? Math.max(12,bar.top-popup.offsetHeight-10) : bar.bottom+10}px`;
-  }
+  function positionPopup() { /* The popover flows inside the booking dialog. */ }
   function placeForm() {
     frame = 0;
     nav.classList.toggle('is-compact', window.scrollY > 48);
     const height = nav.getBoundingClientRect().height;
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
     document.documentElement.style.setProperty('--booking-offset','0px');
-    if (!mobile.matches) slot.style.setProperty('--booking-height', `${form.offsetHeight}px`);
-    positionPopup();
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
-  function presentation() {
-    closeField();
-    if (mobile.matches) { form.append(popup); sheet.append(form); form.classList.remove('is-docked'); }
-    else { if (sheet.open) sheet.close(); slot.append(form); document.body.append(popup); }
-    schedule();
-  }
   function openBooking(event) {
     event?.preventDefault(); opener = event?.currentTarget || document.activeElement;
-    if (mobile.matches) { if (!sheet.open) sheet.showModal(); }
-    else if (form.getBoundingClientRect().bottom < nav.getBoundingClientRect().bottom) window.scrollTo({top:0,behavior:'instant'});
+    if (!sheet.open) sheet.showModal();
     openField('destination');
   }
   function openField(name) {
@@ -75,7 +54,7 @@
     else { month = parse(state[name] || (name==='checkout' && state.checkin ? nextDay(state.checkin) : today())); month.setDate(1); renderCalendar(); }
     positionPopup();
     (popup.querySelector('[data-date][aria-pressed=true]:not(:disabled)') || popup.querySelector('[data-date]:not(:disabled)') || popup.querySelector('input,button:not(:disabled)'))?.focus({preventScroll:true});
-    if (mobile.matches) popup.scrollIntoView({block:'nearest',behavior:'instant'});
+    popup.scrollIntoView({block:'nearest',behavior:'instant'});
   }
   function renderDestination() {
     popup.innerHTML = '<h3>Where would you like to stay?</h3><label for="destination-search">Find a hotel or city</label><input id="destination-search" type="search" autocomplete="off" placeholder="Try Jakarta or Harper Malioboro"><div class="destination-options"></div>';
@@ -149,7 +128,7 @@
     matching.forEach(hotel=>{const article=document.createElement('article');article.className='booking-match';article.innerHTML=`<img src="./assets/${hotel.image}" alt="${hotel.name}"><div><h3>${hotel.name}</h3><p>${hotel.city}</p><a href="${hotel.url}" target="_blank" rel="noopener noreferrer">Continue to official booking</a></div>`;list.append(article);});
     results.showModal();
   });
-  window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule);mobile.addEventListener('change',presentation);
+  window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule);
   new ResizeObserver(schedule).observe(nav);new ResizeObserver(schedule).observe(form);
-  document.fonts?.ready.then(schedule);presentation();
+  document.fonts?.ready.then(schedule);schedule();
 })();

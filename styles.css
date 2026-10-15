@@ -676,3 +676,45 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .site-nav.is-compact .primary-links a{font-size:15px}
 @media(max-width:800px){.hero-building{top:clamp(65px,9svh,100px)}.hero-orbit{inset:clamp(70px,8svh,100px) 2% 30px}}
 @media(max-width:600px){.hero-building{top:clamp(76px,10svh,105px)}.hero-orbit{inset:clamp(70px,8svh,100px) 0 25px}}
+
+/* Two-line title surrounded by the React Bits orbit on the supplied gradient. */
+.hero.hero-orbit-stage{height:calc(100svh - var(--top-nav-height));min-height:520px;margin:0;background:#f4a220 url('./assets/gradient-1.webp') center center/cover no-repeat;overflow:hidden;isolation:isolate}
+.hero-orbit-stage .hero-heading{position:absolute;inset:0;display:grid;place-items:center;z-index:8;text-align:center;pointer-events:none;transform:none}
+.hero-orbit-stage h1{margin:0;display:grid;gap:.04em;max-width:90%;font:400 clamp(54px,7.8vw,126px)/.98 var(--serif);letter-spacing:-.045em;text-transform:uppercase;white-space:normal;color:#28221d;text-shadow:0 2px 22px rgb(255 235 197 / 90%),0 0 3px rgb(255 244 228 / 65%)}
+.hero-orbit-stage h1 span{display:block;white-space:nowrap}
+.hero-orbit-stage .hero-orbit{position:absolute;inset:5% 6% 4%;z-index:5}
+.hero-orbit-stage .circular-carousel__caption{bottom:2%;color:#31241b;text-shadow:0 1px 8px #ffdc9c}
+.hero-orbit-stage .circular-carousel__title{font-family:var(--serif);font-size:14px}
+.hero-orbit-stage .circular-carousel__subtitle{font-family:var(--sans);font-size:12px;opacity:.85}
+.hero-orbit-stage .circular-carousel__count{font-size:11px;opacity:.75}
+.hero-accent{position:absolute;z-index:2;width:clamp(150px,21vw,310px);height:auto;pointer-events:none;filter:drop-shadow(0 15px 16px rgb(106 53 0 / 14%))}
+.hero-accent-left{left:-7%;top:9%;transform:rotate(132deg) scale(.82)}
+.hero-accent-right{right:-6%;bottom:3%;transform:rotate(-21deg) scale(1.08)}
+.booking-sheet{width:min(94vw,980px);padding:22px;max-height:90svh;border-radius:18px;background:#fff8ef}
+.booking-sheet .booking-bar{position:static!important;inset:auto!important;width:100%!important;padding:0!important;margin:0;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;background:transparent}
+.booking-sheet .booking-sheet-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.booking-sheet .booking-sheet-heading h2{margin:0;font:400 26px var(--serif)}
+.booking-sheet .booking-popover{position:static!important;inset:auto!important;width:min(100%,440px)!important;max-height:min(42svh,340px)!important;margin:16px 0 0;box-shadow:none}
+@media(max-width:800px){
+ .hero.hero-orbit-stage{height:calc(100svh - var(--top-nav-height));min-height:500px}
+ .hero-orbit-stage h1{font-size:clamp(46px,9.3vw,76px)!important;letter-spacing:-.045em}
+ .hero-orbit-stage .hero-orbit{inset:6% 2% 5%}
+ .hero-accent{width:clamp(125px,25vw,220px)}
+ .hero-accent-left{left:-10%;top:16%}.hero-accent-right{right:-9%;bottom:10%}
+ .booking-sheet{inset:auto 0 0;max-width:none;width:100%;border-radius:18px 18px 0 0}
+}
+@media(max-width:600px){
+ .hero-orbit-stage h1{font-size:clamp(38px,10vw,56px)!important;max-width:96%;line-height:1.04}
+ .hero-orbit-stage .hero-orbit{inset:5% 0 6%}
+ .hero-accent{width:145px}.hero-accent-left{left:-58px;top:11%}.hero-accent-right{right:-55px;bottom:13%}
+ .hero-orbit-stage .circular-carousel__title{font-size:12px}
+ .hero-orbit-stage .circular-carousel__subtitle{font-size:10px}
+ .booking-sheet{padding:0}
+ .booking-sheet .booking-bar{padding:20px!important}
+}
+/* Place the orbit at the edges of the message and keep its lettering legible. */
+.hero-orbit-stage .hero-heading::before{content:'';position:absolute;left:50%;top:50%;width:min(850px,82vw);height:min(340px,44svh);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(255,222,168,.76) 0%,rgba(255,222,168,.48) 43%,transparent 73%);pointer-events:none}
+.hero-orbit-stage h1{position:relative;z-index:1}
+.hero-accent-left{left:-3%;top:7%;transform:rotate(132deg) scale(.95)}
+.hero-accent-right{right:-2%;bottom:2%;transform:rotate(-21deg) scale(1.08)}
+@media(max-width:600px){.hero-accent-left{left:-42px;top:9%}.hero-accent-right{right:-42px;bottom:9%}.hero-orbit-stage .hero-heading::before{width:97vw;height:230px}}

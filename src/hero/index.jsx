@@ -23,20 +23,19 @@ function HeroOrbit() {
       items={items}
       preset="orbit"
       intro="rise"
-      cardWidth={width <= 600 ? 170 : 178}
-      aspectRatio={0.77}
-      gap={width <= 600 ? 32 : width <= 800 ? 70 : 130}
-      tilt={-12}
-      perspective={1450}
+      cardWidth={width <= 600 ? 190 : 220}
+      aspectRatio={1}
+      gap={width <= 600 ? 55 : width <= 800 ? 100 : 170}
+      tilt={-34}
+      perspective={1900}
       autoplay="drift"
-      speed={9}
-      momentum={0.65}
-      parallax={0.15}
-      stretch={0.18}
-      fadeColor="#fff4e8"
-      depthFade={0.35}
+      speed={14}
+      momentum={0.59}
+      stretch={0.21}
+      fadeColor="#4b494d"
+      innerShade={0.52}
       cornerRadius={13}
-      captions={false}
+      captions
     />
   );
 }

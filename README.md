@@ -9,15 +9,15 @@ npm run build
 npm run preview
 ```
 
-Open <http://localhost:4173>. The site has no runtime dependencies. `npm run build` copies the static files to `dist/` for local preview or other static hosts.
+Run `npm install` once, then open <http://localhost:4173>. The build bundles the React Bits hero carousel and copies the static site to `dist/`.
 
 ## Routes and interactions
 
 - `?city=jakarta`, `?city=bali`, `?city=yogyakarta` and `?city=makassar` select city routes. Jakarta is the default. The hotel gallery previews images on hover, keyboard focus, or tap without navigating.
-- The navigation starts after the hero and sticks when it reaches the top of the viewport.
+- The navigation stays at the top and becomes more compact on scroll without changing link font sizes. Its Book Now button opens the booking dialog.
 - Offer cards scroll past a pinned title on desktop. The title returns to normal flow on smaller screens.
 - The moments gallery moves continuously on pointer devices, pauses on hover or keyboard focus, and becomes swipeable on touch screens. Reduced-motion users get a static, scrollable gallery.
-- Section headings, offer cards, and journal images reveal as they enter view. The hero has a short entrance sequence, links and cards respond to hover or focus, the navigation shows reading progress, and the membership image drifts gently while scrolling on desktop. These decorative effects are disabled or simplified for reduced-motion users.
+- The hero uses the supplied Gradient 1 artwork, a two-line heading, orange membership accents, and a draggable React Bits image orbit. Section headings, offer cards, and journal images reveal as they enter view. Decorative motion is disabled or simplified for reduced-motion users.
 - Booking and membership links lead to the official Harper or Archipelago websites. Journal buttons open readable story dialogs.
 
 ## Deployment
