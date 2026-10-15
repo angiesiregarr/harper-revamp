@@ -9,12 +9,12 @@ import subprocess
 
 
 ROOMS = [
-    ('harper-room-01.png', 'https://cdn0.archipelagointernational.com/v1/imgs/temp_image/PremierRoomatHarperKutaBali.png'),
+    ('harper-room-01.jpg', 'https://images.trvl-media.com/lodging/7000000/6490000/6481500/6481422/8b2dbad7.jpg?h=800&impolicy=fcrop&quality=medium&w=1200'),
     ('harper-room-02.jpg', 'https://www.kayak.sg/rimg/himg/9c/de/79/expedia_group-803576-3db72074-687522.jpg?crop=true&height=607&width=836'),
     ('harper-room-03.jpg', 'https://q-xx.bstatic.com/xdata/images/hotel/max1024x768/432389875.jpg?k=adf8376b5bc37a55b81430f70aad09d7316a204e8bbbb4945edfaec4a39cd998&o='),
     ('harper-room-04.jpg', 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/12/fb/39/99/deluxe-room.jpg?h=-1&s=1&w=700'),
     ('harper-room-05.jpg', 'https://images.trvl-media.com/lodging/34000000/33240000/33235200/33235182/c4200db3.jpg?h=800&impolicy=fcrop&quality=medium&w=1200'),
-    ('harper-room-06.png', 'https://cdn0.archipelagointernational.com/v1/imgs/temp_image/releaseDeluxePremierRoomatHarperKuta.png'),
+    ('harper-room-06.jpg', 'https://bynder.onthebeach.co.uk/cdn-cgi/image/width%3D1400%2Cquality%3D80%2Cfit%3Dcover%2Cformat%3Dauto/m/49d83a403bb4080c/original/Harper-Kuta-Hotel-by-ASTON-Indonesia-BALI-Room-3.jpg'),
     ('harper-room-07.jpg', 'https://images.trvl-media.com/lodging/95000000/94880000/94874600/94874516/e662ad21.jpg?h=800&impolicy=fcrop&quality=medium&w=1200'),
     ('harper-room-08.jpg', 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/09/da/89/caption.jpg?h=-1&s=1&w=1200'),
     ('harper-room-09.jpg', 'https://images.trvl-media.com/lodging/16000000/15870000/15868000/15867986/39c10a8b.jpg?h=800&impolicy=fcrop&quality=medium&w=1200'),
