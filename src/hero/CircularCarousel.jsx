@@ -407,7 +407,8 @@ const CircularCarousel = ({
         state.orbitX = rect.width * (rect.width <= 600 ? 0.58 : rect.width > 900 ? 0.49 : 0.46);
         state.orbitY = Math.min(255, (rect.height - (s.captions ? CAPTION_SPACE : 0)) * (rect.width <= 900 ? 0.39 : rect.height < 800 ? 0.36 : 0.34));
         if (rect.width > 900 && rect.height < 800) state.orbitY -= 30;
-        state.backLift = rect.width > 900 && rect.height < 800 ? 58 : rect.width <= 600 && rect.height < 700 ? 18 : 10;
+        state.backLift = rect.width > 900 && rect.height < 800 ? 100 : rect.width <= 600 && rect.height < 700 ? 18 : 10;
+        state.frontLift = rect.width > 900 && rect.height < 800 ? 8 : 0;
         state.drop = rect.height + s.cardH;
         stage.style.perspective = `${s.perspective}px`;
         stage.style.transform = `translate3d(0, ${-rect.height * 0.06}px, 0)`;
@@ -596,7 +597,7 @@ const CircularCarousel = ({
         let transform;
         if (s.layout.billboard) {
           const x = Math.sin(world * TO_RAD) * state.orbitX;
-          const y = facing * state.orbitY - state.backLift * (1 - facing) / 2 + mod.lift;
+          const y = facing * state.orbitY + state.frontLift * (1 + facing) / 2 - state.backLift * (1 - facing) / 2 + mod.lift;
           const z = (facing - 1) * 90;
           const scale = 0.72 + 0.28 * (facing + 1) / 2;
           transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
