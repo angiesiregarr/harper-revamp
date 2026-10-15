@@ -18,24 +18,25 @@ const items = [
 
 const mount = document.getElementById('hero-orbit');
 function HeroOrbit() {
-  const [width, setWidth] = useState(window.innerWidth);
+  const [viewport, setViewport] = useState({ width: window.innerWidth, height: window.innerHeight });
   useEffect(() => {
-    const update = () => setWidth(window.innerWidth);
+    const update = () => setViewport({ width: window.innerWidth, height: window.innerHeight });
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
+  const { width, height } = viewport;
   return (
     <CircularCarousel
       items={items}
       preset="orbit"
       intro="rise"
-      cardWidth={width <= 600 ? 170 : width <= 900 ? 230 : 300}
+      cardWidth={width <= 600 ? height <= 700 ? 125 : 150 : width <= 900 ? 190 : height <= 800 ? 190 : 225}
       aspectRatio={0.75}
-      gap={width <= 600 ? 4 : 8}
-      tilt={width <= 600 ? -17 : -19}
-      perspective={1900}
-      autoplay="step"
-      interval={5}
+      gap={width <= 600 ? 22 : 72}
+      tilt={0}
+      perspective={Math.max(750, Math.min(1700, width * 1.2))}
+      autoplay="drift"
+      speed={25}
       momentum={0.59}
       stretch={0.21}
       fadeColor="#595653"

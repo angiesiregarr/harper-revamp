@@ -2,6 +2,7 @@
 (() => {
   const form = document.getElementById('booking-form');
   const nav = document.getElementById('site-nav');
+  const hero = document.querySelector('.hero-orbit-stage');
   const sheet = document.getElementById('booking-sheet');
   const popup = document.getElementById('booking-popover');
   const results = document.getElementById('booking-results');
@@ -36,6 +37,7 @@
     frame = 0;
     nav.classList.toggle('is-compact', window.scrollY > 48);
     const height = nav.getBoundingClientRect().height;
+    nav.classList.toggle('is-over-hero', Boolean(hero && hero.getBoundingClientRect().bottom > height));
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
     document.documentElement.style.setProperty('--booking-offset','0px');
   }

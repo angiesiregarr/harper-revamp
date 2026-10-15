@@ -402,6 +402,17 @@ const CircularCarousel = ({
       const s = settingsRef.current;
       const rect = root.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
+      if (s.layout.billboard) {
+        state.fit = 1;
+        state.orbitX = rect.width * (rect.width <= 600 ? 0.58 : rect.width > 900 ? 0.49 : 0.46);
+        state.orbitY = Math.min(255, (rect.height - (s.captions ? CAPTION_SPACE : 0)) * (rect.width <= 900 ? 0.39 : rect.height < 800 ? 0.36 : 0.34));
+        if (rect.width > 900 && rect.height < 800) state.orbitY -= 30;
+        state.backLift = rect.width > 900 && rect.height < 800 ? 58 : rect.width <= 600 && rect.height < 700 ? 18 : 10;
+        state.drop = rect.height + s.cardH;
+        stage.style.perspective = `${s.perspective}px`;
+        stage.style.transform = `translate3d(0, ${-rect.height * 0.06}px, 0)`;
+        return;
+      }
       const room = s.captions ? CAPTION_SPACE : 0;
       const width = rect.width * 0.94;
       const height = (rect.height - room) * 0.92;
@@ -560,7 +571,10 @@ const CircularCarousel = ({
       const angle = state.angle + spinOffset;
       const R = s.radius * swell;
 
-      if (s.axis === 'x') {
+      if (s.layout.billboard) {
+        camera.style.transform = 'none';
+        ring.style.transform = 'none';
+      } else if (s.axis === 'x') {
         camera.style.transform = `translate3d(0, 0, ${-R}px) rotateY(${s.tilt + state.yaw}deg) rotateX(${state.pitch}deg)`;
         ring.style.transform = `rotateX(${-angle}deg)`;
       } else if (s.layout.inward) {
@@ -580,7 +594,13 @@ const CircularCarousel = ({
         const world = wrap(base + angle);
         const facing = Math.cos(world * TO_RAD);
         let transform;
-        if (s.axis === 'x') {
+        if (s.layout.billboard) {
+          const x = Math.sin(world * TO_RAD) * state.orbitX;
+          const y = facing * state.orbitY - state.backLift * (1 - facing) / 2 + mod.lift;
+          const z = (facing - 1) * 90;
+          const scale = 0.72 + 0.28 * (facing + 1) / 2;
+          transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) scale(${scale.toFixed(3)})`;
+        } else if (s.axis === 'x') {
           transform = `rotateX(${-base}deg) translateZ(${r}px)`;
         } else if (s.layout.inward) {
           transform = `rotateY(${base}deg) translateZ(${-r}px)`;
@@ -588,9 +608,7 @@ const CircularCarousel = ({
           transform = `rotateY(${base}deg) translateZ(${r}px)`;
           if (s.layout.billboard) transform += ` rotateY(${-(base + angle)}deg)`;
         }
-        // Lift distant orbit cards to open a clear, elliptical space around the title.
-        if (s.layout.billboard) transform += ` translateY(${(-58 * (1 - facing)).toFixed(1)}px)`;
-        if (mod.lift) transform += s.axis === 'x' ? ` translateX(${mod.lift}px)` : ` translateY(${mod.lift}px)`;
+        if (mod.lift && !s.layout.billboard) transform += s.axis === 'x' ? ` translateX(${mod.lift}px)` : ` translateY(${mod.lift}px)`;
         card.style.transform = transform;
 
         if (s.layout.inward) card.style.visibility = Math.abs(world) > 86 ? 'hidden' : '';
@@ -979,11 +997,6 @@ const CircularCarousel = ({
           <span key={active} className="circular-carousel__title">
             {current.subtitle && <span className="circular-carousel__subtitle">{current.subtitle}</span>}
             <span className="circular-carousel__hotel">{current.title || current.alt}</span>
-          </span>
-          <span className="circular-carousel__count">
-            <Digits value={active + 1} />
-            <span className="circular-carousel__slash">/</span>
-            <span>{String(count).padStart(2, '0')}</span>
           </span>
         </div>
       )}
