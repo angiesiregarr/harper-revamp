@@ -75,12 +75,18 @@
   height: auto;
   padding: 14px;
   box-sizing: border-box;
-  background: #fff8ee;
-  border: 1px solid rgb(255 255 255 / 70%);
+  padding: 11px;
+  background: rgb(255 255 255 / 14%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 68%);
   color: #30200f;
   cursor: default;
+  transition: background-color .35s ease, transform .35s ease, box-shadow .35s ease;
 }
-.offers .offer-card-content { display: block; }
+.offers .pixel-card.offer-card:hover,
+.offers .pixel-card.offer-card:focus-within { background: #fff; }
+.offers .offer-card-content { display: block; width: 100%; }
 .offers .pixel-card .offer-body p:not(.card-kicker) {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -89,10 +95,17 @@
   height: 2.96em;
 }
 .offers .pixel-card .offer-body a {
+  border: 1px solid #9e540e;
+  border-image: none;
+  border-radius: 0;
+  background: #f08b1d;
+  color: #281b10;
   opacity: 0;
   transform: translateY(8px);
   transition: opacity .25s ease, transform .3s ease, background .25s, color .25s;
 }
+.offers .pixel-card .offer-body a:hover,
+.offers .pixel-card .offer-body a:focus-visible { background: #d9780d; color: #281b10; }
 .offers .pixel-card:hover .offer-body a,
 .offers .pixel-card:focus-within .offer-body a,
 .offers .pixel-card:focus-visible .offer-body a {

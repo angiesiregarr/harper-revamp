@@ -203,6 +203,30 @@ function setupReveals() {
   items.forEach((item) => observer.observe(item));
 }
 
+function setupTextAnimations() {
+  const selectors = [
+    '#hero-title', '#hotels-title', '#offers-title', '#journal-title',
+    '#moments-title', '#membership-title', '.membership-copy h3', '.footer-invite h2',
+    '.hotels .section-kicker', '.offers-intro .section-kicker',
+    '.offers-intro > p:not(.section-kicker)', '.news-heading .section-kicker',
+    '.moments .section-kicker', '.moments-hint',
+    '.membership-intro > p:not(.section-kicker)', '.footer-invite p:not(.section-kicker)',
+  ];
+  const items = [...document.querySelectorAll(selectors.join(','))];
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('text-motion-shown');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px 36px 0px' });
+  items.forEach((item, index) => {
+    item.classList.add('text-motion', index % 2 ? 'text-motion-fold' : 'text-motion-blur');
+    observer.observe(item);
+  });
+}
+
 function setupScrollMotion() {
   const nav = document.getElementById('site-nav');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -272,5 +296,6 @@ setupSectionAnchors();
 setupMembershipMotion();
 setupMoments();
 setupReveals();
+setupTextAnimations();
 setupScrollMotion();
 document.getElementById('year').textContent = new Date().getFullYear();
