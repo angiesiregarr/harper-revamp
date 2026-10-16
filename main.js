@@ -102,31 +102,36 @@ function setupSectionAnchors() {
 function setupMembershipMotion() {
   const section = document.getElementById('membership');
   const stage = section.querySelector('.membership-stage');
-  const app = section.querySelector('.membership-app');
+  const prints = [...section.querySelectorAll('.membership-print')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = value => Math.max(0, Math.min(1, value));
-  const smooth = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
   let frame = 0;
   function update() {
     frame = 0;
-    if (reduced.matches) {
-      section.style.setProperty('--expand-progress', 0);
-      section.style.setProperty('--app-progress', 1);
-      app.inert = false;
-      app.classList.add('is-interactive');
-      return;
-    }
-    const header = parseFloat(getComputedStyle(section).getPropertyValue('--header-space')) ||
-      document.getElementById('site-nav').getBoundingClientRect().height +
-      (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--booking-offset')) || 0);
+    const header = document.getElementById('site-nav').getBoundingClientRect().height;
     const distance = Math.max(1, section.getBoundingClientRect().height - stage.getBoundingClientRect().height);
     const progress = clamp((header - section.getBoundingClientRect().top) / distance);
-    const expand = smooth((progress - .25) / .4);
-    const reveal = smooth((progress - .65) / .25);
-    section.style.setProperty('--expand-progress', expand.toFixed(4));
-    section.style.setProperty('--app-progress', reveal.toFixed(4));
-    app.inert = progress < .69;
-    app.classList.toggle('is-interactive', progress >= .69);
+    const width = stage.clientWidth;
+    const height = stage.clientHeight;
+    const mobile = width < 650;
+    const radiusX = width * (mobile ? .39 : .43);
+    const radiusY = height * (mobile ? .28 : .34);
+    prints.forEach((print, index) => {
+      // Photos develop out of the phone's center and curl toward the edges.
+      // The short fade at either end of the cycle conceals each reset.
+      const phase = reduced.matches ? (index + .5) / prints.length : ((index + .5) / prints.length + progress * .77) % 1;
+      const spiral = phase * Math.PI * 2;
+      const angle = index * 2.39996 + spiral * 1.85 - .65;
+      const radius = .28 + phase * .78;
+      const x = Math.cos(angle) * radiusX * radius;
+      const y = Math.sin(angle) * radiusY * radius;
+      const scale = .68 + phase * .52;
+      const fadeIn = clamp((phase - .02) / .13);
+      const fadeOut = clamp((1 - phase) / .12);
+      print.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${(Math.sin(angle) * 6).toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+      print.style.opacity = (reduced.matches ? .78 : fadeIn * fadeOut * .92).toFixed(3);
+      print.style.zIndex = String(Math.round(phase * 10));
+    });
   }
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
   window.addEventListener('scroll', schedule, {passive:true});
@@ -245,11 +250,11 @@ function setupReveals() {
 function setupTextAnimations() {
   const selectors = [
     '#hero-title', '#hotels-title', '#offers-title', '#journal-title',
-    '#moments-title', '#membership-title', '.membership-copy h3', '.footer-invite h2',
+    '#moments-title', '.footer-invite h2',
     '.hotels .section-kicker', '.offers-intro .section-kicker',
     '.offers-intro > p:not(.section-kicker)', '.news-heading .section-kicker',
     '.moments .section-kicker', '.moments-hint',
-    '.membership-intro > p:not(.section-kicker)', '.footer-invite p:not(.section-kicker)',
+    '.footer-invite p:not(.section-kicker)',
   ];
   const items = [...document.querySelectorAll(selectors.join(','))];
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
