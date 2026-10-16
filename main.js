@@ -186,7 +186,7 @@ function setupMoments() {
 
 function setupSectionPortalMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const sections = [...document.querySelectorAll('.hero, .hotels, .offers, .news-section, .moments, .membership, .footer')];
+  const sections = [...document.querySelectorAll('.hero, .hotels, .offers, .news-section, .journal-cloud-transition, .moments, .membership, .footer')];
   sections.forEach(section => section.classList.add('portal-ready'));
   const clamp = value => Math.max(0, Math.min(1, value));
   let frame = 0;

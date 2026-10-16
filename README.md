@@ -16,7 +16,7 @@ Run `npm install` once, then open <http://localhost:4173>. The build bundles the
 - `?city=jakarta`, `?city=bali`, `?city=yogyakarta` and `?city=makassar` select city routes. Jakarta is the default. The hotel gallery previews images on hover, keyboard focus, or tap without navigating.
 - The navigation stays at the top and becomes more compact on scroll without changing link font sizes. Its Book Now button opens the booking dialog.
 - Offer cards scroll past a pinned title on desktop. The title returns to normal flow on smaller screens.
-- The Journal presents six linked articles on a raised editorial paper panel, with the supplied floral background. The supplied cloud artwork leads into the gray Moments section.
+- The Journal presents six linked articles on a raised ivory panel over a matching floral paper surface. A separate linear-gradient frame blends the supplied grayscale cloud artwork into the gray Moments section.
 - The Moments gallery shows five social previews with arrow-key, button, side-card, and touch-swipe navigation. The previews currently link to Harper's Instagram profile; individual reel URLs are not in the project.
 - The hero has a two-line heading, orange membership accents, and a draggable React Bits image orbit. Each major section has a distinct scroll entrance; the supplied title ornaments change from color to white over darker backgrounds. Decorative motion is disabled or simplified for reduced-motion users.
 - Booking and membership links lead to the official Harper or Archipelago websites. Journal cards link to their article pages.
