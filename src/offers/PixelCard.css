@@ -73,19 +73,21 @@
   align-self: start;
   width: 100%;
   height: auto;
-  padding: 14px;
   box-sizing: border-box;
   padding: 11px;
   background: rgb(255 255 255 / 14%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgb(255 255 255 / 68%);
-  color: #30200f;
+  color: #fff;
+  text-shadow: 0 1px 4px rgb(96 49 7 / 65%);
   cursor: default;
-  transition: background-color .35s ease, transform .35s ease, box-shadow .35s ease;
+  transition: background-color .35s ease, color .35s ease, transform .35s ease, box-shadow .35s ease;
 }
 .offers .pixel-card.offer-card:hover,
-.offers .pixel-card.offer-card:focus-within { background: #fff; }
+.offers .pixel-card.offer-card:focus-within { background: #fff; color: #3b3b3b; text-shadow: none; }
+.offers .pixel-card .offer-image span,
+.offers .pixel-card .offer-body a { text-shadow: none; }
 .offers .offer-card-content { display: block; width: 100%; }
 .offers .pixel-card .offer-body p:not(.card-kicker) {
   display: -webkit-box;
