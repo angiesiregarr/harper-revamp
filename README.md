@@ -16,14 +16,14 @@ Run `npm install` once, then open <http://localhost:4173>. The build bundles the
 - `?city=jakarta`, `?city=bali`, `?city=yogyakarta` and `?city=makassar` select city routes. Jakarta is the default. The hotel gallery previews images on hover, keyboard focus, or tap without navigating.
 - The navigation stays at the top and becomes more compact on scroll without changing link font sizes. Its Book Now button opens the booking dialog.
 - Offer cards scroll past a pinned title on desktop. The title returns to normal flow on smaller screens.
-- The Journal presents six linked articles in an editorial grid, with the supplied floral background. The supplied cloud artwork leads into the gray Moments section.
+- The Journal presents six linked articles on a raised editorial paper panel, with the supplied floral background. The supplied cloud artwork leads into the gray Moments section.
 - The Moments gallery shows five social previews with arrow-key, button, side-card, and touch-swipe navigation. The previews currently link to Harper's Instagram profile; individual reel URLs are not in the project.
-- The hero has a two-line heading, orange membership accents, and a draggable React Bits image orbit. Section content reveals on entry, and Journal and Moments frames respond gently to scroll. Decorative motion is disabled or simplified for reduced-motion users.
+- The hero has a two-line heading, orange membership accents, and a draggable React Bits image orbit. Each major section has a distinct scroll entrance; the supplied title ornaments change from color to white over darker backgrounds. Decorative motion is disabled or simplified for reduced-motion users.
 - Booking and membership links lead to the official Harper or Archipelago websites. Journal cards link to their article pages.
 
 ## React Bits Pro
 
-`components.json` includes the React Bits Pro registry aliases and references `REACTBITS_LICENSE_KEY` through the Authorization header. The shadcn installer validates the setup but stops because `REACTBITS_LICENSE_KEY` is not configured in this workspace. Once the key is available, run `npx shadcn@latest add @reactbits-starter/scroll-portal-tw`, then integrate the returned React component into the site's build. The current Journal and Moments scroll transitions use the site's local JavaScript and CSS.
+`components.json` includes the React Bits Pro registry aliases and references `REACTBITS_LICENSE_KEY` through the Authorization header. The shadcn installer validates the setup but stops because `REACTBITS_LICENSE_KEY` is not configured in this workspace. Once the key is available, run `npx shadcn@latest add @reactbits-starter/scroll-portal-tw`, then integrate the returned React component into the site's build. The current scroll entrances use the site's local JavaScript and CSS.
 
 ## Deployment
 

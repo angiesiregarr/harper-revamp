@@ -851,3 +851,58 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .news-read>span::after{content:"";position:absolute;top:-1px;right:-1px;width:16px;height:1.5px;background:currentColor;transform:rotate(-45deg);transform-origin:right center}
 @media(min-width:901px) and (max-height:950px){.moments{padding-top:140px;padding-bottom:65px}.moments .section-heading{margin-bottom:35px}.moments-window{height:410px}.moments-track a,.moments-track a:nth-child(5n+3){width:210px}}
 @media(prefers-reduced-motion:no-preference){.news-track,.moments-window{scale:var(--section-portal-scale,1);transform-origin:center center}}
+
+/* Brand-supplied title ornaments, paired by section contrast. */
+:root{--section-gutter:clamp(28px,8vw,150px)}
+body{background:#e8e2d9}
+.section-pad{padding-inline:var(--section-gutter)}
+.section-kicker{gap:clamp(9px,1.5vw,22px)}
+.section-kicker>span{display:none}
+.section-kicker::before,.section-kicker::after{content:"";display:block;flex:0 1 clamp(34px,9vw,132px);height:25px;background-repeat:no-repeat;background-position:center;background-size:contain;pointer-events:none}
+.section-kicker::before{background-image:url('./assets/title-accent-left-color.png')}
+.section-kicker::after{background-image:url('./assets/title-accent-right-color.png')}
+:is(.offers,.moments,.footer) .section-kicker::before{background-image:url('./assets/title-accent-left-white.png')}
+:is(.offers,.moments,.footer) .section-kicker::after{background-image:url('./assets/title-accent-right-white.png')}
+:is(.offers,.moments,.footer) .section-kicker{color:#fff}
+.membership-intro .section-kicker,.membership-copy .section-kicker{color:#a64c00}
+.membership-intro .section-kicker::before,.membership-copy .section-kicker::before{background-image:url('./assets/title-accent-left-color.png')}
+.membership-intro .section-kicker::after,.membership-copy .section-kicker::after{background-image:url('./assets/title-accent-right-color.png')}
+.footer-invite{padding-inline:var(--section-gutter)}
+.footer-main,.footer-bottom{padding-inline:var(--section-gutter)}
+.footer-invite .section-kicker{justify-content:flex-start;color:#fff}
+.offers-layout,.offer-list{max-width:1220px}
+.hotels .hotel-content{max-width:1240px}
+@media(min-width:901px){.membership-intro{left:8%}.membership-tile-one{left:6%}.membership-tile-three{left:5%}.membership-tile-two{right:6%}.membership-tile-four{right:5%}}
+
+/* A raised paper sheet sits partly over the warm Offers section. */
+.news-section{z-index:4;width:calc(100% - clamp(48px,7.4vw,160px));max-width:1380px;margin:-88px auto 0;padding:76px clamp(32px,6.1vw,96px) 182px;background:#faf8f3;border:1px solid #ffffffdf;box-shadow:0 -12px 50px #713a102c,0 24px 70px #53463d20;transform-origin:50% 0;overflow:hidden}
+.news-section::before{background-size:min(1250px,110vw) auto;opacity:.32}
+.news-heading{margin-bottom:58px}
+.news-track{max-width:1200px;gap:48px 32px}
+.news-photo{box-shadow:0 6px 15px #6f625214}
+.news-card:nth-child(3n+2){margin-top:-24px}
+.moments{z-index:5;margin-top:-40px;padding:210px var(--section-gutter) 100px;background:#808285}
+.moments::before{top:-210px;height:650px;background-position:center top;background-size:100% auto;filter:grayscale(1) saturate(0) contrast(.92);opacity:var(--portal-cloud-opacity,1)}
+.moments-window{max-width:1250px}
+@media(max-width:900px){.news-section{width:calc(100% - 48px);margin-top:-54px;padding:65px 32px 150px}.moments{margin-top:-22px;padding:160px 32px 80px}.moments::before{top:-150px;height:490px;background-size:auto 510px}}
+@media(max-width:650px){:root{--section-gutter:24px}.section-kicker::before,.section-kicker::after{flex-basis:clamp(27px,13vw,52px);height:18px}.news-section{width:calc(100% - 22px);margin-top:-32px;padding:52px 18px 110px}.news-heading{margin-bottom:42px}.news-track{gap:34px 18px}.moments{padding:145px 0 68px;margin-top:-12px}.moments::before{top:-110px;height:380px;background-size:auto 390px}.footer-invite,.footer-main,.footer-bottom{padding-inline:24px}}
+
+/* Distinct scroll entrances; all geometry remains in normal flow. */
+@media(prefers-reduced-motion:no-preference){
+ .hero.portal-ready::after{content:"";position:absolute;inset:0;z-index:8;pointer-events:none;background:radial-gradient(circle at 50% 48%,#fff4e8 0,#fff4e8d9 43%,#fff4e838 100%);animation:hero-portal-bloom 1.3s cubic-bezier(.22,1,.36,1) both}
+ @keyframes hero-portal-bloom{from{opacity:1}to{opacity:0}}
+ .hotels.portal-ready{clip-path:circle(var(--portal-circle,150%) at 50% 44%)}
+ .offers.portal-ready{clip-path:inset(0 var(--portal-curtain,0%) round var(--portal-radius,0px))}
+ .news-section.portal-ready{translate:0 var(--portal-lift,0px);scale:var(--portal-scale,1);opacity:var(--portal-opacity,1)}
+ .moments.portal-ready>.section-heading,.moments.portal-ready>.moments-window,.moments.portal-ready>.moments-controls{filter:blur(var(--portal-blur,0px));opacity:var(--portal-opacity,1)}
+ .membership.portal-ready .membership-stage::after{content:"";position:absolute;inset:0;z-index:15;pointer-events:none;background:radial-gradient(circle at 50% 45%,#fffaf2 0,#fffaf2d9 27%,#fffaf260 65%,transparent 100%);opacity:var(--portal-bloom,0)}
+ .footer.portal-ready .footer-invite,.footer.portal-ready .footer-main{translate:0 var(--portal-lift,0px);opacity:var(--portal-opacity,1)}
+ .news-track,.moments-window{scale:1}
+}
+@media(max-width:800px) and (prefers-reduced-motion:no-preference){.hotels.portal-ready,.offers.portal-ready{clip-path:none}.hotels.portal-ready .section-heading,.offers.portal-ready .offers-intro{opacity:var(--portal-opacity,1)}.moments.portal-ready>.section-heading,.moments.portal-ready>.moments-window,.moments.portal-ready>.moments-controls{filter:none}}
+@media(prefers-reduced-motion:reduce){.hero.portal-ready::after,.membership.portal-ready .membership-stage::after{display:none}.hotels,.offers,.news-section,.moments,.footer{clip-path:none!important;translate:none!important;scale:1!important;filter:none!important;opacity:1!important}.moments::before{opacity:1}}
+/* Keep the last article readable before the cloud crosses the paper edge. */
+@media(min-width:901px){.news-section{width:calc(100% - clamp(76px,14vw,240px));padding-inline:clamp(32px,3.7vw,62px);padding-bottom:300px}}
+@media(min-width:651px) and (max-width:900px){.news-section{padding-bottom:235px}}
+@media(max-width:650px){.news-section{padding-bottom:160px}}
+@media(prefers-reduced-motion:no-preference){.news-section.portal-ready .news-track{clip-path:inset(var(--portal-paper-cut,0%) 0 0 0)}}

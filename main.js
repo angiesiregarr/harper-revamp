@@ -186,17 +186,37 @@ function setupMoments() {
 
 function setupSectionPortalMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const frames = [...document.querySelectorAll('.news-track, .moments-window')];
+  const sections = [...document.querySelectorAll('.hero, .hotels, .offers, .news-section, .moments, .membership, .footer')];
+  sections.forEach(section => section.classList.add('portal-ready'));
+  const clamp = value => Math.max(0, Math.min(1, value));
   let frame = 0;
   function update() {
     frame = 0;
-    frames.forEach(element => {
-      if (reduced.matches) { element.style.removeProperty('--section-portal-scale'); return; }
-      const rect = element.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (innerHeight - rect.top) / (innerHeight * .85)));
+    if (reduced.matches) {
+      sections.forEach(section => section.style.removeProperty('--portal-progress'));
+      return;
+    }
+    const height = innerHeight;
+    const mobile = innerWidth <= 800;
+    for (const section of sections) {
+      if (section.classList.contains('hero')) continue;
+      const bounds = section.getBoundingClientRect();
+      if (bounds.bottom < -100 || bounds.top > height + 100) continue;
+      const progress = clamp((height - bounds.top) / (height * (mobile ? .62 : .72)));
       const eased = progress * progress * (3 - 2 * progress);
-      element.style.setProperty('--section-portal-scale', (0.94 + eased * .06).toFixed(4));
-    });
+      const remaining = 1 - eased;
+      section.style.setProperty('--portal-progress', eased.toFixed(4));
+      section.style.setProperty('--portal-circle', `${(18 + 132 * eased).toFixed(2)}%`);
+      section.style.setProperty('--portal-curtain', `${(mobile ? 0 : 11 * remaining).toFixed(2)}%`);
+      section.style.setProperty('--portal-radius', `${(22 * remaining).toFixed(2)}px`);
+      section.style.setProperty('--portal-lift', `${((mobile ? 24 : 54) * remaining).toFixed(2)}px`);
+      section.style.setProperty('--portal-scale', (1 - (mobile ? .025 : .065) * remaining).toFixed(4));
+      section.style.setProperty('--portal-blur', `${(mobile ? 0 : 5 * remaining).toFixed(2)}px`);
+      section.style.setProperty('--portal-opacity', (1 - .42 * remaining).toFixed(4));
+      section.style.setProperty('--portal-cloud-opacity', (1 - .44 * remaining).toFixed(4));
+      section.style.setProperty('--portal-paper-cut', `${((mobile ? 4 : 6) * remaining).toFixed(2)}%`);
+      section.style.setProperty('--portal-bloom', (0.74 * remaining).toFixed(4));
+    }
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(update); }
   addEventListener('scroll', schedule, {passive:true});
