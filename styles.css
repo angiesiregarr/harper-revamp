@@ -677,13 +677,13 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 @media(max-width:800px){.hero-building{top:clamp(65px,9svh,100px)}.hero-orbit{inset:clamp(70px,8svh,100px) 2% 30px}}
 @media(max-width:600px){.hero-building{top:clamp(76px,10svh,105px)}.hero-orbit{inset:clamp(70px,8svh,100px) 0 25px}}
 
-/* The Grainient fills the first viewport, including behind the transparent nav. */
-.hero.hero-orbit-stage{height:100svh;min-height:520px;margin:calc(-1 * var(--top-nav-height)) 0 0;background:#f08b1d;overflow:hidden;isolation:isolate}
+/* The PatternWaves surface fills the first viewport, including behind the nav. */
+.hero.hero-orbit-stage{height:100svh;min-height:520px;margin:calc(-1 * var(--top-nav-height)) 0 0;background:#f9f2eb;overflow:hidden;isolation:isolate}
 .site-nav{transition:min-height .28s ease,padding .28s ease,background-color .28s ease,backdrop-filter .28s ease}
 .site-nav.is-over-hero{background:rgb(255 244 232 / 82%);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:none}
 .site-nav.is-over-hero.is-compact{background:rgb(255 244 232 / 93%)}
-.hero-grainient{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:1;mix-blend-mode:normal}
-.hero-grainient .grainient-container{width:100%;height:100%}
+.hero-pattern-waves{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-pattern-waves .pattern-waves{width:100%;height:100%}
 .hero-orbit-stage .hero-heading{position:absolute;inset:0;display:grid;place-items:center;z-index:8;text-align:center;pointer-events:none;transform:translateY(-70px)}
 .hero-orbit-stage h1{margin:0;display:grid;gap:.04em;max-width:90%;font:400 clamp(44px,4.55vw,69px)/.98 var(--serif);letter-spacing:-.045em;text-transform:uppercase;white-space:normal;color:#28221d;text-shadow:0 2px 22px rgb(255 235 197 / 95%),0 0 3px rgb(255 244 228 / 75%)}
 .hero-orbit-stage h1 span{display:block;white-space:nowrap}
@@ -727,7 +727,7 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
  .booking-sheet .booking-bar{padding:20px!important}
 }
 /* Place the orbit at the edges of the message and keep its lettering legible. */
-.hero-orbit-stage .hero-heading::before{content:'';position:absolute;left:50%;top:50%;width:min(850px,82vw);height:min(340px,44svh);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(255,222,168,.76) 0%,rgba(255,222,168,.48) 43%,transparent 73%);pointer-events:none}
+.hero-orbit-stage .hero-heading::before{display:none}
 .hero-orbit-stage h1{position:relative;z-index:1}
 .hero-accent-left{left:-3%;top:7%;transform:rotate(132deg) scale(.95)}
 .hero-accent-right{right:-2%;bottom:2%;transform:rotate(-21deg) scale(1.08)}

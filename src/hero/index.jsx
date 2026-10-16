@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import CircularCarousel from './CircularCarousel.jsx';
-import Grainient from './Grainient.jsx';
+import PatternWaves from './PatternWaves.jsx';
 
 const items = [
   { src: './assets/harper-room-01.jpg', alt: 'Guest room with terrace at Harper Kuta Bali', title: 'Harper Kuta Bali', subtitle: 'Kuta, Indonesia', position: '53% center' },
@@ -53,19 +53,26 @@ if (mount) {
   createRoot(mount).render(<HeroOrbit />);
 }
 
-const background = document.getElementById('hero-grainient');
+const background = document.getElementById('hero-pattern-waves');
 if (background) {
   createRoot(background).render(
-    <Grainient
-      colors={['#d5d5d5', '#f38a18', '#F3A24A', '#F08B1D']}
-      angle={41}
-      flow={0.8}
-      silk={0.35}
-      grainAmount={0.08}
-      grainSize={0.6}
-      lightMode
-      interactive={false}
-      clickSwirl={false}
+    <PatternWaves
+      preset="ocean"
+      color="#fbfbfb"
+      backgroundColor="#f9f2eb"
+      fade="edges"
+      interactive
+      cursorSize={50}
+      cursorStrength={0.6}
+      wave="ripple"
+      spacing={16}
+      markSize={0.65}
+      depth={0.55}
+      light={28}
+      shine={1}
+      contrast={1.35}
+      speed={0.45}
+      direction={100}
     />
   );
 }
