@@ -23,7 +23,7 @@ Run `npm install` once, then open <http://localhost:4173>. The build bundles the
 
 ## React Bits Pro
 
-`components.json` includes the React Bits Pro registry aliases and references `REACTBITS_LICENSE_KEY` through the Authorization header. Scroll Portal is not installed yet because the key is not configured in this workspace and the Pro registry is unreachable here. Once the key and registry access are available, run `npx shadcn@latest add @reactbits-starter/scroll-portal-tw`, then integrate the returned React component into the site's build. The current Journal and Moments scroll transitions use the site's local JavaScript and CSS.
+`components.json` includes the React Bits Pro registry aliases and references `REACTBITS_LICENSE_KEY` through the Authorization header. The shadcn installer validates the setup but stops because `REACTBITS_LICENSE_KEY` is not configured in this workspace. Once the key is available, run `npx shadcn@latest add @reactbits-starter/scroll-portal-tw`, then integrate the returned React component into the site's build. The current Journal and Moments scroll transitions use the site's local JavaScript and CSS.
 
 ## Deployment
 
