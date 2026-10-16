@@ -102,6 +102,7 @@ function setupSectionAnchors() {
 function setupMembershipMotion() {
   const section = document.getElementById('membership');
   const stage = section.querySelector('.membership-stage');
+  const visual = section.querySelector('.membership-visual');
   const prints = [...section.querySelectorAll('.membership-print')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const clamp = value => Math.max(0, Math.min(1, value));
@@ -111,24 +112,22 @@ function setupMembershipMotion() {
     const header = document.getElementById('site-nav').getBoundingClientRect().height;
     const distance = Math.max(1, section.getBoundingClientRect().height - stage.getBoundingClientRect().height);
     const progress = clamp((header - section.getBoundingClientRect().top) / distance);
-    const width = stage.clientWidth;
-    const height = stage.clientHeight;
-    const mobile = width < 650;
-    const radiusX = width * (mobile ? .39 : .43);
-    const radiusY = height * (mobile ? .28 : .34);
+    const width = visual.clientWidth;
+    const height = visual.clientHeight;
+    const radiusX = width * .48;
+    const radiusY = height * .48;
     prints.forEach((print, index) => {
       // Photos develop out of the phone's center and curl toward the edges.
       // The short fade at either end of the cycle conceals each reset.
-      const phase = reduced.matches ? (index + .5) / prints.length : ((index + .5) / prints.length + progress * .77) % 1;
-      const spiral = phase * Math.PI * 2;
-      const angle = index * 2.39996 + spiral * 1.85 - .65;
-      const radius = .28 + phase * .78;
+      const phase = reduced.matches ? (index + .5) / prints.length : ((index + .5) / prints.length + progress * .58) % 1;
+      const angle = phase * Math.PI * 3.4 - 1.2;
+      const radius = .28 + phase * .7;
       const x = Math.cos(angle) * radiusX * radius;
       const y = Math.sin(angle) * radiusY * radius;
-      const scale = .68 + phase * .52;
+      const scale = .77 + phase * .3;
       const fadeIn = clamp((phase - .02) / .13);
       const fadeOut = clamp((1 - phase) / .12);
-      print.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${(Math.sin(angle) * 6).toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+      print.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${(Math.sin(angle) * 4).toFixed(1)}deg) scale(${scale.toFixed(3)})`;
       print.style.opacity = (reduced.matches ? .78 : fadeIn * fadeOut * .92).toFixed(3);
       print.style.zIndex = String(Math.round(phase * 10));
     });
