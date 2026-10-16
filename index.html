@@ -8,11 +8,11 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=974b83e69d53" />
+    <link rel="stylesheet" href="./styles.css?v=314cbc8dd6dc" />
     <link rel="stylesheet" href="./hero-carousel.css?v=0708285b1e7a" />
     <link rel="stylesheet" href="./offers-pixel.css?v=2619944de854" />
     <script>document.documentElement.classList.add('js');</script>
-    <script src="./main.js?v=1c7d02990374" defer></script>
+    <script src="./main.js?v=d424c59bf81c" defer></script>
     <script src="./hero-carousel.js?v=55499e05dd84" defer></script>
     <script src="./offers-pixel.js?v=911307990b3b" defer></script>
   </head>
@@ -89,13 +89,9 @@
 
       <section class="journal news-section" id="journal" aria-labelledby="journal-title">
         <div class="news-heading">
-          <div><p class="section-kicker">News inside Harper</p><h2 id="journal-title">The Journal</h2></div>
-          <div class="news-controls" aria-label="News navigation">
-            <button type="button" data-news-direction="-1" aria-label="Previous news" aria-controls="news-track">←</button>
-            <button type="button" data-news-direction="1" aria-label="Next news" aria-controls="news-track">→</button>
-          </div>
+          <div><p class="section-kicker"><span aria-hidden="true">✣</span> News inside Harper <span aria-hidden="true">✣</span></p><h2 id="journal-title">The Journal</h2></div>
         </div>
-        <div class="news-track" id="news-track" role="region" aria-roledescription="carousel" aria-label="Harper news. Use left and right arrow keys to browse." tabindex="0">
+        <div class="news-track" id="news-track" aria-label="Harper journal articles">
           <a class="news-card" href="./news/recognition.html" aria-labelledby="news-recognition-title">
             <div class="news-photo"><img src="./assets/journal-award.png" alt="" loading="lazy" /></div>
             <div class="news-copy">
@@ -151,8 +147,6 @@
             </div>
           </a>
         </div>
-        <p class="news-position" aria-hidden="true"><span id="news-current">02</span> <span class="news-position-line"></span> <span id="news-total">06</span></p>
-        <p class="sr-only" id="news-status" aria-live="polite" aria-atomic="true"></p>
       </section>
 
       <section class="moments section-pad" id="moments" aria-labelledby="moments-title">
@@ -160,8 +154,7 @@
           <p class="section-kicker"><span>✣</span> Unscripted Harper <span>✣</span></p>
           <h2 id="moments-title">Your moments.<br />Our inspiration.</h2>
         </div>
-        <p class="moments-hint">A little of life at Harper. Hover or focus to pause, or swipe to explore.</p>
-        <div class="moments-window" aria-label="Harper moments gallery">
+        <div class="moments-window" aria-label="Harper social moments gallery">
           <div class="moments-track" id="moments-track">
             <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper moments on Instagram"><img src="./assets/moment-1.png" alt="Guest enjoying a quiet moment" loading="lazy" /></a>
             <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper dining moments on Instagram"><img src="./assets/moment-2.png" alt="Guests dining together" loading="lazy" /></a>
@@ -170,7 +163,7 @@
             <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper team moments on Instagram"><img src="./assets/moment-5.png" alt="Harper team member smiling" loading="lazy" /></a>
           </div>
         </div>
-        <a class="moments-more" href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer">Follow along @harperhotels <span aria-hidden="true">↗</span></a>
+        <div class="moments-controls" aria-label="Moments navigation"><button type="button" data-moment-direction="-1" aria-label="Previous moment" aria-controls="moments-track">←</button><span class="moments-position" aria-live="polite">01 / 05</span><button type="button" data-moment-direction="1" aria-label="Next moment" aria-controls="moments-track">→</button></div>
       </section>
 
       <section class="membership" id="membership" aria-labelledby="membership-title">

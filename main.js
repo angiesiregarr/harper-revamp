@@ -73,59 +73,18 @@ function setupMenu() {
 }
 
 function setupNews() {
-  const section = document.getElementById('journal');
-  const track = document.getElementById('news-track');
-  const cards = [...track.querySelectorAll('.news-card')];
-  const controls = [...document.querySelectorAll('[data-news-direction]')];
-  document.getElementById('news-total').textContent = String(cards.length).padStart(2, '0');
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  if (!reduced.matches && 'IntersectionObserver' in window) {
-    section.classList.add('is-entering');
-    const reveal = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        section.classList.remove('is-entering');
-        reveal.disconnect();
-      }
-    }, { threshold: 0.12 });
-    reveal.observe(section);
-  }
-  let active = 1, pending = 1, settleTimer, frame;
-  const target = index => cards[index].offsetLeft - track.offsetLeft - (track.clientWidth - cards[index].offsetWidth) / 2;
-  function highlight(index, announce = false) {
-    active = index;
-    cards.forEach((card, i) => card.classList.toggle('is-active', i === index));
-    controls[0].disabled = index === 0;
-    controls[1].disabled = index === cards.length - 1;
-    document.getElementById('news-current').textContent = String(index + 1).padStart(2, '0');
-    if (announce) document.getElementById('news-status').textContent = `Story ${index + 1} of ${cards.length}: ${cards[index].querySelector('h3').textContent}`;
-  }
-  function go(index, instant = false) {
-    pending = Math.max(0, Math.min(cards.length - 1, index));
-    track.scrollTo({left: target(pending), behavior: instant || reduced.matches ? 'instant' : 'smooth'});
-    if (instant) highlight(pending);
-  }
-  controls.forEach(button => button.addEventListener('click', () => go(pending + Number(button.dataset.newsDirection))));
-  track.addEventListener('keydown', event => {
-    const keys = {ArrowLeft: active - 1, ArrowRight: active + 1, Home: 0, End: cards.length - 1};
-    if (!(event.key in keys) || event.altKey || event.metaKey || event.ctrlKey) return;
-    event.preventDefault();
-    const index = Math.max(0, Math.min(cards.length - 1, keys[event.key]));
-    if (document.activeElement.matches('.news-card')) cards[index].focus({preventScroll:true});
-    go(index);
-  });
-  cards.forEach((card,index) => card.addEventListener('focus', () => go(index)));
-  track.addEventListener('scroll', () => {
-    if (!frame) frame = requestAnimationFrame(() => {
-      frame = 0;
-      const index = cards.reduce((best,card,i) => Math.abs(target(i)-track.scrollLeft) < Math.abs(target(best)-track.scrollLeft) ? i : best, 0);
-      highlight(index);
+  const cards = [...document.querySelectorAll('.news-card')];
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  cards.forEach(card => card.classList.add('portal-pending'));
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.remove('portal-pending');
+      entry.target.classList.add('portal-visible');
+      observer.unobserve(entry.target);
     });
-    clearTimeout(settleTimer);
-    settleTimer = setTimeout(() => { pending = active; highlight(active, true); }, 180);
-  }, {passive:true});
-  // Native scrolling supplies touch swipes and momentum; no drag interception.
-  new ResizeObserver(() => go(active, true)).observe(track);
-  go(active, true);
+  }, {threshold: .12, rootMargin: '0px 0px 48px 0px'});
+  cards.forEach(card => observer.observe(card));
 }
 
 function setupSectionAnchors() {
@@ -178,12 +137,72 @@ function setupMembershipMotion() {
 
 function setupMoments() {
   const track = document.getElementById('moments-track');
-  [...track.children].forEach((item) => {
-    const clone = item.cloneNode(true);
-    clone.setAttribute('aria-hidden', 'true');
-    clone.tabIndex = -1;
-    track.appendChild(clone);
+  const cards = [...track.querySelectorAll('a')];
+  const position = document.querySelector('.moments-position');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let active = 2;
+  let touchStart = null;
+  function render() {
+    const step = Math.min(285, Math.max(120, track.clientWidth * (window.innerWidth <= 650 ? .32 : .22)));
+    cards.forEach((card, index) => {
+      let offset = index - active;
+      if (offset > cards.length / 2) offset -= cards.length;
+      if (offset < -cards.length / 2) offset += cards.length;
+      const distance = Math.abs(offset);
+      card.style.setProperty('--x', `${offset * step}px`);
+      card.style.setProperty('--card-scale', distance === 0 ? (window.innerWidth <= 650 ? '1.12' : '1.28') : distance === 1 ? '1.01' : '.78');
+      card.style.setProperty('--card-opacity', distance === 2 ? '.76' : '1');
+      card.style.zIndex = String(5 - distance);
+      card.classList.toggle('is-current', distance === 0);
+      card.setAttribute('aria-current', distance === 0 ? 'true' : 'false');
+    });
+    position.textContent = `${String(active + 1).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')}`;
+  }
+  function go(step) { active = (active + step + cards.length) % cards.length; render(); }
+  document.querySelectorAll('[data-moment-direction]').forEach(button => button.addEventListener('click', () => go(Number(button.dataset.momentDirection))));
+  cards.forEach((card, index) => card.addEventListener('click', event => {
+    if (index === active) return;
+    event.preventDefault();
+    active = index;
+    render();
+  }));
+  track.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    go(event.key === 'ArrowRight' ? 1 : -1);
+    cards[active].focus({preventScroll: true});
   });
+  track.addEventListener('touchstart', event => { touchStart = event.changedTouches[0].clientX; }, {passive:true});
+  track.addEventListener('touchend', event => {
+    if (touchStart === null) return;
+    const difference = event.changedTouches[0].clientX - touchStart;
+    touchStart = null;
+    if (Math.abs(difference) > 40) go(difference < 0 ? 1 : -1);
+  }, {passive:true});
+  reduced.addEventListener('change', render);
+  window.addEventListener('resize', render);
+  render();
+}
+
+function setupSectionPortalMotion() {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const frames = [...document.querySelectorAll('.news-track, .moments-window')];
+  let frame = 0;
+  function update() {
+    frame = 0;
+    frames.forEach(element => {
+      if (reduced.matches) { element.style.removeProperty('--section-portal-scale'); return; }
+      const rect = element.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, (innerHeight - rect.top) / (innerHeight * .85)));
+      const eased = progress * progress * (3 - 2 * progress);
+      element.style.setProperty('--section-portal-scale', (0.94 + eased * .06).toFixed(4));
+    });
+  }
+  function schedule() { if (!frame) frame = requestAnimationFrame(update); }
+  addEventListener('scroll', schedule, {passive:true});
+  addEventListener('resize', schedule);
+  reduced.addEventListener('change', schedule);
+  schedule();
 }
 
 function setupReveals() {
@@ -295,6 +314,7 @@ setupNews();
 setupSectionAnchors();
 setupMembershipMotion();
 setupMoments();
+setupSectionPortalMotion();
 setupReveals();
 setupTextAnimations();
 setupScrollMotion();
