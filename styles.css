@@ -652,7 +652,7 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .hero h1{margin:0;font-size:clamp(40px,5.8vw,96px);line-height:1.08;letter-spacing:-.02em;white-space:nowrap}
 .hero-building{left:50%;top:clamp(96px,13svh,145px);height:min(78svh,710px);max-width:none;transform:translateX(-50%);z-index:3;translate:none}
 .hero-orbit{position:absolute;inset:clamp(110px,15svh,155px) 4% 76px;z-index:5;isolation:isolate}
-.hero-orbit .circular-carousel__card{filter:drop-shadow(0 12px 18px rgb(61 42 22 / 20%));opacity:calc(.6 + var(--cc-nearness, 1) * .4)}
+.hero-orbit .circular-carousel__card{filter:drop-shadow(0 12px 18px rgb(61 42 22 / 20%));opacity:calc(.76 + var(--cc-nearness, 1) * .24)}
 .hero-orbit .circular-carousel__frame{border:1px solid rgb(255 255 255 / 75%)}
 .hero-orbit .circular-carousel__view{pointer-events:auto}
 .site-nav.is-compact .primary-links a{font-size:inherit}
@@ -680,15 +680,20 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 /* The PatternWaves surface fills the first viewport, including behind the nav. */
 .hero.hero-orbit-stage{height:100svh;min-height:520px;margin:calc(-1 * var(--top-nav-height)) 0 0;background:#f9f2eb;overflow:hidden;isolation:isolate}
 .site-nav{transition:min-height .28s ease,padding .28s ease,background-color .28s ease,backdrop-filter .28s ease}
-.site-nav.is-over-hero{background:rgb(255 244 232 / 82%);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:none}
-.site-nav.is-over-hero.is-compact{background:rgb(255 244 232 / 93%)}
+.site-nav.is-over-hero,.site-nav.is-over-hero.is-compact{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+.site-nav .nav-book,.site-nav .nav-book:hover{border:0;border-image:none;border-radius:0;background:var(--orange);color:#261b12;box-shadow:none;filter:none;text-decoration:none}
+.site-nav .nav-book:hover{background:#dc7910}
 .hero-pattern-waves{position:absolute;inset:0;z-index:0;pointer-events:none}
 .hero-pattern-waves .pattern-waves{width:100%;height:100%}
+.hero-orbit-stage::before,.hero-orbit-stage::after{content:'';position:absolute;top:0;bottom:0;width:clamp(70px,12vw,180px);z-index:1;pointer-events:none}
+.hero-orbit-stage::before{left:0;background:linear-gradient(90deg,rgb(240 139 29 / 31%),transparent)}
+.hero-orbit-stage::after{right:0;background:linear-gradient(270deg,rgb(240 139 29 / 31%),transparent)}
 .hero-orbit-stage .hero-heading{position:absolute;inset:0;display:grid;place-items:center;z-index:8;text-align:center;pointer-events:none;transform:translateY(-70px)}
-.hero-orbit-stage h1{margin:0;display:grid;gap:.04em;max-width:90%;font:400 clamp(44px,4.55vw,69px)/.98 var(--serif);letter-spacing:-.045em;text-transform:uppercase;white-space:normal;color:#28221d;text-shadow:0 2px 22px rgb(255 235 197 / 95%),0 0 3px rgb(255 244 228 / 75%)}
+.hero-orbit-stage h1{margin:0;display:grid;gap:.04em;max-width:90%;font:400 clamp(40px,4.1vw,62px)/.98 var(--serif);letter-spacing:-.045em;text-transform:uppercase;white-space:normal;color:#28221d;text-shadow:0 2px 22px rgb(255 235 197 / 95%),0 0 3px rgb(255 244 228 / 75%)}
 .hero-orbit-stage h1 span{display:block;white-space:nowrap}
 .hero-orbit-stage .hero-orbit{position:absolute;inset:3% 0 2%;z-index:5}
-.hero-orbit-stage .circular-carousel__view{-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%)}
+.hero-orbit-stage .circular-carousel__view{-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 3%,#000 97%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 3%,#000 97%,transparent 100%)}
+.hero-orbit-stage .circular-carousel__photo{filter:grayscale(var(--cc-muted, 0)) saturate(calc(1 - var(--cc-muted, 0) * .52))}
 .hero-orbit-stage .circular-carousel__stage{translate:none}
 .hero-orbit-stage .circular-carousel__caption{bottom:1%;color:#31241b;text-shadow:0 1px 8px #ffdc9c;gap:3px}
 .hero-orbit-stage .circular-carousel__title{font-family:var(--serif);font-size:16px;gap:5px;line-height:1.2}
@@ -708,7 +713,7 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .booking-sheet .booking-popover{position:static!important;inset:auto!important;width:min(100%,440px)!important;max-height:min(42svh,340px)!important;margin:16px 0 0;box-shadow:none}
 @media(max-width:800px){
  .hero.hero-orbit-stage{height:100svh;min-height:500px}
- .hero-orbit-stage h1{font-size:clamp(39px,5.9vw,57px)!important;letter-spacing:-.045em}
+ .hero-orbit-stage h1{font-size:clamp(35px,5.3vw,51px)!important;letter-spacing:-.045em}
  .hero-orbit-stage .hero-heading{transform:translateY(-70px)}
  .hero-orbit-stage .hero-orbit{inset:3% 0 3%}
  .hero-accent{width:clamp(125px,25vw,220px)}
@@ -716,7 +721,7 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
  .booking-sheet{inset:auto 0 0;max-width:none;width:100%;border-radius:18px 18px 0 0}
 }
 @media(max-width:600px){
- .hero-orbit-stage h1{font-size:clamp(28px,7vw,38px)!important;max-width:96%;line-height:1.04}
+ .hero-orbit-stage h1{font-size:clamp(25px,6.3vw,34px)!important;max-width:96%;line-height:1.04}
  .hero-orbit-stage .hero-heading{transform:translateY(-90px)}
  .hero-orbit-stage .hero-orbit{inset:2% 0 4%}
  .hero-accent{width:145px}.hero-accent-left{left:-58px;top:11%}.hero-accent-right{right:-55px;bottom:13%}
