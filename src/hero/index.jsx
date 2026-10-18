@@ -142,7 +142,7 @@ function RusticOrbit() {
         changed = true;
         if (ratio === 1) move = null;
       } else if (!motion.matches && !document.hidden && !Object.values(paused.current).some(Boolean)) {
-        distance += 18 * elapsed; changed = true; // CSS pixels of arc length per second.
+        distance += 28 * elapsed; changed = true; // CSS pixels of arc length per second.
       }
       if (changed) paint(phaseAt(distance, geometry));
       frame = requestAnimationFrame(tick);
@@ -196,10 +196,8 @@ function RusticOrbit() {
         aria-current={index === active ? 'true' : undefined}
         aria-label={`Show ${room.hotel} room in ${room.place}${index === active ? ', featured' : ''}`}>
         <img src={room.src} alt={room.alt} style={{ objectPosition: room.position }} draggable="false" loading="eager" />
-        {index === active && <span className="rustic-orbit__caption" aria-hidden="true"><span className="rustic-orbit__hotel"><svg className="rustic-orbit__pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M19 9c0 5-7 12-7 12S5 14 5 9a7 7 0 0 1 14 0Z"/><circle cx="12" cy="9" r="2.3"/></svg><span><small>{room.place}, Indonesia</small><strong>{room.hotel}</strong></span></span><span className="rustic-orbit__count">{String(active + 1).padStart(2, '0')} / {String(rooms.length).padStart(2, '0')}</span></span>}
+        {index === active && <span className="rustic-orbit__caption" aria-hidden="true"><span className="rustic-orbit__hotel"><svg className="rustic-orbit__pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M19 9c0 5-7 12-7 12S5 14 5 9a7 7 0 0 1 14 0Z"/><circle cx="12" cy="9" r="2.3"/></svg><span><small>{room.place}, Indonesia</small><strong>{room.hotel}</strong></span></span></span>}
       </button>)}
-      <button className="rustic-orbit__arrow rustic-orbit__arrow--previous" type="button" onClick={() => controller.current?.step(-1)} aria-label="Previous hotel room"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 4.5-7.5 7.5 7.5 7.5"/></svg></button>
-      <button className="rustic-orbit__arrow rustic-orbit__arrow--next" type="button" onClick={() => controller.current?.step(1)} aria-label="Next hotel room"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 4.5 7.5 7.5-7.5 7.5"/></svg></button>
       <span className="visually-hidden" aria-live="polite">Featured room: {rooms[active].hotel}, {rooms[active].place}. Use left and right arrow keys or select a surrounding room.</span>
     </div>
   );
