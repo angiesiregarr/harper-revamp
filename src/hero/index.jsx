@@ -27,19 +27,19 @@ function makeGeometry(width, height) {
   const nearX = width * (mobile ? .44 : tablet ? .39 : .30);
   const outerX = width * (mobile ? .52 : tablet ? .47 : .42);
   const upperX = width * (mobile ? .29 : tablet ? .31 : .235);
-  const visibleOuter = mobile ? 0 : tablet ? .52 : .76;
-  const visibleUpper = mobile || tablet ? 0 : .65;
+  const visibleOuter = mobile ? 0 : 1;
+  const visibleUpper = mobile || tablet ? 0 : 1;
   const points = [
     [0, 0, frontWidth, frontHeight, 1],
-    [nearX, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, .93],
-    [outerX, mobile ? -72 : -79, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
-    [upperX, mobile ? -116 : -146, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
-    [width * .12, -169, 100, 86, 0],
-    [0, -180, 100, 86, 0],
-    [-width * .12, -169, 100, 86, 0],
-    [-upperX, mobile ? -116 : -146, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
-    [-outerX * .93, mobile ? -72 : -79, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
-    [-nearX * 1.04, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, .93],
+    [nearX, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, 1],
+    [outerX, -65, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
+    [upperX, mobile ? -100 : -108, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
+    [width * .12, mobile ? -119 : -137, 100, 86, 0],
+    [0, mobile ? -125 : -145, 100, 86, 0],
+    [-width * .12, mobile ? -119 : -137, 100, 86, 0],
+    [-upperX, mobile ? -100 : -108, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
+    [-outerX * .93, -65, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
+    [-nearX * 1.04, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, 1],
   ];
   const sample = phase => {
     const t = mod(phase, points.length), i = Math.floor(t), u = t - i;
@@ -80,7 +80,7 @@ function phaseAt(distance, geometry) {
 
 function RusticOrbit() {
   const [active, setActive] = useState(0);
-  const cardRefs = useRef([]), controller = useRef(null), touch = useRef(null), suppressClick = useRef(false);
+  const cardRefs = useRef([]), orbitRef = useRef(null), controller = useRef(null), touch = useRef(null), suppressClick = useRef(false);
   const paused = useRef({ hover: false, focus: false, touch: false, offscreen: false });
 
   useLayoutEffect(() => {
@@ -97,12 +97,17 @@ function RusticOrbit() {
         card.style.width = `${width}px`;
         card.style.height = `${height}px`;
         card.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`;
-        card.style.opacity = opacity;
+        // Keep the card surface solid while it crosses the left woven arc.
+        const leftEdge = orbitRef.current.clientWidth / 2 + x - width / 2;
+        const rattanOpacity = orbitRef.current.clientWidth < 640 && x < 0
+          ? Math.max(0, Math.min(1, (98 - leftEdge) / 30)) : 0;
+        const visibleOpacity = Math.max(opacity, rattanOpacity);
+        card.style.opacity = visibleOpacity;
         card.style.zIndex = String(20 - Math.round(shortest * 2));
         const gray = Math.min(1, Math.max(0, (shortest - .38) / .82));
         const blur = Math.min(2.7, Math.max(0, shortest - .42) * .85);
         card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${1 - gray * .82}) blur(${blur}px)`;
-        const visible = opacity > .12;
+        const visible = visibleOpacity > .12;
         card.tabIndex = visible ? 0 : -1;
         if (visible) card.removeAttribute('aria-hidden'); else card.setAttribute('aria-hidden', 'true');
         card.classList.toggle('is-featured', index === nearest);
@@ -111,7 +116,16 @@ function RusticOrbit() {
     };
     const resize = () => {
       const phase = geometry ? phaseAt(distance, geometry) : 0;
-      geometry = makeGeometry(window.innerWidth, window.innerHeight);
+      const { width, height } = orbitRef.current.getBoundingClientRect();
+      geometry = makeGeometry(width, window.innerHeight);
+      const line = orbitRef.current.querySelector('.rustic-orbit__lines');
+      const samples = 240;
+      const points = Array.from({ length: samples }, (_, index) => {
+        const [x, y] = geometry.sample(index * geometry.count / samples);
+        return `${index ? 'L' : 'M'}${(width / 2 + x).toFixed(2)} ${(height / 2 + y).toFixed(2)}`;
+      });
+      line.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      line.querySelector('path').setAttribute('d', `${points.join(' ')} Z`);
       distance = distanceAt(phase, geometry);
       paint(phase);
     };
@@ -153,7 +167,7 @@ function RusticOrbit() {
   }, []);
 
   return (
-    <div className="rustic-orbit" role="region" aria-roledescription="carousel" aria-label="Harper hotel room carousel" tabIndex={0}
+    <div ref={orbitRef} className="rustic-orbit" role="region" aria-roledescription="carousel" aria-label="Harper hotel room carousel" tabIndex={0}
       onMouseEnter={() => { paused.current.hover = true; }}
       onMouseLeave={() => { paused.current.hover = false; }}
       onFocusCapture={() => { paused.current.focus = true; }}
@@ -183,11 +197,7 @@ function RusticOrbit() {
         }
         touch.current = null;
       }}>
-      <svg className="rustic-orbit__lines" viewBox="0 0 1440 360" preserveAspectRatio="none" aria-hidden="true">
-        <ellipse cx="720" cy="181" rx="724" ry="120" />
-        <ellipse cx="720" cy="181" rx="772" ry="70" />
-        <circle cx="77" cy="244" r="3"/><circle cx="444" cy="285" r="3"/><circle cx="1190" cy="101" r="3"/><circle cx="1371" cy="239" r="3"/>
-      </svg>
+      <svg className="rustic-orbit__lines" aria-hidden="true"><path /></svg>
       {rooms.map((room, index) => <button type="button" key={index} ref={element => { cardRefs.current[index] = element; }}
         className={`rustic-orbit__card${index === active ? ' is-featured' : ''}`}
         onClick={() => controller.current?.select(index)}
