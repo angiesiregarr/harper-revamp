@@ -1,53 +1,63 @@
 const officialSite = 'https://harperhotels.com/';
-const cityViews = {
-  bali: { title: 'Bali', image: './assets/hero-room.png', alt: 'Warm Harper guest room' },
-  yogyakarta: { title: 'Yogyakarta', image: './assets/journal-table.png', alt: 'A welcoming table arranged for sharing' },
-  makassar: { title: 'Makassar', image: './assets/hotel-perintis.png', alt: 'Poolside space at a Harper hotel' },
-};
+const cityHotels = [
+  { city: 'jakarta', place: 'Jakarta, Indonesia', title: 'Harper Cawang', src: './assets/hotel-cawang.png', alt: 'Harper Cawang hotel exterior in Jakarta' },
+  { city: 'bali', place: 'Kuta, Bali, Indonesia', title: 'Harper Kuta Bali', src: './assets/harper-room-01.jpg', alt: 'Guest room at Harper Kuta Bali' },
+  { city: 'yogyakarta', place: 'Yogyakarta, Indonesia', title: 'Harper Malioboro Yogyakarta', src: './assets/hotel-malioboro.webp', alt: 'Harper Malioboro hotel exterior in Yogyakarta' },
+  { city: 'makassar', place: 'Makassar, Indonesia', title: 'Harper Perintis', src: './assets/hotel-perintis.png', alt: 'Poolside setting at Harper Perintis in Makassar' },
+];
 
 function renderCity() {
-  const requested = new URLSearchParams(window.location.search).get('city')?.toLowerCase();
-  const city = requested && Object.hasOwn(cityViews, requested) ? requested : 'jakarta';
-  document.querySelectorAll('[data-city]').forEach((tab) => {
-    if (tab.dataset.city === city) tab.setAttribute('aria-current', 'page');
-    else tab.removeAttribute('aria-current');
-  });
   const view = document.getElementById('city-view');
-  if (city !== 'jakarta') {
-    const { title, image, alt } = cityViews[city];
-    view.innerHTML = `<div class="city-landing"><div class="city-landing-copy"><p class="section-kicker">Find your rhythm</p><h3>${title}</h3><p>Explore the Harper experience in ${title}. For current properties, availability and booking details, visit the official Harper Hotels website.</p><a class="button button-primary" href="${officialSite}" target="_blank" rel="noopener noreferrer">Explore hotels <span aria-hidden="true">↗</span></a></div><div class="city-landing-photo"><img src="${image}" alt="${alt}" /></div></div>`;
-    return;
-  }
-  const images = [
-    { src: './assets/hotel-pasteur.png', title: 'Harper Pasteur', alt: 'Harper hotel exterior at dusk' },
-    { src: './assets/hotel-malioboro.webp', title: 'Harper Malioboro', alt: 'Harper hotel building beneath a blue evening sky' },
-    { src: './assets/hotel-perintis.png', title: 'Harper Perintis', alt: 'Poolside setting at Harper Perintis' },
-    { src: './assets/hotel-cawang.png', title: 'Harper Cawang', alt: 'Harper Cawang building' },
-  ];
-  view.innerHTML = `<div class="gallery" aria-label="Preview Harper hotel photos">${images.map((photo, i) => `<button class="gallery-card${i === 0 ? ' is-active' : ''}" type="button" data-index="${i}" aria-label="Preview ${photo.title} photo" aria-pressed="${i === 0}"><img src="${photo.src}" alt="${photo.alt}" /><span class="gallery-label">${photo.title}</span></button>`).join('')}</div><div class="hotel-caption"><div><p id="hotel-location">Selected Harper stays · Indonesia</p><h3 id="hotel-name">${images[0].title}</h3></div><a href="${officialSite}" target="_blank" rel="noopener noreferrer">Discover hotels <span aria-hidden="true">↗</span></a></div>`;
+  view.innerHTML = `<div class="gallery" aria-label="Explore Harper hotels by city">${cityHotels.map((hotel, i) => `<button class="gallery-card${i === 0 ? ' is-active' : ''}" type="button" data-city="${hotel.city}" aria-label="Show ${hotel.title} in ${hotel.place}" aria-pressed="${i === 0}"><img src="${hotel.src}" alt="${hotel.alt}" /></button>`).join('')}</div><div class="hotel-caption"><div><p id="hotel-location">${cityHotels[0].place}</p><h3 id="hotel-name">${cityHotels[0].title}</h3></div><a href="${officialSite}" target="_blank" rel="noopener noreferrer">Discover hotel</a></div>`;
   const cards = [...view.querySelectorAll('.gallery-card')];
-  const select = (index) => {
+  const tabs = [...document.querySelectorAll('.city-tabs [data-city]')];
+  const select = (city, updateUrl = false) => {
+    const index = cityHotels.findIndex((hotel) => hotel.city === city);
+    if (index < 0) return;
     cards.forEach((card, i) => {
       const active = i === index;
       card.classList.toggle('is-active', active);
       card.setAttribute('aria-pressed', String(active));
     });
-    document.getElementById('hotel-name').textContent = images[index].title;
-  };
-  cards.forEach((card, index) => {
-    card.addEventListener('pointerenter', (event) => {
-      if (event.pointerType === 'mouse') select(index);
+    tabs.forEach((tab) => {
+      if (tab.dataset.city === city) tab.setAttribute('aria-current', 'page');
+      else tab.removeAttribute('aria-current');
     });
-    card.addEventListener('focus', () => select(index));
-    card.addEventListener('click', () => select(index));
+    const strip = tabs[0].parentElement;
+    if (strip.scrollWidth > strip.clientWidth) {
+      const selected = tabs[index];
+      const left = strip.scrollLeft + selected.getBoundingClientRect().left - strip.getBoundingClientRect().left - (strip.clientWidth - selected.clientWidth) / 2;
+      strip.scrollTo({ left, behavior: updateUrl && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'instant' });
+    }
+    document.getElementById('hotel-location').textContent = cityHotels[index].place;
+    document.getElementById('hotel-name').textContent = cityHotels[index].title;
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('city') !== city || url.hash !== '#hotels') {
+        url.searchParams.set('city', city);
+        url.hash = 'hotels';
+        history.pushState(null, '', url);
+      }
+    }
+  };
+  const currentCity = () => new URLSearchParams(window.location.search).get('city')?.toLowerCase();
+  select(cityHotels.some((hotel) => hotel.city === currentCity()) ? currentCity() : 'jakarta');
+  tabs.forEach((tab) => tab.addEventListener('click', (event) => {
+    event.preventDefault();
+    select(tab.dataset.city, true);
+  }));
+  cards.forEach((card, index) => {
+    card.addEventListener('click', () => select(cityHotels[index].city, true));
     card.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
         event.preventDefault();
         const next = (index + (event.key === 'ArrowRight' ? 1 : -1) + cards.length) % cards.length;
+        select(cityHotels[next].city, true);
         cards[next].focus();
       }
     });
   });
+  window.addEventListener('popstate', () => select(cityHotels.some((hotel) => hotel.city === currentCity()) ? currentCity() : 'jakarta'));
 }
 
 function setupMenu() {

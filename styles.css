@@ -112,15 +112,13 @@ button:focus-visible{outline-offset:3px}
 .city-tabs a span{font-size:11px}
 .city-tabs a:hover,.city-tabs a[aria-current="page"]{color:var(--orange-ink);background:#fff6ee}
 .gallery{display:flex;gap:12px;height:390px;margin-top:32px;overflow:hidden}
-.gallery-card{position:relative;min-width:0;flex:1;overflow:hidden;border:0;padding:0;background:#ddd;transition:flex .55s cubic-bezier(.2,.7,.2,1),filter .35s ease}
+.gallery-card{position:relative;min-width:0;flex:1;overflow:hidden;border:0;padding:0;background:#ddd;transition:flex .55s cubic-bezier(.2,.7,.2,1)}
 .gallery-card.is-active{flex:4.8}
-.gallery-card:not(.is-active){filter:saturate(.68)}
-.gallery-card img{width:100%;height:100%;max-width:none;object-fit:cover;transition:transform .65s ease}
+.gallery-card img{width:100%;height:100%;max-width:none;object-fit:cover;filter:grayscale(1);transition:filter .55s ease,transform .65s ease}
 .gallery-card:hover img,.gallery-card:focus-visible img{transform:scale(1.035)}
-.gallery-card.is-active img{filter:saturate(1.05)}
-.gallery-card .gallery-label{position:absolute;left:14px;bottom:14px;padding:6px 9px;background:#fffef5eb;color:#282828;font-size:12px;opacity:0;transform:translateY(5px);transition:opacity .25s ease,transform .25s ease}
-.gallery-card.is-active .gallery-label,.gallery-card:focus-visible .gallery-label{opacity:1;transform:translateY(0)}
-.hotel-caption{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-top:24px}
+.gallery-card.is-active img{filter:grayscale(0)}
+.gallery-card:focus-visible{outline:3px solid #b9550b;outline-offset:-3px;z-index:1}
+.hotel-caption{display:flex;align-items:center;justify-content:space-between;gap:25px;min-height:86px;margin-top:24px}
 .hotel-caption p{margin:0;color:#575d61;font-size:14px}
 .hotel-caption h3{margin:8px 0 0;color:#b75600;font:400 clamp(24px,2.5vw,34px)/1.2 var(--serif);text-transform:uppercase}
 .hotel-caption a{color:var(--orange-ink);font-weight:700;white-space:nowrap}
@@ -264,7 +262,7 @@ button:focus-visible{outline-offset:3px}
   html{scroll-padding-top:78px}.section-pad{padding:70px 20px}.section-heading{margin-bottom:40px}.section-heading h2{font-size:35px}.section-kicker{gap:11px;font-size:10px}.section-kicker span{font-size:16px}
 
   .site-nav{padding:10px 16px;gap:8px}.brand{width:124px;height:36px}.brand img{width:112px}.nav-book{min-width:100px;font-size:11px;letter-spacing:0}.menu-toggle{width:38px}
-  .hotels{min-height:0}.hotels .section-heading{margin-bottom:30px}.outline-link{margin-top:17px}.city-tabs{margin-inline:-20px}.city-tabs a{min-width:145px;flex-basis:45%;padding-left:18px}.gallery{height:330px;gap:6px;margin-top:22px}.gallery-card{flex:.6}.gallery-card.is-active{flex:4}.gallery-card .gallery-label{font-size:11px;left:6px;bottom:7px;padding:4px 6px}.hotel-caption{display:block}.hotel-caption h3{font-size:25px}.hotel-caption a{display:inline-block;margin-top:15px}.city-landing{grid-template-columns:1fr}.city-landing-photo{height:260px;grid-row:1}.city-landing-copy{padding:30px}.city-landing-copy h3{font-size:36px}
+  .hotels{min-height:0}.hotels .section-heading{margin-bottom:30px}.outline-link{margin-top:17px}.city-tabs{margin-inline:-20px}.city-tabs a{min-width:145px;flex-basis:45%;padding-left:18px}.gallery{height:330px;gap:6px;margin-top:22px}.gallery-card{flex:.6}.gallery-card.is-active{flex:4}.hotel-caption{display:block;min-height:154px}.hotel-caption h3{font-size:25px}.hotel-caption a{display:inline-flex;margin-top:15px}.city-landing{grid-template-columns:1fr}.city-landing-photo{height:260px;grid-row:1}.city-landing-copy{padding:30px}.city-landing-copy h3{font-size:36px}
   .offers-intro{margin-bottom:35px}.offers-intro h2{font-size:38px}.offers-illustration{margin-top:8px}.offer-list{grid-template-columns:1fr;max-width:410px;gap:22px}.offer-card:nth-child(n){transform:none;margin:0}.offer-card:nth-child(n):hover,.offer-card:nth-child(n):focus-within{transform:translateY(-5px)}.offer-card:last-child{margin-bottom:0}.offer-image{aspect-ratio:1.5}.offers-decoration{font-size:170px}
   .journal-grid{display:block}.story{margin:0 0 38px}.story-feature{display:block}.story-feature .story-media{height:290px}.story-offset .story-media,.story-bottom .story-media{height:220px}.story-feature h3{font-size:31px}.story-copy h3{font-size:23px}.story-feature .story-copy{padding-top:16px}
   .moments-hint{margin:0 0 25px}.moments-window{margin:0 -20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin}.moments-track{animation:none;padding:0 20px 12px}.moments-track a,.moments-track a:nth-child(5n+3){width:220px;height:315px;transform:none;scroll-snap-align:center}.moments-more{margin-top:28px}
@@ -1008,3 +1006,15 @@ body{background:#f5f2ec}
 .js .hero-orbit-stage .hero-orbit{animation:hero-rise .8s .14s cubic-bezier(.22,1,.36,1) both}
 .js .hero-orbit-stage .hero-booking{animation:hero-rise .8s .29s cubic-bezier(.22,1,.36,1) both}
 @media(prefers-reduced-motion:reduce){.rustic-orbit__card,.rustic-orbit__card img,.hero-booking-submit{transition:none}.js .hero-orbit-stage .hero-heading,.js .hero-orbit-stage .hero-orbit,.js .hero-orbit-stage .hero-booking{animation:none}}
+
+/* Carry the hero's ivory paper gently into the light city section. */
+.hero-city-fade{position:absolute;inset:auto 0 0;z-index:3;height:clamp(230px,32svh,340px);pointer-events:none;background:linear-gradient(to bottom,transparent 0%,rgb(242 243 243 / 56%) 64%,#f2f3f3 100%)}
+.hotels{background:#f2f3f3;padding-top:clamp(120px,10vw,150px)}
+@media(max-width:600px){.hotels{padding-top:92px}}
+
+/* City actions use the site's clean orange button shape. */
+.hotels .outline-link,.hotels .hotel-caption a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;border:1px solid transparent;border-image:none;border-radius:0;background:#f08b1d;color:#261b12;font:700 13px/1.2 var(--sans);letter-spacing:.04em;text-transform:uppercase;text-decoration:none;box-shadow:none;filter:none;transition:background-color .2s ease,transform .16s ease,box-shadow .2s ease}
+.hotels .outline-link:hover,.hotels .hotel-caption a:hover{background:#d97912;color:#261b12;text-decoration:none;transform:translateY(-2px);box-shadow:0 7px 16px rgb(128 72 24 / 16%);filter:none}
+.hotels .outline-link:active,.hotels .hotel-caption a:active{background:#c5680d;transform:translateY(1px) scale(.985);box-shadow:none}
+.hotels .outline-link:focus-visible,.hotels .hotel-caption a:focus-visible,.city-tabs a:focus-visible{outline:3px solid #9d4d14;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.gallery-card,.gallery-card img,.hotels .outline-link,.hotels .hotel-caption a{transition:none!important}.gallery-card:hover img,.gallery-card:focus-visible img{transform:none}}
