@@ -8,7 +8,7 @@ await build({ entryPoints: [new URL('src/hero/index.jsx', root).pathname], outfi
   bundle: true, minify: true, format: 'iife', platform: 'browser', target: 'es2020', jsx: 'automatic' });
 await build({ entryPoints: [new URL('src/offers/index.jsx', root).pathname], outfile: new URL('offers-pixel.js', root).pathname,
   bundle: true, minify: true, format: 'iife', platform: 'browser', target: 'es2020', jsx: 'automatic' });
-const assets = ['styles.css', 'main.js', 'booking.js', 'hero-carousel.js', 'hero-carousel.css', 'offers-pixel.js', 'offers-pixel.css'];
+const assets = ['styles.css', 'main.js', 'booking.js', 'hero-carousel.js', 'offers-pixel.js', 'offers-pixel.css'];
 let html = await readFile(new URL('index.html', root), 'utf8');
 for (const name of assets) {
   const content = await readFile(new URL(name, root));

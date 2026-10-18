@@ -8,12 +8,11 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=9ff1568e1f95" />
-    <link rel="stylesheet" href="./hero-carousel.css?v=0708285b1e7a" />
+    <link rel="stylesheet" href="./styles.css?v=23fc48301f3f" />
     <link rel="stylesheet" href="./offers-pixel.css?v=2619944de854" />
     <script>document.documentElement.classList.add('js');</script>
     <script src="./main.js?v=a1df46afe004" defer></script>
-    <script src="./hero-carousel.js?v=55499e05dd84" defer></script>
+    <script src="./hero-carousel.js?v=9aab50179430" defer></script>
     <script src="./offers-pixel.js?v=911307990b3b" defer></script>
   </head>
   <body>
@@ -31,11 +30,20 @@
       </div>
     <main id="main">
       <section class="hero hero-orbit-stage" aria-labelledby="hero-title">
-        <div class="hero-pattern-waves" id="hero-pattern-waves" aria-hidden="true"></div>
-        <img class="hero-accent hero-accent-left" src="./assets/membership-accent.png" alt="" aria-hidden="true" fetchpriority="low" />
-        <img class="hero-accent hero-accent-right" src="./assets/membership-accent.png" alt="" aria-hidden="true" fetchpriority="low" />
-        <div class="hero-orbit" id="hero-orbit" aria-label="Harper stay moments"></div>
-        <div class="hero-heading"><h1 id="hero-title"><span>Come Home</span><span>to Harmony</span></h1></div>
+        <div class="hero-rattan hero-rattan-left" aria-hidden="true"></div>
+        <div class="hero-rattan hero-rattan-top" aria-hidden="true"></div>
+        <div class="hero-rattan hero-rattan-bottom" aria-hidden="true"></div>
+        <img class="hero-palm hero-palm-left" src="./assets/palm-shadow.svg" alt="" aria-hidden="true" />
+        <img class="hero-palm hero-palm-bottom" src="./assets/palm-shadow.svg" alt="" aria-hidden="true" />
+        <div class="hero-heading"><h1 id="hero-title"><span>Come Home</span><span>to Harmony</span></h1><p>Thoughtful stays, warm hospitality and modern comforts —<br />a place to feel at ease, wherever your journey takes you.</p></div>
+        <div class="hero-orbit" id="hero-orbit" aria-label="Explore Harper hotel rooms"></div>
+        <div class="hero-booking" role="search" aria-label="Find a Harper stay">
+          <button type="button" class="hero-booking-field" data-hero-field="destination"><svg class="hero-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20 10c0 5.2-8 11.5-8 11.5S4 15.2 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.4"/></svg><span><small>Destination</small><strong id="hero-destination-value">Choose a hotel or city</strong></span><span class="hero-field-chevron" aria-hidden="true">⌄</span></button>
+          <button type="button" class="hero-booking-field" data-hero-field="checkin"><svg class="hero-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18"/></svg><span><small>Check-in</small><strong id="hero-checkin-value">Select date</strong></span><span class="hero-field-chevron" aria-hidden="true">⌄</span></button>
+          <button type="button" class="hero-booking-field" data-hero-field="checkout"><svg class="hero-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18"/></svg><span><small>Check-out</small><strong id="hero-checkout-value">Select date</strong></span><span class="hero-field-chevron" aria-hidden="true">⌄</span></button>
+          <button type="button" class="hero-booking-field" data-hero-field="guests"><svg class="hero-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><path d="M4.5 21v-2.5a7.5 7.5 0 0 1 15 0V21Z"/></svg><span><small>Guests</small><strong id="hero-guests-value">2 guests · 1 room</strong></span><span class="hero-field-chevron" aria-hidden="true">⌄</span></button>
+          <button type="button" class="hero-booking-submit" id="hero-booking-submit" aria-label="Search stays"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m15.6 15.6 5.2 5.2"/></svg></button>
+        </div>
       </section>
 
       <section class="hotels section-pad" id="hotels" aria-labelledby="hotels-title">
@@ -224,7 +232,7 @@
       </form>
     </dialog>
     <dialog id="booking-results" class="booking-results" aria-labelledby="booking-results-title"><button type="button" class="booking-close" aria-label="Close search results">×</button><p class="eyebrow">Your next Harper stay</p><h2 id="booking-results-title">A place to come home to.</h2><p id="booking-summary"></p><p class="booking-results-note">Explore your matching stays below. Confirm live availability, rates and your stay details on the official booking site.</p><div id="booking-matches"></div></dialog>
-    <script src="./booking.js?v=802b0883c699" defer></script>
+    <script src="./booking.js?v=b4a11ca9d845" defer></script>
     <dialog class="story-dialog" id="story-dialog" aria-labelledby="story-dialog-title"><button class="dialog-close" type="button" aria-label="Close story">×</button><p class="section-kicker">The Harper Journal</p><h2 id="story-dialog-title"></h2><p id="story-dialog-body"></p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Explore Harper <span aria-hidden="true">↗</span></a></dialog>
   </body>
 </html>

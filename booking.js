@@ -8,6 +8,7 @@
   const results = document.getElementById('booking-results');
   const fields = [...form.querySelectorAll('[data-field]')];
   const hotels = [
+    { name: 'Harper Kuta Bali', city: 'Kuta, Bali', image: 'harper-room-01.jpg', url: 'https://harperhotels.com/' },
     { name: 'Harper Malioboro', city: 'Yogyakarta', image: 'hero-exterior.png', url: 'https://malioboro.harperhotels.com/' },
     { name: 'Harper Cawang', city: 'Jakarta', image: 'hotel-cawang.png', url: 'https://harperhotels.com/' },
     { name: 'Harper Pasteur', city: 'Bandung', image: 'hotel-pasteur.png', url: 'https://harperhotels.com/' },
@@ -27,6 +28,10 @@
     document.getElementById('checkin-value').textContent = pretty(state.checkin);
     document.getElementById('checkout-value').textContent = pretty(state.checkout);
     document.getElementById('guests-value').textContent = `${state.rooms} ${state.rooms===1?'room':'rooms'} · ${state.adults+state.children} guests`;
+    document.getElementById('hero-destination-value').textContent = state.destination || 'Choose a hotel or city';
+    document.getElementById('hero-checkin-value').textContent = pretty(state.checkin);
+    document.getElementById('hero-checkout-value').textContent = pretty(state.checkout);
+    document.getElementById('hero-guests-value').textContent = `${state.adults+state.children} guests · ${state.rooms} ${state.rooms===1?'room':'rooms'}`;
   }
   function closeField(focus = false) {
     popup.hidden = true; fields.forEach(button => button.setAttribute('aria-expanded','false'));
@@ -42,10 +47,10 @@
     document.documentElement.style.setProperty('--booking-offset','0px');
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
-  function openBooking(event) {
+  function openBooking(event, field = 'destination') {
     event?.preventDefault(); opener = event?.currentTarget || document.activeElement;
     if (!sheet.open) sheet.showModal();
-    openField('destination');
+    openField(field);
   }
   function openField(name) {
     active = name; anchor = fields.find(button => button.dataset.field === name);
@@ -109,6 +114,14 @@
   }
   fields.forEach(button=>button.addEventListener('click',()=>active===button.dataset.field?closeField(true):openField(button.dataset.field)));
   document.querySelectorAll('[data-booking-open]').forEach(button=>button.addEventListener('click',openBooking));
+  document.querySelectorAll('[data-hero-field]').forEach(button=>button.addEventListener('click',event=>openBooking(event,button.dataset.heroField)));
+  document.getElementById('hero-booking-submit').addEventListener('click',event=>{
+    opener=event.currentTarget;
+    if (!state.destination || !state.checkin || !state.checkout || state.checkout<=state.checkin || state.adults<state.rooms) {
+      if (!sheet.open) sheet.showModal();
+    }
+    form.requestSubmit();
+  });
   document.addEventListener('pointerdown',event=>{if(!popup.contains(event.target) && !fields.some(button=>button.contains(event.target)))closeField();});
   document.addEventListener('keydown',event=>{if(event.key==='Escape' && !popup.hidden){event.preventDefault();event.stopPropagation();closeField(true);}},true);
   sheet.addEventListener('cancel',()=>closeField());
@@ -132,5 +145,5 @@
   });
   window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule);
   new ResizeObserver(schedule).observe(nav);new ResizeObserver(schedule).observe(form);
-  document.fonts?.ready.then(schedule);schedule();
+  updateLabels();document.fonts?.ready.then(schedule);schedule();
 })();
