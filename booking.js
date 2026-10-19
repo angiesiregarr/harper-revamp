@@ -161,6 +161,6 @@
     results.showModal();
   });
   window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule);
-  new ResizeObserver(schedule).observe(nav);new ResizeObserver(schedule).observe(form);
+  new ResizeObserver(schedule).observe(nav);new ResizeObserver(schedule).observe(form);new ResizeObserver(schedule).observe(heroBooking);
   updateLabels();document.fonts?.ready.then(schedule);schedule();
 })();

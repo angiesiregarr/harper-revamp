@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
 <!-- Natural Earth 1:110m land data, public domain. Equirectangular projection. -->
-<g fill="#d9ded9" stroke="#bfc7c1" stroke-width=".75" stroke-linejoin="round" fill-rule="evenodd">
+<g fill="#bbc3bb" stroke="#aab5aa" stroke-width=".75" stroke-linejoin="round" fill-rule="evenodd">
 <path d="M267.6 377.9 L267.0 379.0 L266.3 380.0 L261.7 379.7 L256.7 379.8 L253.9 379.1 L253.9 379.0 L252.7 378.3 L257.7 378.4 L262.5 378.7 L264.1 377.7 L265.3 377.0Z"/>
 <path d="M46.2 376.7 L41.9 377.0 L39.0 376.2 L37.7 375.4 L37.6 375.3 L36.2 374.7 L36.2 374.7 L37.5 373.8 L41.7 374.2 L43.9 374.9 L45.6 375.7Z"/>
 <path d="M299.7 373.4 L302.4 374.4 L303.4 375.7 L303.6 376.7 L303.7 377.8 L300.3 378.5 L296.7 379.1 L292.5 379.6 L287.8 380.1 L282.6 379.9 L279.6 379.2 L280.0 378.3 L284.8 377.7 L286.7 376.9 L288.1 376.0 L289.1 375.1 L290.4 374.4 L291.9 373.4 L291.9 373.4 L293.0 373.4 L296.3 373.0Z"/>

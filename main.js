@@ -158,7 +158,7 @@ function setupSectionAnchors() {
   document.querySelectorAll('a[href="#journal"], a[href="#membership"]').forEach(link => link.addEventListener('click', event => {
     event.preventDefault();
     const section = document.querySelector(link.getAttribute('href'));
-    const clearance = (innerWidth > 800 ? 58 + booking.getBoundingClientRect().height : nav.getBoundingClientRect().height) + 16;
+    const clearance = (innerWidth > 800 ? 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76) : nav.getBoundingClientRect().height) + 16;
     const top = window.scrollY + section.getBoundingClientRect().top - clearance;
     history.pushState(null, '', link.getAttribute('href'));
     window.scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
@@ -188,9 +188,9 @@ function setupCityViewport() {
   const align = behavior => {
     update();
     const targetClearance = innerWidth > 800
-      ? Math.max(clearance(), 58 + booking.getBoundingClientRect().height)
+      ? Math.max(clearance(), 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76))
       : clearance();
-    const top = scrollY + section.getBoundingClientRect().top - targetClearance + 4;
+    const top = scrollY + section.getBoundingClientRect().top - targetClearance - 2;
     scrollTo({top, behavior});
   };
   document.querySelectorAll('a[href="#hotels"]').forEach(link => link.addEventListener('click', event => {
@@ -200,6 +200,8 @@ function setupCityViewport() {
   }));
   addEventListener('scroll', schedule, {passive:true});
   addEventListener('resize', schedule);
+  new ResizeObserver(schedule).observe(nav);
+  new ResizeObserver(schedule).observe(booking);
   if (location.hash === '#hotels') {
     const alignAfterNavSettles = () => requestAnimationFrame(() => {
       align('instant');
