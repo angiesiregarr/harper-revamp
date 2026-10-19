@@ -1167,18 +1167,42 @@ body{background:#f5f2ec}
 }
 @media(prefers-reduced-motion:reduce){.prism-arrow::before{transition:none}}
 
-/* Keep the full world behind the waypoints, with a single selected route. */
+/* Real coastlines and geographically anchored destinations. */
 .city-heading h2{font-size:33px}
-.city-constellation{margin-top:0}
-.city-map{inset:-24px 0 -18px;width:100%;height:calc(100% + 42px);object-fit:fill;opacity:.28;filter:none;mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.city-constellation{height:260px;margin-top:8px}
+.city-map-frame{position:absolute;left:18.75%;top:0;width:50%;height:100%;z-index:0}
+.city-map{inset:0;width:100%;height:100%;object-fit:fill;opacity:.92;filter:none;mask-image:none;z-index:0}
+.city-markers{position:absolute;inset:0;z-index:1}
+.city-marker{position:absolute;left:var(--x);top:var(--y);width:26px;height:26px;transform:translate(-50%,-50%);cursor:pointer}
+.city-marker::before{content:'';position:absolute;left:9px;top:9px;width:8px;height:8px;border:1px solid #e87514;border-radius:50%;background:#fffaf5;box-shadow:0 0 0 2px #fffaf5}
+.city-marker.is-active::before,.city-marker:hover::before{background:#f08b1d;box-shadow:0 0 0 5px rgb(240 139 29 / 18%)}
+.city-waypoints{z-index:3;pointer-events:none}
+.city-waypoint{left:var(--x);top:var(--y);min-height:36px;padding:0 6px;gap:0;transform:translateY(-50%);background:transparent;pointer-events:auto;text-shadow:0 1px 3px #f8f7f3,0 -1px 3px #f8f7f3}
+.city-waypoint-left,.city-waypoint-left.is-active{transform:translate(-100%,-50%)}
+.city-waypoint-right,.city-waypoint-right.is-active{transform:translateY(-50%)}
+.city-waypoint .city-label{white-space:nowrap}
+.city-routes{z-index:1;overflow:hidden}
+.city-routes .city-leader{fill:none;stroke:#a9b1ab;stroke-width:.85;opacity:.65;vector-effect:non-scaling-stroke}
 .city-routes .city-route{fill:none;stroke:#f08b1d;stroke-width:1.7;opacity:0;stroke-dasharray:1;stroke-dashoffset:0;vector-effect:non-scaling-stroke;transition:opacity .48s ease}
 .city-routes .city-route.is-active{stroke:#f08b1d;stroke-width:1.7;opacity:.85}
-.city-map-glow{position:absolute;z-index:-1;width:72px;height:72px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgb(240 139 29 / 17%),transparent 70%);filter:blur(10px);opacity:.15;transition:opacity .45s ease}
-.city-map-glow-indonesia{left:76%;top:51%}
-.city-map-glow-caribbean{left:34%;top:34%}
-.city-constellation:not(.is-caribbean) .city-map-glow-indonesia,.city-constellation.is-caribbean .city-map-glow-caribbean{opacity:.5}
-@media(min-width:851px){.hotels{padding-top:max(28px,calc(var(--booking-offset) + 28px))}.city-constellation{height:190px}}
-@media(prefers-reduced-motion:no-preference){.hotels.portal-ready .city-map{opacity:calc(.28 * var(--portal-progress,1))}}
-@media(max-width:850px){.city-routes{display:none}.city-map{inset:0;width:100%;height:100%;opacity:.24}.city-map-glow{display:none}.city-constellation{margin-top:8px}}
-@media(max-width:600px){.city-heading h2{font-size:33px}.city-constellation{margin-top:22px}.city-map{opacity:.13}}
-@media(prefers-reduced-motion:reduce){.city-routes .city-route,.city-map-glow{transition:none!important}.city-routes .city-route{stroke-dashoffset:0!important}}
+.city-view{z-index:4}
+@media(min-width:851px){.hotels{padding-top:max(28px,calc(var(--booking-offset) + 28px))}.city-constellation{height:260px}.city-view{margin-top:-20px}}
+@media(prefers-reduced-motion:no-preference){.hotels.portal-ready .city-map{opacity:calc(.92 * var(--portal-progress,1))}}
+@media(max-width:850px){
+  .city-constellation{height:auto;margin-top:12px;margin-bottom:18px}
+  .city-map-frame{left:0;top:0;width:100%;height:195px}
+  .city-map{inset:0;width:100%;height:100%;opacity:.92}
+  .city-routes{display:none}
+  .city-waypoints{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;height:auto;padding-top:208px}
+  .city-waypoint,.city-waypoint-left,.city-waypoint-right,.city-waypoint.is-active{position:relative;left:auto;top:auto;min-height:44px;padding:4px 8px;transform:none!important;background:transparent}
+  .city-waypoint::before{content:'';flex:none;width:7px;height:7px;margin-right:8px;border:1px solid #e87514;border-radius:50%;background:#fffaf5}
+  .city-waypoint.is-active::before{background:#f08b1d}
+}
+@media(max-width:600px){
+  .city-heading h2{font-size:33px}
+  .city-constellation{margin-top:16px;margin-bottom:18px}
+  .city-map-frame{height:170px}
+  .city-waypoints{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:180px}
+  .city-waypoint .city-label{white-space:normal}
+}
+@media(prefers-reduced-motion:reduce){.city-routes .city-route{transition:none!important;stroke-dashoffset:0!important}}

@@ -17,16 +17,41 @@ const cityHotels = [
 function renderCity() {
   const view = document.getElementById('city-view');
   const waypointHost = document.getElementById('city-waypoints');
-  const positions = [[8, 16], [24, 61], [49, 23], [43, 70], [65, 71], [75, 35], [8, 76], [29, 9], [83, 13], [91, 75], [59, 6], [79, 59]];
-  waypointHost.innerHTML = cityHotels.map((hotel, index) => `<button class="city-waypoint" type="button" data-city="${hotel.city}" style="--x:${positions[index][0]}%;--y:${positions[index][1]}%" aria-label="Preview ${hotel.title} in ${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}"><span class="city-point" aria-hidden="true"></span><span class="city-label">${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span></button>`).join('');
+  // The map frame covers x=300..1100 of the 1600-unit constellation.
+  // Labels are offset; the plotted points stay at their geographic coordinates.
+  const geography = {
+    jakarta:[106.8456,-6.2088], bali:[115.1745,-8.7177], yogyakarta:[110.3695,-7.7956],
+    cikarang:[107.1528,-6.2617], purwakarta:[107.4433,-6.5569], palembang:[104.7754,-2.9761],
+    medan:[98.6722,3.5952], banjarmasin:[114.5944,-3.3186], makassar:[119.4327,-5.1477],
+    kupang:[123.607,-10.1772], batam:[104.0305,1.0456], 'punta-cana':[-68.3725,18.5601]
+  };
+  const labelPlaces = {
+    medan:[760,25,'left'], batam:[760,62,'left'], palembang:[760,99,'left'],
+    jakarta:[760,136,'left'], cikarang:[760,173,'left'], yogyakarta:[760,210,'left'],
+    banjarmasin:[1110,25,'right'], makassar:[1110,62,'right'], bali:[1110,99,'right'],
+    purwakarta:[1110,136,'right'], kupang:[1110,173,'right'], 'punta-cana':[435,100,'left']
+  };
+  const mapPoint = city => {
+    const [longitude, latitude] = geography[city];
+    const mapX = (longitude + 180) / 360 * 800;
+    const y = (80 - latitude) / 140 * 260;
+    return {mapX, x:300 + mapX, y};
+  };
+  waypointHost.innerHTML = cityHotels.map(hotel => {
+    const [x,y,side] = labelPlaces[hotel.city];
+    return `<button class="city-waypoint city-waypoint-${side}" type="button" data-city="${hotel.city}" style="--x:${x / 16}%;--y:${y / 260 * 100}%" aria-label="Preview ${hotel.title} in ${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}"><span class="city-label">${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span></button>`;
+  }).join('');
+  const markerHost = document.getElementById('city-markers');
+  markerHost.innerHTML = cityHotels.map(hotel => {
+    const {mapX,y} = mapPoint(hotel.city);
+    return `<span class="city-marker" data-city="${hotel.city}" style="--x:${mapX / 8}%;--y:${y / 260 * 100}%" title="${hotel.label || hotel.city}"></span>`;
+  }).join('');
   const routeHost = document.querySelector('.city-routes');
-  routeHost.innerHTML = cityHotels.map((hotel, index) => {
-    const [px, py] = positions[index];
-    const x = px * 12 + 4.1;
-    const y = py * 3.6;
-    const endX = 455 + index * 26;
-    const bend = x < 600 ? 1 : -1;
-    return `<path class="city-route" data-city="${hotel.city}" pathLength="1" d="M ${x} ${y} C ${x + bend * 160} 305, ${endX - bend * 90} 330, ${endX} 350" />`;
+  routeHost.innerHTML = cityHotels.map(hotel => {
+    const {x,y} = mapPoint(hotel.city);
+    const [labelX,labelY,side] = labelPlaces[hotel.city];
+    const leaderEnd = side === 'left' ? labelX + 7 : labelX - 7;
+    return `<path class="city-leader" d="M ${x.toFixed(1)} ${y.toFixed(1)} L ${leaderEnd} ${labelY}" /><path class="city-route" data-city="${hotel.city}" pathLength="1" d="M ${x.toFixed(1)} ${y.toFixed(1)} L ${x.toFixed(1)} 242" />`;
   }).join('');
   view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
   const panels = [...view.querySelectorAll('.prism-card')];
@@ -37,6 +62,7 @@ function renderCity() {
   }, {rootMargin: '600px'});
   imagePreloader.observe(document.getElementById('hotels'));
   const waypoints = [...waypointHost.querySelectorAll('.city-waypoint')];
+  const markers = [...markerHost.querySelectorAll('.city-marker')];
   const routes = [...routeHost.querySelectorAll('.city-route')];
   const constellation = document.querySelector('.city-constellation');
   let committed = 0;
@@ -58,6 +84,7 @@ function renderCity() {
       point.classList.toggle('is-active', active);
       point.setAttribute('aria-pressed', String(active));
     });
+    markers.forEach(marker => marker.classList.toggle('is-active', marker.dataset.city === hotel.city));
     routes.forEach(route => route.classList.toggle('is-active', route.dataset.city === hotel.city));
     const activeRoute = routes[index];
     if (activeRoute !== previousRoute && previousRoute && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -67,7 +94,6 @@ function renderCity() {
         {strokeDashoffset: activeRoute.style.strokeDashoffset || '0', opacity: .85}
       ], {duration: 620, easing: 'cubic-bezier(.22,.61,.36,1)'});
     }
-    constellation.classList.toggle('is-caribbean', hotel.city === 'punta-cana');
     document.getElementById('hotel-location').textContent = hotel.place;
     document.getElementById('hotel-name').textContent = hotel.title;
     const inCity = cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city);
@@ -95,6 +121,12 @@ function renderCity() {
     point.addEventListener('focus', () => { preview = index; show(index); });
     point.addEventListener('blur', () => { if (preview !== null) { preview = null; show(committed); } });
     point.addEventListener('click', () => select(index, true));
+  });
+  markers.forEach(marker => {
+    const index = cityHotels.findIndex(hotel => hotel.city === marker.dataset.city);
+    marker.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') { preview = index; show(index); } });
+    marker.addEventListener('pointerleave', () => { if (preview !== null) { preview = null; show(committed); } });
+    marker.addEventListener('click', () => select(index, true));
   });
   panels.forEach((panel, index) => panel.addEventListener('click', () => select(index, true)));
   view.addEventListener('click', event => {
