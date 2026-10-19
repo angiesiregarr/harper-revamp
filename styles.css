@@ -1168,12 +1168,12 @@ body{background:#f5f2ec}
 @media(prefers-reduced-motion:reduce){.prism-arrow::before{transition:none}}
 
 /* The world map is scenery; city buttons use the editorial constellation layout. */
-.hotels{--city-available:calc(100svh - var(--city-header-clearance,58px));display:flex;flex-direction:column;justify-content:center;min-height:min(700px,calc(82svh - var(--city-header-clearance,58px)));padding:clamp(18px,3svh,34px) clamp(40px,6vw,112px);scroll-margin-top:0;isolation:isolate}
-.hotels>.city-map{position:absolute;inset:3% 0;width:100%;height:94%;object-fit:contain;opacity:.24;filter:none;mask-image:none;pointer-events:none;z-index:0}
+.hotels{--city-available:calc(100svh - var(--city-header-clearance,58px));display:flex;flex-direction:column;justify-content:center;min-height:min(720px,var(--city-available));padding:clamp(24px,3.5svh,38px) clamp(40px,6vw,112px);scroll-margin-top:var(--city-header-clearance,58px);isolation:isolate}
+.hotels>.city-map{position:absolute;inset:auto;left:50%;top:50%;width:clamp(1220px,86vw,1660px);height:auto;max-width:none;transform:translate(-50%,-50%);opacity:.18;filter:none;mask-image:none;pointer-events:none;z-index:0}
 .city-heading,.hotel-content{position:relative;z-index:1}
 .hotels .hotel-content{width:100%}
 .city-heading h2{font-size:33px}
-.city-constellation{height:clamp(170px,calc(var(--city-available) * .24),220px);margin-top:clamp(4px,1svh,12px)}
+.city-constellation{height:200px;margin-top:clamp(4px,1svh,12px)}
 .city-waypoints{z-index:3;pointer-events:none}
 .city-waypoint,.city-waypoint.is-active{left:var(--x);top:var(--y);min-height:42px;padding:2px 9px;gap:11px;transform:translate(-10px,-50%);background:transparent;pointer-events:auto;text-shadow:0 1px 3px #f8f7f3,0 -1px 3px #f8f7f3}
 .city-waypoint .city-point{display:block}
@@ -1182,7 +1182,8 @@ body{background:#f5f2ec}
 .city-routes .city-route{fill:none;stroke:#f08b1d;stroke-width:1.7;opacity:0;stroke-dasharray:1;stroke-dashoffset:0;vector-effect:non-scaling-stroke;transition:opacity .42s ease}
 .city-routes .city-route.is-active{opacity:.8}
 .city-view{z-index:4;margin-top:-12px}
-.prism-gallery{--city-card-height:clamp(165px,calc(var(--city-available) * .245),210px);height:var(--city-card-height)}
+.prism-gallery{--city-card-height:200px;height:var(--city-card-height)}
+.prism-footer{margin-top:20px}
 .prism-card,.prism-card.is-active{width:auto;height:100%;aspect-ratio:40/21}
 .prism-card[data-slot="-1"],.prism-card[data-slot="1"]{top:7%;width:auto;height:86%;aspect-ratio:5/6}
 .prism-card[data-slot="-1"]{left:calc(50% - clamp(230px,calc(var(--city-card-height) * 1.4),295px))}
@@ -1190,10 +1191,10 @@ body{background:#f5f2ec}
 .prism-card[data-slot="-2"],.prism-card[data-slot="2"]{top:14%;width:auto;height:72%;aspect-ratio:3/5}
 .prism-card[data-slot="-2"]{left:calc(50% - clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
 .prism-card[data-slot="2"]{left:calc(50% + clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
-@media(prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.24 * var(--portal-progress,1))}}
+@media(prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.18 * var(--portal-progress,1))}}
 @media(max-width:850px){
   .hotels{display:block;min-height:0;padding:clamp(24px,4vw,42px) clamp(24px,5vw,46px) 72px}
-  .hotels>.city-map{inset:2% 0;width:100%;height:96%;opacity:.18}
+  .hotels>.city-map{width:max(520px,110vw);opacity:.14}
   .city-constellation{height:auto;margin-top:18px;margin-bottom:16px}
   .city-routes{display:none}
   .city-waypoints{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;height:auto;padding-top:0}
@@ -1203,7 +1204,7 @@ body{background:#f5f2ec}
   .prism-card,.prism-card.is-active{width:auto;height:100%;aspect-ratio:40/21}
   .prism-card[data-slot="-1"],.prism-card[data-slot="1"]{height:84%;top:8%}
 }
-@media(max-width:850px) and (prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.18 * var(--portal-progress,1))}}
+@media(max-width:850px) and (prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.14 * var(--portal-progress,1))}}
 @media(max-width:600px){
   .hotels{padding:26px 20px 66px}
   .city-heading h2{font-size:33px}
@@ -1214,4 +1215,15 @@ body{background:#f5f2ec}
   .prism-card[data-slot="-1"]{left:calc(50% - min(48vw,200px))}
   .prism-card[data-slot="1"]{left:calc(50% + min(48vw,200px))}
 }
+
+/* Apply the glass treatment as soon as the page leaves its initial position. */
+.site-nav{transition:min-height .18s ease,padding .18s ease,background-color .18s ease,backdrop-filter .18s ease,-webkit-backdrop-filter .18s ease;isolation:isolate}
+.site-nav:not(.is-over-hero){background:#fff8efd1;border-bottom:1px solid #8b76562b;-webkit-backdrop-filter:blur(24px) saturate(1.2);backdrop-filter:blur(24px) saturate(1.2);box-shadow:0 5px 20px #3a271417}
+.hero-booking.is-docked{position:fixed;top:var(--top-nav-height);bottom:auto;z-index:79;min-height:96px;padding:8px 11px;border-radius:0 0 18px 18px;background:#fffcf8ed}
+.news-section,.moments{scroll-margin-top:calc(var(--top-nav-height) + var(--booking-offset) + 18px)}
+.membership{--header-space:calc(var(--top-nav-height) + var(--booking-offset));scroll-margin-top:var(--header-space)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.site-nav:not(.is-over-hero){background:#fff8ef}}
+@media(max-width:800px){.hero-booking.is-docked{position:absolute;top:auto;bottom:73px}}
+@media(max-height:800px) and (min-width:851px){.hotels{padding-block:18px}.city-constellation{height:185px}.prism-gallery{--city-card-height:190px;height:190px}.prism-footer{margin-top:19px}}
+@media(prefers-reduced-motion:reduce){.site-nav{transition:none}}
 @media(prefers-reduced-motion:reduce){.city-routes .city-route{transition:none!important;stroke-dashoffset:0!important}}

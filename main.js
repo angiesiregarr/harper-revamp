@@ -171,10 +171,11 @@ function setupNews() {
 
 function setupSectionAnchors() {
   const nav = document.getElementById('site-nav');
+  const booking = document.querySelector('.hero-booking');
   document.querySelectorAll('a[href="#journal"], a[href="#membership"]').forEach(link => link.addEventListener('click', event => {
     event.preventDefault();
     const section = document.querySelector(link.getAttribute('href'));
-    const clearance = nav.getBoundingClientRect().height + 16;
+    const clearance = (innerWidth > 800 ? 58 + booking.getBoundingClientRect().height : nav.getBoundingClientRect().height) + 16;
     const top = window.scrollY + section.getBoundingClientRect().top - clearance;
     history.pushState(null, '', link.getAttribute('href'));
     window.scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
@@ -203,7 +204,10 @@ function setupCityViewport() {
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
   const align = behavior => {
     update();
-    const top = scrollY + section.getBoundingClientRect().top - clearance() - 28;
+    const targetClearance = innerWidth > 800
+      ? Math.max(clearance(), 58 + booking.getBoundingClientRect().height)
+      : clearance();
+    const top = scrollY + section.getBoundingClientRect().top - targetClearance + 4;
     scrollTo({top, behavior});
   };
   document.querySelectorAll('a[href="#hotels"]').forEach(link => link.addEventListener('click', event => {
@@ -234,7 +238,8 @@ function setupMembershipMotion() {
   let frame = 0;
   function update() {
     frame = 0;
-    const header = document.getElementById('site-nav').getBoundingClientRect().height;
+    const header = document.getElementById('site-nav').getBoundingClientRect().height +
+      (document.querySelector('.hero-booking.is-docked')?.getBoundingClientRect().height || 0);
     const distance = Math.max(1, section.getBoundingClientRect().height - stage.getBoundingClientRect().height);
     const progress = clamp((header - section.getBoundingClientRect().top) / distance);
     const width = visual.clientWidth;

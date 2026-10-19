@@ -3,6 +3,7 @@
   const form = document.getElementById('booking-form');
   const nav = document.getElementById('site-nav');
   const hero = document.querySelector('.hero-orbit-stage');
+  const heroBooking = hero.querySelector('.hero-booking');
   const sheet = document.getElementById('booking-sheet');
   const popup = document.getElementById('booking-popover');
   const results = document.getElementById('booking-results');
@@ -18,6 +19,7 @@
   ];
   const state = { destination: '', checkin: '', checkout: '', rooms: 1, adults: 2, children: 0 };
   let active = '', anchor = null, opener = null, month = new Date(), frame = 0;
+  let bookingBottomGap = 0, bookingHeroHeight = 0;
   const iso = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   const today = () => iso(new Date());
   const parse = value => new Date(`${value}T12:00:00`);
@@ -40,11 +42,26 @@
   function positionPopup() { /* The popover flows inside the booking dialog. */ }
   function placeForm() {
     frame = 0;
-    nav.classList.toggle('is-compact', window.scrollY > 48);
+    const scrolled = window.scrollY > 0;
+    nav.classList.toggle('is-compact', scrolled);
     const height = nav.getBoundingClientRect().height;
-    nav.classList.toggle('is-over-hero', Boolean(hero && hero.getBoundingClientRect().bottom > height));
+    nav.classList.toggle('is-over-hero', !scrolled && Boolean(hero && hero.getBoundingClientRect().bottom > height));
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
-    document.documentElement.style.setProperty('--booking-offset','0px');
+    const docked = heroBooking.classList.contains('is-docked');
+    if (!docked) {
+      const bounds = heroBooking.getBoundingClientRect();
+      bookingBottomGap = hero.getBoundingClientRect().bottom - bounds.bottom;
+      bookingHeroHeight = bounds.height;
+    }
+    const naturalTop = hero.getBoundingClientRect().bottom - bookingBottomGap - bookingHeroHeight;
+    if (!docked && innerWidth > 800 && scrolled && naturalTop <= height + 8) {
+      document.body.append(heroBooking);
+      heroBooking.classList.add('is-docked');
+    } else if (docked && (innerWidth <= 800 || !scrolled || naturalTop > Math.max(height + 16, innerHeight * .55))) {
+      hero.append(heroBooking);
+      heroBooking.classList.remove('is-docked');
+    }
+    document.documentElement.style.setProperty('--booking-offset',heroBooking.classList.contains('is-docked') ? `${heroBooking.getBoundingClientRect().height}px` : '0px');
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
   function openBooking(event, field = 'destination') {
