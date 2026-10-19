@@ -8,10 +8,10 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=2b7244a00717" />
+    <link rel="stylesheet" href="./styles.css?v=d26ff56a0cd4" />
     <link rel="stylesheet" href="./offers-pixel.css?v=2619944de854" />
     <script>document.documentElement.classList.add('js');</script>
-    <script src="./main.js?v=8f9da2116d28" defer></script>
+    <script src="./main.js?v=bde841bf1cc5" defer></script>
     <script src="./hero-carousel.js?v=09b486c31dfd" defer></script>
     <script src="./offers-pixel.js?v=911307990b3b" defer></script>
   </head>
@@ -51,18 +51,17 @@
       </section>
 
       <section class="hotels section-pad" id="hotels" aria-labelledby="hotels-title">
-        <div class="section-heading reveal">
-          <p class="section-kicker"><span>✣</span> Your stay, with soul <span>✣</span></p>
-          <h2 id="hotels-title">A place for <em>every rhythm.</em></h2>
-          <a class="outline-link" href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">More hotels <span aria-hidden="true">↗</span></a>
+        <div class="city-heading reveal">
+          <p>Explore Harper</p>
+          <h2 id="hotels-title">Places to call yours</h2>
+          <span>A familiar welcome, wherever you go.</span>
         </div>
         <div class="hotel-content reveal">
-          <nav class="city-tabs" aria-label="Explore cities">
-            <a href="?city=jakarta#hotels" data-city="jakarta"><span>01</span> Jakarta</a>
-            <a href="?city=bali#hotels" data-city="bali"><span>02</span> Bali</a>
-            <a href="?city=yogyakarta#hotels" data-city="yogyakarta"><span>03</span> Yogyakarta</a>
-            <a href="?city=makassar#hotels" data-city="makassar"><span>04</span> Makassar</a>
-          </nav>
+          <div class="city-constellation" aria-label="Explore Harper destinations">
+            <img class="city-map" src="./assets/dotted-map.png" alt="" aria-hidden="true" />
+            <svg class="city-routes" viewBox="0 0 1200 360" preserveAspectRatio="none" aria-hidden="true"><path d="M65 170 C145 15 235 310 330 125 S535 290 635 130 S825 215 950 75 S1110 225 1180 140"/><path d="M90 295 C240 155 290 245 435 210 S700 50 795 230 S1010 170 1150 275"/><path class="city-route-active" d="M45 245 C170 125 250 260 420 185 S655 160 800 245"/></svg>
+            <div class="city-waypoints" id="city-waypoints"></div>
+          </div>
           <div class="city-view" id="city-view" aria-live="polite"></div>
         </div>
       </section>

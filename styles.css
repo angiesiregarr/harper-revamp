@@ -1018,3 +1018,57 @@ body{background:#f5f2ec}
 .hotels .outline-link:active,.hotels .hotel-caption a:active{background:#c5680d;transform:translateY(1px) scale(.985);box-shadow:none}
 .hotels .outline-link:focus-visible,.hotels .hotel-caption a:focus-visible,.city-tabs a:focus-visible{outline:3px solid #9d4d14;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.gallery-card,.gallery-card img,.hotels .outline-link,.hotels .hotel-caption a{transition:none!important}.gallery-card:hover img,.gallery-card:focus-visible img{transform:none}}
+
+/* Destination constellation and prism gallery */
+.hotels{position:relative;min-height:0;overflow:hidden;background:#f8f7f3;padding:clamp(100px,9vw,140px) clamp(40px,6vw,112px) clamp(100px,9vw,140px)}
+.hotels .hotel-content{max-width:1600px;margin:auto}
+.city-heading{text-align:center;position:relative;z-index:2}
+.city-heading p{margin:0 0 15px;color:#4f5660;font:700 12px/1.4 var(--sans);letter-spacing:.48em;text-transform:uppercase}
+.city-heading h2{margin:0;color:#e86f0d;font:400 clamp(48px,5.2vw,84px)/1.06 var(--serif);letter-spacing:-.055em;text-transform:uppercase}
+.city-heading>span{display:block;margin-top:6px;color:#59616a;font:400 clamp(18px,1.7vw,26px)/1.45 var(--sans)}
+.city-constellation{height:clamp(310px,27vw,390px);position:relative;margin-top:30px;isolation:isolate}
+.city-map{position:absolute;inset:-70px 8% -35px;width:84%;height:calc(100% + 105px);object-fit:contain;opacity:.13;filter:grayscale(1);pointer-events:none;z-index:-2}
+.city-routes{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:-1}
+.city-routes path{fill:none;stroke:#aab0ae;stroke-width:.9;opacity:.45;vector-effect:non-scaling-stroke}
+.city-routes .city-route-active{stroke:#ed7415;stroke-width:1.5;opacity:.88;transition:d .6s cubic-bezier(.22,.61,.36,1)}
+.city-waypoints{position:absolute;inset:0}
+.city-waypoint{position:absolute;left:var(--x);top:var(--y);display:inline-flex;align-items:center;gap:11px;min-height:46px;padding:2px 9px;border:0;background:transparent;color:#4f5760;white-space:nowrap;cursor:pointer;transform:translate(-10px,-50%);transition:color .5s,transform .5s}
+.city-label{font:400 clamp(16px,1.35vw,22px)/1.15 var(--serif)}
+.city-point{position:relative;flex:none;width:13px;height:13px;border:1.5px solid #ec7416;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 3px #fff}
+.city-point::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#ef7a18;transition:inset .5s,background .5s}
+.city-waypoint.is-active{color:#e66c0b;transform:translate(-10px,-50%) scale(1.07);z-index:2}
+.city-waypoint.is-active .city-label{font-size:clamp(24px,2.3vw,37px)}
+.city-waypoint.is-active .city-point{background:#f07813;box-shadow:0 0 0 7px rgb(240 139 29 / 17%)}
+.city-waypoint.is-active .city-point::after{inset:0}
+.city-waypoint:hover,.city-waypoint:focus-visible{color:#d96609;z-index:3}
+.city-waypoint:hover .city-point,.city-waypoint:focus-visible .city-point{box-shadow:0 0 0 9px rgb(240 139 29 / 13%)}
+.city-waypoint:active .city-point{transform:scale(.8)}
+.city-waypoint:focus-visible,.prism-card:focus-visible,.prism-arrow:focus-visible,.city-properties button:focus-visible{outline:2px solid #a64d0a;outline-offset:4px}
+.city-view{position:relative;z-index:1;margin-top:-80px}
+.prism-gallery{position:relative;height:clamp(300px,30vw,440px);max-width:1400px;margin:auto;perspective:1200px}
+.prism-card{position:absolute;top:0;left:50%;width:46%;height:100%;padding:0;border:1px solid rgb(237 116 21 / 24%);border-radius:8px;overflow:hidden;background:#e9e5de;cursor:pointer;box-shadow:0 16px 33px rgb(75 57 40 / 9%);transition:left .62s cubic-bezier(.22,.61,.36,1),top .62s cubic-bezier(.22,.61,.36,1),width .62s cubic-bezier(.22,.61,.36,1),height .62s cubic-bezier(.22,.61,.36,1),transform .62s cubic-bezier(.22,.61,.36,1),opacity .62s ease,filter .62s ease,box-shadow .62s ease;transform:translateX(-50%);z-index:5}
+.prism-card img{width:100%;height:100%;object-fit:cover;filter:grayscale(1);transition:filter .62s ease,transform .62s ease}
+.prism-card:hover img{transform:scale(1.025)}
+.prism-card.is-active{border-color:#e97415;box-shadow:0 20px 44px rgb(87 61 33 / 14%)}
+.prism-card.is-active img{filter:grayscale(0)}
+.prism-card[data-slot="-1"],.prism-card[data-slot="1"]{top:8%;width:18%;height:84%;z-index:3}
+.prism-card[data-slot="-1"]{left:20%;transform:translateX(-50%) rotateY(14deg)}
+.prism-card[data-slot="1"]{left:80%;transform:translateX(-50%) rotateY(-14deg)}
+.prism-card[data-slot="-2"],.prism-card[data-slot="2"]{top:14%;width:10%;height:72%;z-index:1;filter:brightness(.91)}
+.prism-card[data-slot="-2"]{left:7%;transform:translateX(-50%) rotateY(18deg)}
+.prism-card[data-slot="2"]{left:93%;transform:translateX(-50%) rotateY(-18deg)}
+.prism-card[data-slot="away"]{opacity:0;pointer-events:none;z-index:0;transform:translateX(-50%) scale(.72)}
+.prism-footer{display:grid;grid-template-columns:56px minmax(0,1fr) 56px;align-items:start;gap:20px;max-width:670px;margin:30px auto 0;text-align:center}
+.prism-caption p{margin:0;color:#5d6570;font:700 12px/1.4 var(--sans);letter-spacing:.25em;text-transform:uppercase}
+.prism-caption h3{margin:8px 0 0;color:#e66c0b;font:400 clamp(28px,3vw,46px)/1.1 var(--serif);text-transform:uppercase}
+.prism-arrow{width:52px;height:52px;border:1px solid #9fa4a5;border-radius:50%;background:#fffaf5;color:#434950;font:400 26px/1 var(--sans);cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.prism-arrow:hover{background:#f08b1d;border-color:#f08b1d;transform:translateY(-2px)}
+.prism-arrow:active{transform:translateY(1px) scale(.95)}
+.city-properties{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;margin-top:16px}
+.city-properties[hidden]{display:none}
+.city-properties span{flex:0 0 100%;color:#656b70;font:700 11px var(--sans);letter-spacing:.14em;text-transform:uppercase}
+.city-properties button{padding:8px 12px;border:1px solid #c6b7a8;border-radius:0;background:#fffaf4;color:#4d5155;font:700 12px var(--sans);cursor:pointer}
+.city-properties button[aria-pressed="true"]{border-color:#e67c16;background:#f08b1d;color:#2b221b}
+@media(max-width:850px){.hotels{padding-inline:clamp(24px,5vw,46px)}.city-constellation{height:390px}.city-waypoint{--x:0!important;--y:0!important;position:relative;left:auto;top:auto;transform:none!important;min-height:48px}.city-waypoints{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;align-content:center;height:100%}.city-route-active{display:none}.city-view{margin-top:-15px}.prism-gallery{height:380px}.prism-card{width:54%}.prism-card[data-slot="-1"],.prism-card[data-slot="1"]{width:21%}.prism-card[data-slot="-1"]{left:16%}.prism-card[data-slot="1"]{left:84%}.prism-card[data-slot="-2"],.prism-card[data-slot="2"]{display:none}}
+@media(max-width:600px){.hotels{padding:95px 20px 100px}.city-heading h2{font-size:clamp(38px,11vw,55px)}.city-heading>span{font-size:17px}.city-constellation{height:auto;margin-top:34px;margin-bottom:26px}.city-waypoints{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 8px}.city-waypoint{gap:8px;padding:4px;white-space:normal}.city-waypoint.is-active .city-label{font-size:23px}.city-label{font-size:17px}.city-routes{display:none}.city-map{inset:0;width:100%;height:100%;opacity:.07}.city-view{margin-top:0}.prism-gallery{height:310px;margin-inline:-20px;overflow:hidden}.prism-card{width:72%}.prism-card[data-slot="-1"],.prism-card[data-slot="1"]{width:32%;height:78%;top:11%}.prism-card[data-slot="-1"]{left:-4%}.prism-card[data-slot="1"]{left:104%}.prism-footer{grid-template-columns:46px minmax(0,1fr) 46px;gap:4px;margin-top:22px}.prism-arrow{width:42px;height:42px;font-size:22px}.prism-caption p{font-size:10px;letter-spacing:.15em}.prism-caption h3{font-size:25px}}
+@media(prefers-reduced-motion:reduce){.city-waypoint,.city-point,.city-routes .city-route-active,.prism-card,.prism-card img,.prism-arrow{transition:none!important}}
