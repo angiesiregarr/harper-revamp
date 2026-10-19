@@ -1238,6 +1238,70 @@ html{overflow-anchor:none}
 @media(prefers-reduced-motion:reduce){.site-nav,.hero-booking{transition:none}}
 @media(prefers-reduced-motion:reduce){.city-routes .city-route{transition:none!important;stroke-dashoffset:0!important}}
 
+/* Harper Journal: one open notebook, with a cover that opens in place. */
+.journal-paper-area{background:#f5f2ec}
+.news-section,.news-section.portal-ready{width:min(1530px,calc(100% - clamp(32px,7vw,136px)));max-width:none;margin:-32px auto 0;padding:clamp(28px,4vw,56px) clamp(20px,3vw,46px) 78px;background:transparent;border:0;box-shadow:none;overflow:visible;translate:none;scale:1;opacity:1}
+.news-section::before{display:none}
+.journal-book{position:relative;isolation:isolate;min-height:690px;padding-left:34px;filter:drop-shadow(0 17px 25px #3c302426);perspective:1800px}
+.journal-book::before{content:"";position:absolute;inset:8px 10px -7px 35px;border-radius:4px 14px 16px 4px;background:repeating-linear-gradient(180deg,#f6f0e5 0 2px,#d9cfc0 3px 4px);box-shadow:0 2px 3px #5b514324}
+.journal-spine{position:absolute;z-index:5;inset:0 auto 0 0;width:39px;border-radius:10px 0 0 10px;background:linear-gradient(90deg,#272726,#47413b 45%,#302e2c 78%,#1f1f1f);box-shadow:inset -4px 0 5px #0005;color:#d4c8b7;display:flex;align-items:center;justify-content:center}
+.journal-spine span{writing-mode:vertical-rl;transform:rotate(180deg);font:600 11px var(--serif);letter-spacing:.24em;white-space:nowrap}
+.journal-spread{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;min-height:690px;margin-left:3px;border:1px solid #d8cfc1;border-radius:0 13px 13px 0;overflow:hidden;background:#f7f2e9}
+.journal-page{position:relative;display:flex;flex-direction:column;min-width:0;padding:clamp(30px,3.2vw,55px) clamp(27px,3.4vw,62px) 28px;background:linear-gradient(100deg,#f8f3ea,#f5efe4 82%,#eae0d1);}
+.journal-page::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.17;background:url('./assets/paper-grain.svg') repeat;background-size:180px 180px}
+.journal-page-left{box-shadow:inset -9px 0 14px #5e49321c;border-right:1px solid #d4c7b7}
+.journal-page-right{background:linear-gradient(90deg,#e9dfd1 0,#f6f0e6 6%,#faf5ec 100%);box-shadow:inset 11px 0 16px #5e493218}
+.journal-page>*{position:relative}
+.news-section .news-heading{max-width:none;margin:0 0 26px;padding:0;text-align:left}
+.journal-eyebrow,.journal-page-rule,.journal-right-heading>span,.journal-folio{font:700 10px/1.35 var(--sans);letter-spacing:.16em;color:#906c4d}
+.journal-eyebrow{margin:0 0 9px}.journal-eyebrow span{color:#e98124;padding:0 5px}
+.news-section .news-heading h2{font:400 clamp(38px,3.2vw,46px)/1.08 var(--serif);letter-spacing:-.045em;text-transform:none;color:#342820;margin:0}
+.journal-intro{margin:8px 0 0;color:#746a61;font:400 14px/1.45 var(--sans)}
+.journal-page-rule{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid #ba9b7e;border-bottom:1px solid #d9c6b2;margin-bottom:19px}
+.journal-feature{flex:1}
+.news-section .news-card,.news-section .news-card:nth-child(n),.news-section .news-card:hover,.news-section .news-card:focus-visible{display:block;min-width:0;margin:0;padding:0;color:inherit;background:transparent;border:0;border-radius:0;box-shadow:none;opacity:1;transform:none;translate:none;transition:none}
+.news-section .news-card:focus-visible{outline:2px solid #e67712;outline-offset:6px}
+.news-section .news-photo{height:auto;aspect-ratio:1.63;overflow:hidden;background:#dcd2c6;box-shadow:none}
+.news-section .news-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+.news-section .news-card:hover .news-photo img,.news-section .news-card:focus-visible .news-photo img{transform:scale(1.035)}
+.news-section .news-copy{padding:13px 0 0}
+.news-section .news-meta{display:flex;justify-content:space-between;gap:8px;margin:0 0 9px;font:700 10px/1.35 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#8a7059}
+.news-section .news-meta>span{display:inline}
+.news-section .news-copy h3{display:block;overflow:visible;min-height:0;margin:0;color:#322a25;text-transform:none;letter-spacing:-.025em;font:400 clamp(17px,1.35vw,20px)/1.26 var(--serif);transition:color .25s ease}
+.news-section .news-card:hover h3,.news-section .news-card:focus-visible h3{color:#b75f1a}
+.news-section .journal-feature h3{font-size:clamp(25px,2vw,29px);line-height:1.22}
+.news-excerpt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:11px 0 0;color:#675d53;font:400 14px/1.46 var(--sans)}
+.news-section .news-read{display:inline-flex;align-items:center;gap:9px;margin:12px 0 0;color:#bc6018;font:700 12px/1.2 var(--sans);letter-spacing:.045em;text-transform:uppercase;opacity:1;transform:none}
+.news-section .news-read>span{display:inline-block;font:400 17px/1 var(--sans);transition:transform .24s ease}
+.news-section .news-card:hover .news-read>span,.news-section .news-card:focus-visible .news-read>span{transform:translate(3px,-3px)}
+.journal-folio{display:flex;justify-content:space-between;gap:12px;margin:auto 0 0;padding-top:20px;border-top:1px solid #cfc0ad}
+.journal-right-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid #ba9b7e;margin-bottom:18px}.journal-right-heading .journal-eyebrow{margin:0}
+.news-section .news-track{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 22px;max-width:none;margin:0 0 22px;padding:0;overflow:visible;clip-path:none;align-items:start;scroll-snap-type:none;scale:1}
+.news-section.portal-ready .news-track{clip-path:none;opacity:1;transform:none;transition:none}
+.news-section .news-track .news-photo{aspect-ratio:1.65}
+.news-section .news-track .news-copy{padding-top:8px}
+.news-section .news-track .news-meta{font-size:9px;margin-bottom:6px;flex-wrap:wrap}
+.news-section .news-track h3{font-size:clamp(16px,1.18vw,19px);line-height:1.25}
+.news-section .news-track .news-read{margin-top:7px;font-size:11px}
+.journal-elastic{position:absolute;z-index:6;top:0;bottom:0;right:clamp(14px,2vw,27px);width:11px;background:linear-gradient(90deg,#a9490b,#ef8424 40%,#cb6014 84%,#8c3908);box-shadow:-2px 0 3px #4a261537,2px 0 3px #4a261537;pointer-events:none}
+.journal-bookmark{position:absolute;z-index:4;top:-9px;right:14%;width:26px;height:72px;background:#df741e;clip-path:polygon(0 0,100% 0,100% 100%,50% 79%,0 100%);box-shadow:0 2px 3px #74381033;pointer-events:none}
+.journal-cover{position:absolute;z-index:4;inset:0 0 0 38px;display:flex;flex-direction:column;align-items:flex-start;padding:9% 9%;border-radius:0 13px 13px 0;background:linear-gradient(116deg,#272726,#48413a 65%,#292827);color:#f4e8d8;transform-origin:0 50%;backface-visibility:hidden;pointer-events:none;opacity:0;transform:rotateY(-165deg)}
+.journal-cover::before{content:"";position:absolute;inset:12px;border:1px solid #ddc6a064;border-radius:0 7px 7px 0;pointer-events:none}
+.journal-cover-mark{font:400 20px var(--serif);letter-spacing:.22em}.journal-cover-mark small{display:block;margin-top:5px;font:700 8px var(--sans);letter-spacing:.3em}
+.journal-cover-title{margin:auto 0;font:400 clamp(56px,7vw,110px)/1.04 var(--serif);letter-spacing:-.04em}.journal-cover-foot{font:700 10px var(--sans);letter-spacing:.2em}
+.js .journal-book.is-closed .journal-cover,.js .journal-book.is-opening .journal-cover{opacity:1;transform:rotateY(0)}
+.js .journal-book.is-closed .journal-page>*:not(.journal-folio),.js .journal-book.is-opening .journal-page>*:not(.journal-folio){opacity:0}
+.js .journal-book.is-opening .journal-cover{animation:journal-open-cover .85s cubic-bezier(.2,.72,.22,1) both}
+.js .journal-book.is-opening .journal-page>*:not(.journal-folio){animation:journal-content-in .5s ease .16s both}
+.js .journal-book.is-open .journal-cover{opacity:0;transform:rotateY(-165deg)}
+.js .journal-book.is-open .journal-page>*:not(.journal-folio){opacity:1}
+@keyframes journal-open-cover{0%{opacity:1;transform:rotateY(0)}72%{opacity:1}100%{opacity:0;transform:rotateY(-165deg)}}
+@keyframes journal-content-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@media(max-width:1100px){.journal-book,.journal-spread{min-height:0}.journal-spread{display:block}.journal-page{padding:30px clamp(27px,5vw,48px) 25px}.journal-page-left{border-right:0;border-bottom:1px solid #cfbdab;box-shadow:none}.journal-page-right{background:#f8f2e8}.news-section .journal-feature{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.news-section .journal-feature .news-copy{padding:0}.news-section .news-track{gap:22px}.news-section .news-track h3{font-size:18px}.news-section .news-track .news-photo{aspect-ratio:1.85}.journal-page-rule{margin-bottom:16px}.journal-right-heading{margin-bottom:16px}.journal-folio{margin-top:24px}}
+@media(max-width:800px){.news-section,.news-section.portal-ready{width:calc(100% - 28px);margin-top:-20px;padding:25px 0 70px}.journal-book{padding-left:27px}.journal-spine{width:30px}.journal-spine span{font-size:9px}.journal-spread{margin-left:2px}.journal-page{padding:27px 21px 20px}.journal-book,.journal-spread{min-height:0}.news-section .news-heading h2{font-size:37px}.news-section .news-track{grid-template-columns:1fr 1fr;gap:17px 14px}.news-section .news-track h3{font-size:15px}.news-section .news-track .news-meta{font-size:8px}.journal-right-heading>span{display:none}.journal-elastic{right:10px;width:8px}}
+@media(max-width:620px){.news-section,.news-section.portal-ready{width:calc(100% - 22px);padding:20px 0 54px}.journal-book{padding-left:24px}.journal-spine{width:27px}.journal-spread{display:block}.journal-page{padding:29px 26px 26px}.journal-page-left{border-right:0;border-bottom:1px solid #cfbdab;box-shadow:none}.journal-page-right{background:#f8f2e8}.journal-right-heading{margin:0 0 20px}.news-section .journal-feature{display:block}.news-section .journal-feature .news-copy{padding-top:13px}.news-section .news-track{display:grid;grid-template-columns:1fr;gap:28px}.news-section .news-track .news-photo{aspect-ratio:1.75}.news-section .news-track h3{font-size:19px}.news-section .news-track .news-meta{font-size:10px}.news-section .journal-feature h3{font-size:23px}.journal-folio{margin-top:24px}.journal-elastic{right:7px;width:6px}.journal-bookmark{width:20px;height:55px}.journal-cover{display:none}}
+@media(prefers-reduced-motion:reduce){.journal-cover{display:none!important}.journal-page>*{opacity:1!important;animation:none!important;transform:none!important}.news-section .news-card .news-photo img,.news-section .news-read>span{transition:none}}
+
 /* A single visual card bridges the existing hero and city gallery in normal page flow. */
 .hero-city-handoff{position:fixed;left:0;top:0;z-index:78;display:none;overflow:hidden;pointer-events:none;border:2px solid #fff8ec;border-radius:16px;background:#efe6da;box-shadow:0 20px 42px #4e302a24;transform-origin:top left;will-change:transform,opacity,width,height}
 .hero-city-handoff img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}

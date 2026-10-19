@@ -8,10 +8,10 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=9b962ee0cce1" />
+    <link rel="stylesheet" href="./styles.css?v=fe54630b9cd6" />
     <link rel="stylesheet" href="./offers-pixel.css?v=2619944de854" />
     <script>document.documentElement.classList.add('js');</script>
-    <script src="./main.js?v=87e03e7543bb" defer></script>
+    <script src="./main.js?v=0bec065652e3" defer></script>
     <script src="./hero-carousel.js?v=30cb5a467da0" defer></script>
     <script src="./offers-pixel.js?v=911307990b3b" defer></script>
   </head>
@@ -99,58 +99,31 @@
 
       <div class="journal-paper-area">
       <section class="journal news-section" id="journal" aria-labelledby="journal-title">
-        <div class="news-heading">
-          <div><p class="section-kicker"><span aria-hidden="true">✣</span> News inside Harper <span aria-hidden="true">✣</span></p><h2 id="journal-title">The Journal</h2></div>
-        </div>
-        <div class="news-track" id="news-track" aria-label="Harper journal articles">
-          <a class="news-card" href="./news/recognition.html" aria-labelledby="news-recognition-title">
-            <div class="news-photo"><img src="./assets/journal-award.png" alt="" loading="lazy" /></div>
-            <div class="news-copy">
-              <p class="news-meta"><span>People · Sample</span><time datetime="2026-06-24">24 Jun 2026</time></p>
-              <h3 id="news-recognition-title">Meet the thoughtful people who turn every Harper arrival into a warmer welcome and a memorable stay</h3>
-              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
+        <div class="journal-book" id="journal-book">
+          <div class="journal-spine" aria-hidden="true"><span>HARPER JOURNAL</span></div>
+          <div class="journal-cover" aria-hidden="true"><span class="journal-cover-mark">HARPER <small>BY ASTON</small></span><span class="journal-cover-title">The<br />Journal</span><span class="journal-cover-foot">STORIES FROM THE ROAD &nbsp; · &nbsp; VOL. 01</span></div>
+          <div class="journal-spread">
+            <div class="journal-page journal-page-left">
+              <header class="news-heading"><p class="journal-eyebrow">HARPER BY ASTON <span>·</span> THE TRAVEL NOTEBOOK</p><h2 id="journal-title">The Journal</h2><p class="journal-intro">Stories, places and people worth coming back to.</p></header>
+              <div class="journal-page-rule"><span>FEATURED STORY</span><span>ISSUE 01 / 2026</span></div>
+              <a class="news-card journal-feature" href="./news/recognition.html" aria-labelledby="news-recognition-title">
+                <div class="news-photo"><img src="./assets/journal-award.png" alt="Harper team members at an awards event" loading="lazy" /></div>
+                <div class="news-copy"><p class="news-meta"><span>People · Sample</span><time datetime="2026-06-24">24 Jun 2026</time></p><h3 id="news-recognition-title">Meet the thoughtful people who turn every Harper arrival into a warmer welcome and a memorable stay</h3><p class="news-excerpt">From the first hello to the small details that make a room feel familiar, discover how care and thoughtful gestures bring comfort to every journey.</p><span class="news-read">Read story <span aria-hidden="true">↗</span></span></div>
+              </a>
+              <p class="journal-folio">HARPER JOURNAL <span>01</span></p>
             </div>
-          </a>
-          <a class="news-card" href="./news/table.html" aria-labelledby="news-table-title">
-            <div class="news-photo"><img src="./assets/journal-table.png" alt="" loading="lazy" /></div>
-            <div class="news-copy">
-              <p class="news-meta"><span>Food &amp; culture · Sample</span><time datetime="2026-03-03">03 Mar 2026</time></p>
-              <h3 id="news-table-title">Gather around the table for familiar flavours, new conversations and moments worth staying a little longer for</h3>
-              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
+            <div class="journal-page journal-page-right">
+              <div class="journal-right-heading"><p class="journal-eyebrow">NOTES FROM HARPER</p><span>FIVE STORIES / ONE JOURNEY</span></div>
+              <div class="news-track" id="news-track" aria-label="More Harper journal articles">
+                <a class="news-card" href="./news/table.html" aria-labelledby="news-table-title"><div class="news-photo"><img src="./assets/journal-table.png" alt="A shared meal presented at Harper" loading="lazy" /></div><div class="news-copy"><p class="news-meta"><span>Food &amp; culture · Sample</span><time datetime="2026-03-03">03 Mar 2026</time></p><h3 id="news-table-title">Gather around the table for familiar flavours, new conversations and moments worth staying a little longer for</h3><span class="news-read">Read story <span aria-hidden="true">↗</span></span></div></a>
+                <a class="news-card" href="./news/taste.html" aria-labelledby="news-taste-title"><div class="news-photo"><img src="./assets/journal-chef.png" alt="Chef preparing a meal in a Harper kitchen" loading="lazy" /></div><div class="news-copy"><p class="news-meta"><span>Dining · Sample</span><time datetime="2026-02-18">18 Feb 2026</time></p><h3 id="news-taste-title">Behind the kitchen doors, discover the little details that turn a shared meal into a lasting travel memory</h3><span class="news-read">Read story <span aria-hidden="true">↗</span></span></div></a>
+                <a class="news-card" href="./news/weekend.html" aria-labelledby="news-weekend-title"><div class="news-photo"><img src="./assets/hero-room.png" alt="A comfortable Harper guest room" loading="lazy" /></div><div class="news-copy"><p class="news-meta"><span>Getaways · Sample</span><time datetime="2026-01-12">12 Jan 2026</time></p><h3 id="news-weekend-title">A slower weekend starts with a quiet corner, an open schedule and a little more time for yourself</h3><span class="news-read">Read story <span aria-hidden="true">↗</span></span></div></a>
+                <a class="news-card" href="./news/city.html" aria-labelledby="news-city-title"><div class="news-photo"><img src="./assets/hotel-pasteur.png" alt="Harper hotel and city setting" loading="lazy" /></div><div class="news-copy"><p class="news-meta"><span>Destinations · Sample</span><time datetime="2026-01-08">08 Jan 2026</time></p><h3 id="news-city-title">Take the scenic route and discover the everyday places that make a city feel like somewhere you belong</h3><span class="news-read">Read story <span aria-hidden="true">↗</span></span></div></a>
+              </div>
+              <p class="journal-folio">STORIES TO TAKE WITH YOU <span>02</span></p>
             </div>
-          </a>
-          <a class="news-card" href="./news/taste.html" aria-labelledby="news-taste-title">
-            <div class="news-photo"><img src="./assets/journal-chef.png" alt="" loading="lazy" /></div>
-            <div class="news-copy">
-              <p class="news-meta"><span>Dining · Sample</span><time datetime="2026-02-18">18 Feb 2026</time></p>
-              <h3 id="news-taste-title">Behind the kitchen doors, discover the little details that turn a shared meal into a lasting travel memory</h3>
-              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
-            </div>
-          </a>
-          <a class="news-card" href="./news/weekend.html" aria-labelledby="news-weekend-title">
-            <div class="news-photo"><img src="./assets/hero-room.png" alt="" loading="lazy" /></div>
-            <div class="news-copy">
-              <p class="news-meta"><span>Getaways · Sample</span><time datetime="2026-01-12">12 Jan 2026</time></p>
-              <h3 id="news-weekend-title">A slower weekend starts with a quiet corner, an open schedule and a little more time for yourself</h3>
-              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
-            </div>
-          </a>
-          <a class="news-card" href="./news/city.html" aria-labelledby="news-city-title">
-            <div class="news-photo"><img src="./assets/hotel-pasteur.png" alt="" loading="lazy" /></div>
-            <div class="news-copy">
-              <p class="news-meta"><span>Destinations · Sample</span><time datetime="2026-01-08">08 Jan 2026</time></p>
-              <h3 id="news-city-title">Take the scenic route and discover the everyday places that make a city feel like somewhere you belong</h3>
-              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
-            </div>
-          </a>
-          <a class="news-card" href="./news/moments.html" aria-labelledby="news-moments-title">
-            <div class="news-photo"><img src="./assets/moment-2.png" alt="" loading="lazy" /></div>
-            <div class="news-copy">
-              <p class="news-meta"><span>Inspiration · Sample</span><time datetime="2026-01-05">05 Jan 2026</time></p>
-              <h3 id="news-moments-title">Make room for meaningful moments with the people you love, from the first morning coffee to the last goodbye</h3>
-              <span class="news-read">Read more <span aria-hidden="true">↗</span></span>
-            </div>
-          </a>
+          </div>
+          <div class="journal-elastic" aria-hidden="true"></div><div class="journal-bookmark" aria-hidden="true"></div>
         </div>
       </section>
       </div>

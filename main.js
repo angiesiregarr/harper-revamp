@@ -139,18 +139,56 @@ function setupMenu() {
 }
 
 function setupNews() {
-  const cards = [...document.querySelectorAll('.news-card')];
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-  cards.forEach(card => card.classList.add('portal-pending'));
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.remove('portal-pending');
-      entry.target.classList.add('portal-visible');
-      observer.unobserve(entry.target);
-    });
-  }, {threshold: .12, rootMargin: '0px 0px 48px 0px'});
-  cards.forEach(card => observer.observe(card));
+  const section = document.getElementById('journal');
+  const book = document.getElementById('journal-book');
+  if (!section || !book) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile = matchMedia('(max-width: 620px)');
+  let timer = 0;
+  let scheduled = false;
+  let lastY = scrollY;
+  const open = immediate => {
+    clearTimeout(timer);
+    scheduled = false;
+    book.classList.remove('is-closed');
+    book.classList.add(immediate ? 'is-open' : 'is-opening');
+    if (!immediate) timer = setTimeout(() => {
+      book.classList.remove('is-opening');
+      book.classList.add('is-open');
+    }, 900);
+  };
+  if (reduced.matches || mobile.matches || section.getBoundingClientRect().top < innerHeight * .7) {
+    open(true);
+  } else {
+    book.classList.add('is-closed');
+  }
+  const update = () => {
+    if (!book.classList.contains('is-closed')) return;
+    if (reduced.matches || mobile.matches) { open(true); return; }
+    const bounds = section.getBoundingClientRect();
+    const nav = document.getElementById('site-nav');
+    const booking = document.querySelector('.hero-booking');
+    const headerBottom = Math.max(nav?.getBoundingClientRect().bottom || 0,
+      booking?.classList.contains('is-docked') ? booking.getBoundingClientRect().bottom : 0);
+    const skipped = Math.abs(scrollY - lastY) > innerHeight * .65 || bounds.top < headerBottom + 10;
+    if (bounds.top < innerHeight * .56 && bounds.bottom > headerBottom) {
+      if (skipped) open(true);
+      else if (!scheduled) {
+        scheduled = true;
+        timer = setTimeout(() => open(false), 350);
+      }
+    }
+    lastY = scrollY;
+  };
+  addEventListener('scroll', () => requestAnimationFrame(update), {passive:true});
+  addEventListener('harper:booking-position', update);
+  addEventListener('resize', update);
+  reduced.addEventListener('change', () => { if (reduced.matches) open(true); });
+  mobile.addEventListener('change', () => { if (mobile.matches) open(true); });
+  book.addEventListener('focusin', () => open(true));
+  book.addEventListener('pointerdown', () => open(true));
+  update();
+  setTimeout(update, 120);
 }
 
 function setupSectionAnchors() {
