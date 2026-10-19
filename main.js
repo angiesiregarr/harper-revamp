@@ -25,10 +25,10 @@ function renderCity() {
     const x = px * 12 + 4.1;
     const y = py * 3.6;
     const endX = 455 + index * 26;
-    const bend = x < 600 ? 38 : -38;
-    return `<path class="city-route" data-city="${hotel.city}" pathLength="1" d="M ${x} ${y} C ${x + bend} ${Math.min(y + 54, 316)}, ${endX - bend} 325, ${endX} 350" />`;
+    const bend = x < 600 ? 1 : -1;
+    return `<path class="city-route" data-city="${hotel.city}" pathLength="1" d="M ${x} ${y} C ${x + bend * 160} 305, ${endX - bend * 90} 330, ${endX} 350" />`;
   }).join('');
-  view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><small class="prism-image-note" id="hotel-image-note" hidden>Illustrative room image</small><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
+  view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
   const panels = [...view.querySelectorAll('.prism-card')];
   const imagePreloader = new IntersectionObserver(entries => {
     if (!entries[0].isIntersecting) return;
@@ -43,6 +43,7 @@ function renderCity() {
   let preview = null;
   const show = (index) => {
     const hotel = cityHotels[index];
+    const previousRoute = routes.find(route => route.classList.contains('is-active'));
     panels.forEach((panel, i) => {
       let distance = (i - index + panels.length) % panels.length;
       if (distance > panels.length / 2) distance -= panels.length;
@@ -58,10 +59,17 @@ function renderCity() {
       point.setAttribute('aria-pressed', String(active));
     });
     routes.forEach(route => route.classList.toggle('is-active', route.dataset.city === hotel.city));
+    const activeRoute = routes[index];
+    if (activeRoute !== previousRoute && previousRoute && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      activeRoute.getAnimations().forEach(animation => animation.cancel());
+      activeRoute.animate([
+        {strokeDashoffset: '1', opacity: 0},
+        {strokeDashoffset: activeRoute.style.strokeDashoffset || '0', opacity: .85}
+      ], {duration: 620, easing: 'cubic-bezier(.22,.61,.36,1)'});
+    }
     constellation.classList.toggle('is-caribbean', hotel.city === 'punta-cana');
     document.getElementById('hotel-location').textContent = hotel.place;
     document.getElementById('hotel-name').textContent = hotel.title;
-    document.getElementById('hotel-image-note').hidden = !hotel.src.includes('-illustrative.');
     const inCity = cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city);
     const selector = document.getElementById('city-properties');
     selector.hidden = inCity.length < 2;
