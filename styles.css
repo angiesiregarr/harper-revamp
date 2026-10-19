@@ -1169,7 +1169,7 @@ body{background:#f5f2ec}
 
 /* The world map is scenery; city buttons use the editorial constellation layout. */
 .hotels{--city-available:calc(100svh - var(--city-header-clearance,58px));display:flex;flex-direction:column;justify-content:center;min-height:min(700px,calc(82svh - var(--city-header-clearance,58px)));padding:clamp(18px,3svh,34px) clamp(40px,6vw,112px);scroll-margin-top:0;isolation:isolate}
-.hotels>.city-map{position:absolute;inset:3% 0;width:100%;height:94%;object-fit:contain;opacity:.4;filter:none;mask-image:none;pointer-events:none;z-index:0}
+.hotels>.city-map{position:absolute;inset:3% 0;width:100%;height:94%;object-fit:contain;opacity:.24;filter:none;mask-image:none;pointer-events:none;z-index:0}
 .city-heading,.hotel-content{position:relative;z-index:1}
 .hotels .hotel-content{width:100%}
 .city-heading h2{font-size:33px}
@@ -1190,10 +1190,10 @@ body{background:#f5f2ec}
 .prism-card[data-slot="-2"],.prism-card[data-slot="2"]{top:14%;width:auto;height:72%;aspect-ratio:3/5}
 .prism-card[data-slot="-2"]{left:calc(50% - clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
 .prism-card[data-slot="2"]{left:calc(50% + clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
-@media(prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.4 * var(--portal-progress,1))}}
+@media(prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.24 * var(--portal-progress,1))}}
 @media(max-width:850px){
   .hotels{display:block;min-height:0;padding:clamp(24px,4vw,42px) clamp(24px,5vw,46px) 72px}
-  .hotels>.city-map{inset:2% 0;width:100%;height:96%;opacity:.28}
+  .hotels>.city-map{inset:2% 0;width:100%;height:96%;opacity:.18}
   .city-constellation{height:auto;margin-top:18px;margin-bottom:16px}
   .city-routes{display:none}
   .city-waypoints{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;height:auto;padding-top:0}
@@ -1203,6 +1203,7 @@ body{background:#f5f2ec}
   .prism-card,.prism-card.is-active{width:auto;height:100%;aspect-ratio:40/21}
   .prism-card[data-slot="-1"],.prism-card[data-slot="1"]{height:84%;top:8%}
 }
+@media(max-width:850px) and (prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.18 * var(--portal-progress,1))}}
 @media(max-width:600px){
   .hotels{padding:26px 20px 66px}
   .city-heading h2{font-size:33px}
