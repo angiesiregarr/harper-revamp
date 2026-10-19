@@ -1167,42 +1167,50 @@ body{background:#f5f2ec}
 }
 @media(prefers-reduced-motion:reduce){.prism-arrow::before{transition:none}}
 
-/* Real coastlines and geographically anchored destinations. */
+/* The world map is scenery; city buttons use the editorial constellation layout. */
+.hotels{--city-available:calc(100svh - var(--city-header-clearance,58px));display:flex;flex-direction:column;justify-content:center;min-height:min(700px,calc(82svh - var(--city-header-clearance,58px)));padding:clamp(18px,3svh,34px) clamp(40px,6vw,112px);scroll-margin-top:0;isolation:isolate}
+.hotels>.city-map{position:absolute;inset:3% 0;width:100%;height:94%;object-fit:contain;opacity:.4;filter:none;mask-image:none;pointer-events:none;z-index:0}
+.city-heading,.hotel-content{position:relative;z-index:1}
+.hotels .hotel-content{width:100%}
 .city-heading h2{font-size:33px}
-.city-constellation{height:260px;margin-top:8px}
-.city-map-frame{position:absolute;left:18.75%;top:0;width:50%;height:100%;z-index:0}
-.city-map{inset:0;width:100%;height:100%;object-fit:fill;opacity:.92;filter:none;mask-image:none;z-index:0}
-.city-markers{position:absolute;inset:0;z-index:1}
-.city-marker{position:absolute;left:var(--x);top:var(--y);width:26px;height:26px;transform:translate(-50%,-50%);cursor:pointer}
-.city-marker::before{content:'';position:absolute;left:9px;top:9px;width:8px;height:8px;border:1px solid #e87514;border-radius:50%;background:#fffaf5;box-shadow:0 0 0 2px #fffaf5}
-.city-marker.is-active::before,.city-marker:hover::before{background:#f08b1d;box-shadow:0 0 0 5px rgb(240 139 29 / 18%)}
+.city-constellation{height:clamp(170px,calc(var(--city-available) * .24),220px);margin-top:clamp(4px,1svh,12px)}
 .city-waypoints{z-index:3;pointer-events:none}
-.city-waypoint{left:var(--x);top:var(--y);min-height:36px;padding:0 6px;gap:0;transform:translateY(-50%);background:transparent;pointer-events:auto;text-shadow:0 1px 3px #f8f7f3,0 -1px 3px #f8f7f3}
-.city-waypoint-left,.city-waypoint-left.is-active{transform:translate(-100%,-50%)}
-.city-waypoint-right,.city-waypoint-right.is-active{transform:translateY(-50%)}
+.city-waypoint,.city-waypoint.is-active{left:var(--x);top:var(--y);min-height:42px;padding:2px 9px;gap:11px;transform:translate(-10px,-50%);background:transparent;pointer-events:auto;text-shadow:0 1px 3px #f8f7f3,0 -1px 3px #f8f7f3}
+.city-waypoint .city-point{display:block}
 .city-waypoint .city-label{white-space:nowrap}
 .city-routes{z-index:1;overflow:hidden}
-.city-routes .city-leader{fill:none;stroke:#a9b1ab;stroke-width:.85;opacity:.65;vector-effect:non-scaling-stroke}
-.city-routes .city-route{fill:none;stroke:#f08b1d;stroke-width:1.7;opacity:0;stroke-dasharray:1;stroke-dashoffset:0;vector-effect:non-scaling-stroke;transition:opacity .48s ease}
-.city-routes .city-route.is-active{stroke:#f08b1d;stroke-width:1.7;opacity:.85}
-.city-view{z-index:4}
-@media(min-width:851px){.hotels{padding-top:max(28px,calc(var(--booking-offset) + 28px))}.city-constellation{height:260px}.city-view{margin-top:-20px}}
-@media(prefers-reduced-motion:no-preference){.hotels.portal-ready .city-map{opacity:calc(.92 * var(--portal-progress,1))}}
+.city-routes .city-route{fill:none;stroke:#f08b1d;stroke-width:1.7;opacity:0;stroke-dasharray:1;stroke-dashoffset:0;vector-effect:non-scaling-stroke;transition:opacity .42s ease}
+.city-routes .city-route.is-active{opacity:.8}
+.city-view{z-index:4;margin-top:-12px}
+.prism-gallery{--city-card-height:clamp(165px,calc(var(--city-available) * .245),210px);height:var(--city-card-height)}
+.prism-card,.prism-card.is-active{width:auto;height:100%;aspect-ratio:40/21}
+.prism-card[data-slot="-1"],.prism-card[data-slot="1"]{top:7%;width:auto;height:86%;aspect-ratio:5/6}
+.prism-card[data-slot="-1"]{left:calc(50% - clamp(230px,calc(var(--city-card-height) * 1.4),295px))}
+.prism-card[data-slot="1"]{left:calc(50% + clamp(230px,calc(var(--city-card-height) * 1.4),295px))}
+.prism-card[data-slot="-2"],.prism-card[data-slot="2"]{top:14%;width:auto;height:72%;aspect-ratio:3/5}
+.prism-card[data-slot="-2"]{left:calc(50% - clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
+.prism-card[data-slot="2"]{left:calc(50% + clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
+@media(prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.4 * var(--portal-progress,1))}}
 @media(max-width:850px){
-  .city-constellation{height:auto;margin-top:12px;margin-bottom:18px}
-  .city-map-frame{left:0;top:0;width:100%;height:195px}
-  .city-map{inset:0;width:100%;height:100%;opacity:.92}
+  .hotels{display:block;min-height:0;padding:clamp(24px,4vw,42px) clamp(24px,5vw,46px) 72px}
+  .hotels>.city-map{inset:2% 0;width:100%;height:96%;opacity:.28}
+  .city-constellation{height:auto;margin-top:18px;margin-bottom:16px}
   .city-routes{display:none}
-  .city-waypoints{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;height:auto;padding-top:208px}
-  .city-waypoint,.city-waypoint-left,.city-waypoint-right,.city-waypoint.is-active{position:relative;left:auto;top:auto;min-height:44px;padding:4px 8px;transform:none!important;background:transparent}
-  .city-waypoint::before{content:'';flex:none;width:7px;height:7px;margin-right:8px;border:1px solid #e87514;border-radius:50%;background:#fffaf5}
-  .city-waypoint.is-active::before{background:#f08b1d}
+  .city-waypoints{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;height:auto;padding-top:0}
+  .city-waypoint,.city-waypoint.is-active{position:relative;left:auto;top:auto;min-height:44px;padding:4px 8px;transform:none!important}
+  .city-view{margin-top:0}
+  .prism-gallery{height:190px}
+  .prism-card,.prism-card.is-active{width:auto;height:100%;aspect-ratio:40/21}
+  .prism-card[data-slot="-1"],.prism-card[data-slot="1"]{height:84%;top:8%}
 }
 @media(max-width:600px){
+  .hotels{padding:26px 20px 66px}
   .city-heading h2{font-size:33px}
-  .city-constellation{margin-top:16px;margin-bottom:18px}
-  .city-map-frame{height:170px}
-  .city-waypoints{grid-template-columns:repeat(2,minmax(0,1fr));padding-top:180px}
+  .city-waypoints{grid-template-columns:repeat(2,minmax(0,1fr))}
   .city-waypoint .city-label{white-space:normal}
+  .prism-gallery{height:min(210px,calc(52.5vw - 21px));margin-inline:auto;overflow:visible}
+  .prism-card,.prism-card.is-active{height:100%;width:auto;aspect-ratio:40/21}
+  .prism-card[data-slot="-1"]{left:calc(50% - min(48vw,200px))}
+  .prism-card[data-slot="1"]{left:calc(50% + min(48vw,200px))}
 }
 @media(prefers-reduced-motion:reduce){.city-routes .city-route{transition:none!important;stroke-dashoffset:0!important}}
