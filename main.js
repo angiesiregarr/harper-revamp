@@ -1,26 +1,44 @@
 const officialSite = 'https://harperhotels.com/';
 const cityHotels = [
-  { city: 'jakarta', place: 'Jakarta, Indonesia', title: 'Harper MT Haryono', src: './assets/harper-room-03.jpg', alt: 'Guest suite at Harper MT Haryono in Jakarta' },
-  { city: 'jakarta', place: 'Jakarta, Indonesia', title: 'Harper Cawang', src: './assets/hotel-cawang.png', alt: 'Harper Cawang exterior in Jakarta' },
-  { city: 'bali', place: 'Kuta, Bali, Indonesia', title: 'Harper Kuta Bali', src: './assets/harper-room-01.jpg', alt: 'Guest room at Harper Kuta Bali' },
-  { city: 'yogyakarta', place: 'Yogyakarta, Indonesia', title: 'Harper Malioboro Yogyakarta', src: './assets/harper-room-02.jpg', alt: 'Guest room at Harper Malioboro Yogyakarta' },
-  { city: 'makassar', place: 'Makassar, Indonesia', title: 'Harper Perintis', src: './assets/harper-room-04.jpg', alt: 'Twin guest room at Harper Perintis in Makassar' },
+  { city: 'jakarta', label: 'Jakarta', place: 'Jakarta, Indonesia', title: 'Harper MT Haryono (Cawang)', src: './assets/harper-room-03.jpg', alt: 'Guest suite at Harper MT Haryono in Jakarta' },
+  { city: 'bali', label: 'Bali', place: 'Kuta, Bali, Indonesia', title: 'Harper Kuta Bali', src: './assets/harper-room-01.jpg', alt: 'Guest room at Harper Kuta Bali' },
+  { city: 'yogyakarta', label: 'Yogyakarta', place: 'Yogyakarta, Indonesia', title: 'Harper Malioboro Yogyakarta', src: './assets/harper-room-02.jpg', alt: 'Guest room at Harper Malioboro Yogyakarta' },
+  { city: 'cikarang', label: 'Cikarang', place: 'Cikarang, Indonesia', title: 'Harper Cikarang', src: './assets/city-cikarang-illustrative.webp', alt: 'Illustrative twin guest room representing a stay in Cikarang' },
+  { city: 'purwakarta', label: 'Purwakarta', place: 'Purwakarta, Indonesia', title: 'Harper Purwakarta', src: './assets/city-purwakarta-illustrative.webp', alt: 'Illustrative guest room representing a stay in Purwakarta' },
   { city: 'palembang', place: 'Palembang, Indonesia', title: 'Harper Palembang', src: './assets/harper-room-05.jpg', alt: 'Guest room at Harper Palembang' },
+  { city: 'medan', label: 'Medan', place: 'Medan, Indonesia', title: 'Harper Wahid Hasyim - Medan', src: './assets/city-medan-illustrative.webp', alt: 'Illustrative guest room representing a stay in Medan' },
   { city: 'banjarmasin', place: 'Banjarmasin, Indonesia', title: 'Harper Banjarmasin', src: './assets/harper-room-07.jpg', alt: 'Twin guest room at Harper Banjarmasin' },
+  { city: 'makassar', place: 'Makassar, Indonesia', title: 'Harper Perintis - Makassar', src: './assets/harper-room-04.jpg', alt: 'Twin guest room at Harper Perintis in Makassar' },
   { city: 'kupang', place: 'Kupang, Indonesia', title: 'Harper Kupang', src: './assets/harper-room-08.jpg', alt: 'Guest room at Harper Kupang' },
-  { city: 'bandung', place: 'Bandung, Indonesia', title: 'Harper Pasteur', src: './assets/hotel-pasteur.png', alt: 'Harper Pasteur exterior in Bandung' },
+  { city: 'batam', label: 'Batam', place: 'Batam, Indonesia', title: 'Harper Premier Nagoya Batam', src: './assets/city-batam-illustrative.webp', alt: 'Illustrative guest room representing a stay in Batam' },
+  { city: 'punta-cana', label: 'Punta Cana', place: 'Punta Cana, Dominican Republic', title: 'Reserva Real by Harper', src: './assets/city-punta-cana-illustrative.webp', alt: 'Illustrative Caribbean suite representing a stay in Punta Cana' },
 ];
 
 function renderCity() {
   const view = document.getElementById('city-view');
   const waypointHost = document.getElementById('city-waypoints');
-  const cities = [...new Set(cityHotels.map(hotel => hotel.city))];
-  const positions = [[8, 18], [25, 54], [48, 24], [79, 13], [71, 61], [28, 9], [6, 73], [91, 75]];
-  waypointHost.innerHTML = cities.map((city, index) => `<button class="city-waypoint" type="button" data-city="${city}" style="--x:${positions[index][0]}%;--y:${positions[index][1]}%" aria-label="Preview Harper hotels in ${city[0].toUpperCase() + city.slice(1)}"><span class="city-point" aria-hidden="true"></span><span class="city-label">${city[0].toUpperCase() + city.slice(1)}</span></button>`).join('');
-  view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
+  const positions = [[8, 16], [24, 61], [49, 23], [43, 70], [65, 71], [75, 35], [8, 76], [29, 9], [83, 13], [91, 75], [59, 6], [79, 59]];
+  waypointHost.innerHTML = cityHotels.map((hotel, index) => `<button class="city-waypoint" type="button" data-city="${hotel.city}" style="--x:${positions[index][0]}%;--y:${positions[index][1]}%" aria-label="Preview ${hotel.title} in ${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}"><span class="city-point" aria-hidden="true"></span><span class="city-label">${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span></button>`).join('');
+  const routeHost = document.querySelector('.city-routes');
+  routeHost.innerHTML = cityHotels.map((hotel, index) => {
+    const [px, py] = positions[index];
+    const x = px * 12 + 4.1;
+    const y = py * 3.6;
+    const endX = 455 + index * 26;
+    const bend = x < 600 ? 38 : -38;
+    return `<path class="city-route" data-city="${hotel.city}" pathLength="1" d="M ${x} ${y} C ${x + bend} ${Math.min(y + 54, 316)}, ${endX - bend} 325, ${endX} 350" />`;
+  }).join('');
+  view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><small class="prism-image-note" id="hotel-image-note" hidden>Illustrative room image</small><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
   const panels = [...view.querySelectorAll('.prism-card')];
+  const imagePreloader = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+    panels.forEach(panel => { panel.querySelector('img').loading = 'eager'; });
+    imagePreloader.disconnect();
+  }, {rootMargin: '600px'});
+  imagePreloader.observe(document.getElementById('hotels'));
   const waypoints = [...waypointHost.querySelectorAll('.city-waypoint')];
-  const route = document.querySelector('.city-route-active');
+  const routes = [...routeHost.querySelectorAll('.city-route')];
+  const constellation = document.querySelector('.city-constellation');
   let committed = 0;
   let preview = null;
   const show = (index) => {
@@ -39,12 +57,11 @@ function renderCity() {
       point.classList.toggle('is-active', active);
       point.setAttribute('aria-pressed', String(active));
     });
-    const point = waypoints.find(item => item.dataset.city === hotel.city);
-    const x = parseFloat(point.style.getPropertyValue('--x')) * 12;
-    const y = parseFloat(point.style.getPropertyValue('--y')) * 3.6;
-    route.setAttribute('d', `M ${x} ${y} C ${x + (600 - x) * .42} ${Math.min(y + 115, 320)}, 460 225, 600 360`);
+    routes.forEach(route => route.classList.toggle('is-active', route.dataset.city === hotel.city));
+    constellation.classList.toggle('is-caribbean', hotel.city === 'punta-cana');
     document.getElementById('hotel-location').textContent = hotel.place;
     document.getElementById('hotel-name').textContent = hotel.title;
+    document.getElementById('hotel-image-note').hidden = !hotel.src.includes('-illustrative.');
     const inCity = cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city);
     const selector = document.getElementById('city-properties');
     selector.hidden = inCity.length < 2;
@@ -261,6 +278,9 @@ function setupSectionPortalMotion() {
         section.style.setProperty('--city-portal-scale', (1 - .055 * remaining).toFixed(4));
         section.style.setProperty('--city-portal-color', remaining.toFixed(4));
         section.style.setProperty('--city-portal-opacity', (1 - .58 * remaining).toFixed(4));
+        section.querySelectorAll('.city-route').forEach((route, index) => {
+          route.style.strokeDashoffset = (1 - clamp((eased - index * .024) / .68)).toFixed(3);
+        });
       }
       section.style.setProperty('--portal-circle', `${(18 + 132 * eased).toFixed(2)}%`);
       section.style.setProperty('--portal-curtain', `${(mobile ? 0 : 11 * remaining).toFixed(2)}%`);

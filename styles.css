@@ -1166,3 +1166,20 @@ body{background:#f5f2ec}
   .prism-caption h3{font-size:24px}
 }
 @media(prefers-reduced-motion:reduce){.prism-arrow::before{transition:none}}
+
+/* Twelve destination routes stay attached to their city points; only their color changes. */
+.city-heading h2{font-size:33px}
+.city-constellation{margin-top:13px}
+.city-map{inset:-24px 5% -18px;width:90%;height:calc(100% + 42px);object-fit:contain;opacity:.36;filter:none}
+.city-routes .city-route{fill:none;stroke:#aab0ae;stroke-width:1;opacity:.42;stroke-dasharray:1;stroke-dashoffset:0;vector-effect:non-scaling-stroke;transition:stroke .38s ease,stroke-width .38s ease,opacity .38s ease}
+.city-routes .city-route.is-active{stroke:#f08b1d;stroke-width:1.7;opacity:.85}
+.city-map-glow{position:absolute;z-index:-1;width:72px;height:72px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgb(240 139 29 / 17%),transparent 70%);filter:blur(10px);opacity:.15;transition:opacity .45s ease}
+.city-map-glow-indonesia{left:76%;top:51%}
+.city-map-glow-caribbean{left:34%;top:34%}
+.city-constellation:not(.is-caribbean) .city-map-glow-indonesia,.city-constellation.is-caribbean .city-map-glow-caribbean{opacity:.5}
+.prism-image-note{display:block;margin-top:7px;color:#72777a;font:400 10px/1.3 var(--sans);letter-spacing:.1em;text-transform:uppercase}
+.prism-image-note[hidden]{display:none}
+@media(prefers-reduced-motion:no-preference){.hotels.portal-ready .city-map{opacity:calc(.36 * var(--portal-progress,1))}}
+@media(max-width:850px){.city-routes{display:none}.city-map{inset:0;width:100%;height:100%;opacity:.24}.city-map-glow{display:none}}
+@media(max-width:600px){.city-heading h2{font-size:33px}.city-constellation{margin-top:22px}.city-map{opacity:.13}}
+@media(prefers-reduced-motion:reduce){.city-routes .city-route,.city-map-glow{transition:none!important}.city-routes .city-route{stroke-dashoffset:0!important}}
