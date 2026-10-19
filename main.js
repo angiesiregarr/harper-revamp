@@ -17,7 +17,7 @@ function renderCity() {
   const cities = [...new Set(cityHotels.map(hotel => hotel.city))];
   const positions = [[8, 18], [25, 54], [48, 24], [79, 13], [71, 61], [28, 9], [6, 73], [91, 75]];
   waypointHost.innerHTML = cities.map((city, index) => `<button class="city-waypoint" type="button" data-city="${city}" style="--x:${positions[index][0]}%;--y:${positions[index][1]}%" aria-label="Preview Harper hotels in ${city[0].toUpperCase() + city.slice(1)}"><span class="city-point" aria-hidden="true"></span><span class="city-label">${city[0].toUpperCase() + city.slice(1)}</span></button>`).join('');
-  view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel">←</button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel">→</button></div>`;
+  view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
   const panels = [...view.querySelectorAll('.prism-card')];
   const waypoints = [...waypointHost.querySelectorAll('.city-waypoint')];
   const route = document.querySelector('.city-route-active');
@@ -250,10 +250,18 @@ function setupSectionPortalMotion() {
       if (section.classList.contains('hero')) continue;
       const bounds = section.getBoundingClientRect();
       if (bounds.bottom < -100 || bounds.top > height + 100) continue;
-      const progress = clamp((height - bounds.top) / (height * (mobile ? .62 : .72)));
+      const progress = section.classList.contains('hotels')
+        ? clamp((height - bounds.top - document.getElementById('site-nav').getBoundingClientRect().height) / (height * (mobile ? .5 : .55)))
+        : clamp((height - bounds.top) / (height * (mobile ? .62 : .72)));
       const eased = progress * progress * (3 - 2 * progress);
       const remaining = 1 - eased;
       section.style.setProperty('--portal-progress', eased.toFixed(4));
+      if (section.classList.contains('hotels')) {
+        section.style.setProperty('--city-portal-shift', `${(14 * remaining).toFixed(2)}px`);
+        section.style.setProperty('--city-portal-scale', (1 - .055 * remaining).toFixed(4));
+        section.style.setProperty('--city-portal-color', remaining.toFixed(4));
+        section.style.setProperty('--city-portal-opacity', (1 - .58 * remaining).toFixed(4));
+      }
       section.style.setProperty('--portal-circle', `${(18 + 132 * eased).toFixed(2)}%`);
       section.style.setProperty('--portal-curtain', `${(mobile ? 0 : 11 * remaining).toFixed(2)}%`);
       section.style.setProperty('--portal-radius', `${(22 * remaining).toFixed(2)}px`);

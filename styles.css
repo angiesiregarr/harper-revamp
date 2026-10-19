@@ -1122,3 +1122,47 @@ body{background:#f5f2ec}
   .prism-arrow{width:32px;height:32px;font-size:18px}
 }
 @media(prefers-reduced-motion:reduce){.city-label{transition:none!important}}
+
+/* Keep the destination scene within a wide desktop viewport below the live header. */
+.hotels{scroll-margin-top:calc(var(--top-nav-height) + var(--booking-offset) + 12px);padding-top:max(96px,calc(var(--top-nav-height) + var(--booking-offset) + 20px));padding-bottom:100px}
+.city-heading p{margin-bottom:8px}
+.city-heading h2{font-size:28px;line-height:1.18}
+.city-heading>span{margin-top:3px;font-size:14px}
+.city-constellation{height:230px;margin-top:8px}
+.city-view{margin-top:-20px}
+.city-label{font-size:14px;line-height:1.2}
+.city-waypoint.is-active .city-label,.city-waypoint:hover .city-label,.city-waypoint:focus-visible .city-label{font-size:16px}
+.prism-footer{grid-template-columns:44px minmax(0,1fr) 44px;gap:10px;margin-top:12px}
+.prism-caption h3{margin-top:5px;font-size:24px}
+.prism-arrow{position:relative;isolation:isolate;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:transparent;font-size:18px;box-shadow:none}
+.prism-arrow::before{content:'';position:absolute;z-index:-1;left:6px;top:6px;width:32px;height:32px;border:1px solid #9fa4a5;border-radius:50%;background:#fffaf5;transition:background-color .2s,border-color .2s,transform .2s}
+.prism-arrow:hover,.prism-arrow:active{background:transparent}
+.prism-arrow:hover::before{background:#f08b1d;border-color:#f08b1d}
+.prism-arrow:active::before{transform:scale(.92)}
+.prism-arrow:focus-visible{outline:2px solid #a64d0a;outline-offset:0}
+@media(prefers-reduced-motion:no-preference){
+  .hotels.portal-ready .city-map{opacity:calc(.13 * var(--portal-progress,1))}
+  .hotels.portal-ready .city-routes,.hotels.portal-ready .city-waypoints{opacity:var(--city-portal-opacity,1)}
+  .hotels.portal-ready .prism-gallery{transform:translateY(var(--city-portal-shift,0px)) scale(var(--city-portal-scale,1));transform-origin:center center;opacity:var(--city-portal-opacity,1)}
+  .hotels.portal-ready .prism-card.is-active img{filter:grayscale(var(--city-portal-color,0))}
+}
+@media(max-width:850px){
+  .hotels{padding-top:max(86px,calc(var(--top-nav-height) + var(--booking-offset) + 20px));padding-bottom:90px}
+  .city-constellation{height:230px}
+  .city-view{margin-top:0}
+  .prism-gallery{height:190px}
+  .prism-card,.prism-card.is-active{width:min(362px,52vw);height:190px}
+  .prism-card[data-slot="-1"],.prism-card[data-slot="1"]{height:160px;top:15px}
+}
+@media(max-width:600px){
+  .hotels{padding-top:max(82px,calc(var(--top-nav-height) + var(--booking-offset) + 18px));padding-bottom:84px}
+  .city-heading h2{font-size:28px}
+  .city-constellation{height:auto;margin-top:26px}
+  .city-waypoint.is-active .city-label,.city-waypoint:hover .city-label,.city-waypoint:focus-visible .city-label{font-size:16px}
+  .prism-gallery{height:clamp(160px,54vw,210px)}
+  .prism-card,.prism-card.is-active{width:min(400px,72vw);height:auto}
+  .prism-card[data-slot="-1"],.prism-card[data-slot="1"]{height:76%;top:12%}
+  .prism-footer{grid-template-columns:44px minmax(0,1fr) 44px;gap:4px}
+  .prism-caption h3{font-size:24px}
+}
+@media(prefers-reduced-motion:reduce){.prism-arrow::before{transition:none}}
