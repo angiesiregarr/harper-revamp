@@ -20,12 +20,12 @@ function renderCity() {
   const positions = [[8,16],[24,61],[49,23],[43,70],[65,71],[75,35],[8,76],[29,9],[83,13],[91,75],[59,6],[79,59]];
   waypointHost.innerHTML = cityHotels.map((hotel,index) => `<button class="city-waypoint" type="button" data-city="${hotel.city}" style="--x:${positions[index][0]}%;--y:${positions[index][1]}%" aria-label="Preview ${hotel.title} in ${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}"><span class="city-point" aria-hidden="true"></span><span class="city-label">${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span></button>`).join('');
   const routeHost = document.querySelector('.city-routes');
-  routeHost.innerHTML = `<defs><mask id="city-route-label-mask" maskUnits="userSpaceOnUse"><rect width="1600" height="240" fill="white"/><g id="city-route-cutouts"></g></mask></defs>` + cityHotels.map((hotel,index) => {
+  routeHost.innerHTML = cityHotels.map((hotel,index) => {
     const [px,py] = positions[index];
     const x = px * 16 + 6;
     const y = py * 2.4;
     const endX = Math.max(610,Math.min(990,x));
-    return `<path class="city-route" data-city="${hotel.city}" pathLength="1" mask="url(#city-route-label-mask)" d="M ${x.toFixed(1)} ${y.toFixed(1)} L ${endX.toFixed(1)} 218" />`;
+    return `<path class="city-route" data-city="${hotel.city}" pathLength="1" d="M ${x.toFixed(1)} ${y.toFixed(1)} L ${endX.toFixed(1)} 240" />`;
   }).join('');
   view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
   const panels = [...view.querySelectorAll('.prism-card')];
@@ -37,24 +37,11 @@ function renderCity() {
   imagePreloader.observe(document.getElementById('hotels'));
   const waypoints = [...waypointHost.querySelectorAll('.city-waypoint')];
   const routes = [...routeHost.querySelectorAll('.city-route')];
-  const routeCutouts = routeHost.querySelector('#city-route-cutouts');
-  const updateRouteCutouts = activeCity => {
-    const bounds = routeHost.getBoundingClientRect();
-    if (!bounds.width || !bounds.height) return;
-    routeCutouts.innerHTML = waypoints.filter(point => point.dataset.city !== activeCity).map(point => {
-      const rect = point.getBoundingClientRect();
-      const x = (rect.left - bounds.left) * 1600 / bounds.width - 16;
-      const y = (rect.top - bounds.top) * 240 / bounds.height - 6;
-      const width = rect.width * 1600 / bounds.width + 32;
-      const height = rect.height * 240 / bounds.height + 12;
-      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" fill="black"/>`;
-    }).join('');
-  };
   let committed = 0;
-  let preview = null;
+  let hovered = null;
+  let focused = null;
   const show = (index) => {
     const hotel = cityHotels[index];
-    const previousRoute = routes.find(route => route.classList.contains('is-active'));
     panels.forEach((panel, i) => {
       let distance = (i - index + panels.length) % panels.length;
       if (distance > panels.length / 2) distance -= panels.length;
@@ -69,16 +56,13 @@ function renderCity() {
       point.classList.toggle('is-active', active);
       point.setAttribute('aria-pressed', String(active));
     });
-    updateRouteCutouts(hotel.city);
-    routes.forEach(route => route.classList.toggle('is-active', route.dataset.city === hotel.city));
-    const activeRoute = routes[index];
-    if (activeRoute !== previousRoute && previousRoute && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      activeRoute.getAnimations().forEach(animation => animation.cancel());
-      activeRoute.animate([
-        {strokeDashoffset: '1', opacity: 0},
-        {strokeDashoffset: activeRoute.style.strokeDashoffset || '0', opacity: .85}
-      ], {duration: 620, easing: 'cubic-bezier(.22,.61,.36,1)'});
-    }
+    routes.forEach((route, routeIndex) => {
+      if (routeIndex === index) return;
+      route.getAnimations().forEach(animation => animation.cancel());
+      route.classList.remove('is-active');
+    });
+    routes[index].getAnimations().forEach(animation => animation.cancel());
+    routes[index].classList.add('is-active');
     document.getElementById('hotel-location').textContent = hotel.place;
     document.getElementById('hotel-name').textContent = hotel.title;
     const inCity = cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city);
@@ -88,7 +72,7 @@ function renderCity() {
   };
   const select = (index, updateUrl = false) => {
     committed = index;
-    preview = null;
+    hovered = null;
     show(index);
     if (updateUrl) {
       const url = new URL(window.location.href);
@@ -99,12 +83,13 @@ function renderCity() {
   };
   const currentCity = () => new URLSearchParams(window.location.search).get('city')?.toLowerCase();
   select(Math.max(0, cityHotels.findIndex(hotel => hotel.city === currentCity())));
+  const showPreview = () => show(hovered ?? focused ?? committed);
   waypoints.forEach((point) => {
     const index = cityHotels.findIndex(hotel => hotel.city === point.dataset.city);
-    point.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') { preview = index; show(index); } });
-    point.addEventListener('pointerleave', () => { if (preview !== null) { preview = null; show(committed); } });
-    point.addEventListener('focus', () => { preview = index; show(index); });
-    point.addEventListener('blur', () => { if (preview !== null) { preview = null; show(committed); } });
+    point.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') { hovered = index; showPreview(); } });
+    point.addEventListener('pointerleave', () => { if (hovered === index) { hovered = null; showPreview(); } });
+    point.addEventListener('focus', () => { focused = index; showPreview(); });
+    point.addEventListener('blur', () => { if (focused === index) { focused = null; showPreview(); } });
     point.addEventListener('click', () => select(index, true));
   });
   panels.forEach((panel, index) => panel.addEventListener('click', () => select(index, true)));
@@ -128,8 +113,6 @@ function renderCity() {
     touchX = null;
   }, {passive:true});
   window.addEventListener('popstate', () => select(Math.max(0, cityHotels.findIndex(hotel => hotel.city === currentCity()))));
-  window.addEventListener('resize', () => updateRouteCutouts(cityHotels[preview ?? committed].city));
-  document.fonts.ready.then(() => updateRouteCutouts(cityHotels[preview ?? committed].city));
 }
 
 function setupMenu() {
@@ -347,9 +330,6 @@ function setupSectionPortalMotion() {
         section.style.setProperty('--city-portal-scale', (1 - .055 * remaining).toFixed(4));
         section.style.setProperty('--city-portal-color', remaining.toFixed(4));
         section.style.setProperty('--city-portal-opacity', (1 - .58 * remaining).toFixed(4));
-        section.querySelectorAll('.city-route').forEach((route, index) => {
-          route.style.strokeDashoffset = (1 - clamp((eased - index * .024) / .68)).toFixed(3);
-        });
       }
       section.style.setProperty('--portal-circle', `${(18 + 132 * eased).toFixed(2)}%`);
       section.style.setProperty('--portal-curtain', `${(mobile ? 0 : 11 * remaining).toFixed(2)}%`);

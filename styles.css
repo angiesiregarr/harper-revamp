@@ -1169,7 +1169,7 @@ body{background:#f5f2ec}
 
 /* The world map is scenery; city buttons use the editorial constellation layout. */
 .hotels{--city-available:calc(100svh - var(--city-header-clearance,58px));display:flex;flex-direction:column;justify-content:center;min-height:min(720px,var(--city-available));padding:clamp(24px,3.5svh,38px) clamp(40px,6vw,112px);scroll-margin-top:var(--city-header-clearance,58px);isolation:isolate}
-.hotels>.city-map{position:absolute;inset:auto;left:50%;top:50%;width:clamp(1220px,86vw,1660px);height:auto;max-width:none;transform:translate(-50%,-50%);opacity:.18;filter:none;mask-image:none;pointer-events:none;z-index:0}
+.hotels>.city-map{position:absolute;inset:auto;left:50%;top:50%;height:min(630px,calc(var(--city-available) - 96px));width:auto;max-width:none;transform:translate(-50%,-50%);opacity:.23;filter:none;mask-image:none;pointer-events:none;z-index:0}
 .city-heading,.hotel-content{position:relative;z-index:1}
 .hotels .hotel-content{width:100%}
 .city-heading h2{font-size:33px}
@@ -1179,8 +1179,8 @@ body{background:#f5f2ec}
 .city-waypoint .city-point{display:block}
 .city-waypoint .city-label{white-space:nowrap}
 .city-routes{z-index:1;overflow:hidden}
-.city-routes .city-route{fill:none;stroke:#f08b1d;stroke-width:1.7;opacity:0;stroke-dasharray:1;stroke-dashoffset:0;vector-effect:non-scaling-stroke;transition:opacity .42s ease}
-.city-routes .city-route.is-active{opacity:.8}
+.city-routes .city-route{fill:none;stroke:#f08b1d;stroke-width:1.7;opacity:0;visibility:hidden;stroke-dasharray:1;stroke-dashoffset:.82;vector-effect:non-scaling-stroke;transition:none}
+.city-routes .city-route.is-active{opacity:.8;visibility:visible;stroke-dashoffset:0;transition:stroke-dashoffset .24s ease-out}
 .city-view{z-index:4;margin-top:-12px}
 .prism-gallery{--city-card-height:200px;height:var(--city-card-height)}
 .prism-footer{margin-top:20px}
@@ -1191,10 +1191,11 @@ body{background:#f5f2ec}
 .prism-card[data-slot="-2"],.prism-card[data-slot="2"]{top:14%;width:auto;height:72%;aspect-ratio:3/5}
 .prism-card[data-slot="-2"]{left:calc(50% - clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
 .prism-card[data-slot="2"]{left:calc(50% + clamp(345px,calc(var(--city-card-height) * 2.12),445px))}
-@media(prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.18 * var(--portal-progress,1))}}
+@media(prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.23 * var(--portal-progress,1))}}
+@media(min-width:851px) and (max-width:1300px){.hotels>.city-map{height:auto;width:min(86vw,1000px)}}
 @media(max-width:850px){
   .hotels{display:block;min-height:0;padding:clamp(24px,4vw,42px) clamp(24px,5vw,46px) 72px}
-  .hotels>.city-map{width:max(520px,110vw);opacity:.14}
+  .hotels>.city-map{height:auto;width:min(88vw,600px);opacity:.19}
   .city-constellation{height:auto;margin-top:18px;margin-bottom:16px}
   .city-routes{display:none}
   .city-waypoints{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 8px;height:auto;padding-top:0}
@@ -1204,7 +1205,7 @@ body{background:#f5f2ec}
   .prism-card,.prism-card.is-active{width:auto;height:100%;aspect-ratio:40/21}
   .prism-card[data-slot="-1"],.prism-card[data-slot="1"]{height:84%;top:8%}
 }
-@media(max-width:850px) and (prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.14 * var(--portal-progress,1))}}
+@media(max-width:850px) and (prefers-reduced-motion:no-preference){.hotels.portal-ready>.city-map{opacity:calc(.19 * var(--portal-progress,1))}}
 @media(max-width:600px){
   .hotels{padding:26px 20px 66px}
   .city-heading h2{font-size:33px}
