@@ -142,40 +142,75 @@ function setupNews() {
   const section = document.getElementById('journal');
   const book = document.getElementById('journal-book');
   if (!section || !book) return;
+  const spreads = [...book.querySelectorAll('[data-journal-spread]')];
+  const sheet = book.querySelector('.journal-turn-sheet');
+  const openButton = document.getElementById('journal-open');
+  const prevButton = document.getElementById('journal-prev');
+  const nextButton = document.getElementById('journal-next');
+  const pageCount = document.getElementById('journal-page-count');
+  const nav = document.getElementById('site-nav');
+  const booking = document.querySelector('.hero-booking');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = matchMedia('(max-width: 620px)');
-  let timer = 0;
-  let scheduled = false;
+  let introTimer = 0;
+  let openingTimer = 0;
+  let started = false;
+  let current = 0;
+  let turning = false;
+  let drag = null;
   let lastY = scrollY;
-  const open = immediate => {
-    clearTimeout(timer);
-    scheduled = false;
-    book.classList.remove('is-closed');
-    book.classList.add(immediate ? 'is-open' : 'is-opening');
-    if (!immediate) timer = setTimeout(() => {
+  const headerBottom = () => Math.max(nav?.getBoundingClientRect().bottom || 0,
+    booking?.classList.contains('is-docked') ? booking.getBoundingClientRect().bottom : 0);
+  const measureHeader = () => section.style.setProperty('--journal-header-clearance', `${Math.max(0, headerBottom()).toFixed(1)}px`);
+  const showPage = index => {
+    current = index;
+    spreads.forEach((spread, i) => {
+      spread.classList.toggle('is-current', i === index);
+      spread.toggleAttribute('inert', i !== index);
+      spread.setAttribute('aria-hidden', String(i !== index));
+    });
+    pageCount.textContent = `${String(index + 1).padStart(2, '0')} / ${String(spreads.length).padStart(2, '0')}`;
+    prevButton.disabled = index === 0;
+    nextButton.disabled = index === spreads.length - 1;
+  };
+  const open = (immediate = false) => {
+    clearTimeout(introTimer);
+    clearTimeout(openingTimer);
+    started = true;
+    if (book.classList.contains('is-open')) return;
+    book.classList.remove('is-closed', 'is-opening');
+    if (immediate || reduced.matches || mobile.matches) {
+      book.classList.add('is-open');
+      section.classList.add('journal-is-open');
+      return;
+    }
+    book.classList.add('is-opening');
+    openingTimer = setTimeout(() => {
       book.classList.remove('is-opening');
       book.classList.add('is-open');
-    }, 900);
+      section.classList.add('journal-is-open');
+    }, 1450);
   };
-  if (reduced.matches || mobile.matches || section.getBoundingClientRect().top < innerHeight * .7) {
+  showPage(0);
+  measureHeader();
+  const direct = location.hash === '#journal' || performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
+  if (reduced.matches || mobile.matches || direct || section.getBoundingClientRect().top < innerHeight * .6) {
     open(true);
   } else {
     book.classList.add('is-closed');
   }
   const update = () => {
-    if (!book.classList.contains('is-closed')) return;
+    measureHeader();
+    if (book.classList.contains('is-open')) return;
     if (reduced.matches || mobile.matches) { open(true); return; }
     const bounds = section.getBoundingClientRect();
-    const nav = document.getElementById('site-nav');
-    const booking = document.querySelector('.hero-booking');
-    const headerBottom = Math.max(nav?.getBoundingClientRect().bottom || 0,
-      booking?.classList.contains('is-docked') ? booking.getBoundingClientRect().bottom : 0);
-    const skipped = Math.abs(scrollY - lastY) > innerHeight * .65 || bounds.top < headerBottom + 10;
-    if (bounds.top < innerHeight * .56 && bounds.bottom > headerBottom) {
+    if (bounds.bottom <= headerBottom()) { open(true); return; }
+    const skipped = Math.abs(scrollY - lastY) > innerHeight * .62 || bounds.top < headerBottom() + 4;
+    if (bounds.top < innerHeight * .68 && bounds.bottom > headerBottom()) {
       if (skipped) open(true);
-      else if (!scheduled) {
-        scheduled = true;
-        timer = setTimeout(() => open(false), 350);
+      else if (!started) {
+        started = true;
+        introTimer = setTimeout(() => open(false), 8000);
       }
     }
     lastY = scrollY;
@@ -185,8 +220,100 @@ function setupNews() {
   addEventListener('resize', update);
   reduced.addEventListener('change', () => { if (reduced.matches) open(true); });
   mobile.addEventListener('change', () => { if (mobile.matches) open(true); });
-  book.addEventListener('focusin', () => open(true));
-  book.addEventListener('pointerdown', () => open(true));
+  addEventListener('harper:journal-direct', () => open(true));
+  openButton.addEventListener('click', () => open(false));
+  book.addEventListener('focusin', event => { if (event.target.closest('.news-card')) open(true); });
+  book.addEventListener('click', event => { if (event.target.closest('.news-card')) open(true); });
+  const turn = async (direction, fromDrag = false) => {
+    if (turning || current + direction < 0 || current + direction >= spreads.length) return;
+    open(true);
+    if (reduced.matches || mobile.matches) { showPage(current + direction); return; }
+    turning = true;
+    const source = spreads[current].querySelector(direction > 0 ? '.journal-page-right' : '.journal-page-left');
+    const bookBox = book.getBoundingClientRect();
+    const sourceBox = source.getBoundingClientRect();
+    const clone = source.cloneNode(true);
+    clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+    clone.querySelectorAll('a').forEach(el => { el.removeAttribute('href'); el.tabIndex = -1; });
+    sheet.replaceChildren(clone);
+    sheet.style.left = `${sourceBox.left - bookBox.left}px`;
+    sheet.style.width = `${sourceBox.width}px`;
+    sheet.style.transformOrigin = direction > 0 ? 'left center' : 'right center';
+    sheet.style.transform = 'rotateY(0deg)';
+    sheet.classList.add('is-turning');
+    const from = current;
+    showPage(current + direction);
+    if (fromDrag) return {from, direction, width:sourceBox.width};
+    try { await sheet.animate([{transform:'rotateY(0deg)'},{transform:`rotateY(${direction > 0 ? -180 : 180}deg)`}],{duration:750,easing:'cubic-bezier(.22,.72,.2,1)'}).finished; } catch {}
+    sheet.classList.remove('is-turning');
+    sheet.replaceChildren();
+    turning = false;
+  };
+  prevButton.addEventListener('click', () => turn(-1));
+  nextButton.addEventListener('click', () => turn(1));
+  book.addEventListener('keydown', event => {
+    if (event.target.closest('a,button')) return;
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      turn(event.key === 'ArrowRight' ? 1 : -1);
+    }
+  });
+  book.querySelectorAll('.journal-turn-zone').forEach(zone => {
+    const direction = zone.classList.contains('journal-turn-zone-next') ? 1 : -1;
+    zone.addEventListener('pointermove', event => {
+      const box = book.getBoundingClientRect();
+      book.style.setProperty('--journal-hint-x', `${event.clientX - box.left}px`);
+      book.style.setProperty('--journal-hint-y', `${event.clientY - box.top}px`);
+      if (!drag || drag.pointerId !== event.pointerId) return;
+      const travel = direction > 0 ? drag.x - event.clientX : event.clientX - drag.x;
+      const vertical = Math.abs(event.clientY - drag.y);
+      if (vertical > Math.abs(travel) * 1.2 && vertical > 18) return;
+      drag.progress = Math.max(0, Math.min(1, travel / drag.width));
+      sheet.style.transform = `rotateY(${(direction > 0 ? -180 : 180) * drag.progress}deg)`;
+    });
+    zone.addEventListener('pointerdown', async event => {
+      if (turning || (direction > 0 && current === spreads.length - 1) || (direction < 0 && current === 0)) return;
+      event.preventDefault();
+      zone.setPointerCapture(event.pointerId);
+      const state = await turn(direction, true);
+      if (!state) return;
+      drag = {pointerId:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now(),progress:0,...state};
+      book.classList.add('is-dragging');
+    });
+    const finish = async event => {
+      if (!drag || drag.pointerId !== event.pointerId) return;
+      const state = drag;
+      drag = null;
+      book.classList.remove('is-dragging');
+      const distance = direction > 0 ? state.x - event.clientX : event.clientX - state.x;
+      const speed = distance / Math.max(1, performance.now() - state.time);
+      const complete = event.type !== 'pointercancel' && (state.progress >= .26 || (distance > 35 && speed > .55));
+      const endAngle = complete ? (direction > 0 ? -180 : 180) : 0;
+      try { await sheet.animate([{transform:sheet.style.transform},{transform:`rotateY(${endAngle}deg)`}],{duration:complete ? 420 : 300,easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
+      if (!complete) showPage(state.from);
+      sheet.classList.remove('is-turning');
+      sheet.replaceChildren();
+      turning = false;
+    };
+    zone.addEventListener('pointerup', finish);
+    zone.addEventListener('pointercancel', finish);
+  });
+  let touchStart = null;
+  book.addEventListener('touchstart', event => {
+    if (event.touches.length !== 1 || event.target.closest('button')) return;
+    const touch = event.touches[0];
+    touchStart = {x: touch.clientX, y: touch.clientY};
+  }, {passive:true});
+  book.addEventListener('touchend', event => {
+    if (!touchStart || !event.changedTouches.length) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - touchStart.x;
+    const dy = touch.clientY - touchStart.y;
+    touchStart = null;
+    if (Math.abs(dx) < 62 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
+    event.preventDefault();
+    turn(dx < 0 ? 1 : -1);
+  }, {passive:false});
   update();
   setTimeout(update, 120);
 }
@@ -200,6 +327,7 @@ function setupSectionAnchors() {
     const clearance = (innerWidth > 800 ? 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76) : nav.getBoundingClientRect().height) + 16;
     const top = window.scrollY + section.getBoundingClientRect().top - clearance;
     history.pushState(null, '', link.getAttribute('href'));
+    if (link.getAttribute('href') === '#journal') dispatchEvent(new Event('harper:journal-direct'));
     window.scrollTo({top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
   }));
 }
