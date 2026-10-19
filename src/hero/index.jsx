@@ -88,7 +88,7 @@ function RusticOrbit() {
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const paint = phase => {
       const nearest = mod(Math.round(phase), rooms.length);
-      if (nearest !== currentActive) { currentActive = nearest; setActive(nearest); }
+      if (nearest !== currentActive) { currentActive = nearest; setActive(nearest); window.dispatchEvent(new Event('harper:hero-change')); }
       cardRefs.current.forEach((card, index) => {
         if (!card) return;
         const pathPosition = mod(index - phase, rooms.length);
@@ -155,7 +155,7 @@ function RusticOrbit() {
         distance = mix(move.from, move.to, eased);
         changed = true;
         if (ratio === 1) move = null;
-      } else if (!motion.matches && !document.hidden && !Object.values(paused.current).some(Boolean)) {
+      } else if (!motion.matches && !document.hidden && !document.body.classList.contains('handoff-in-flight') && !Object.values(paused.current).some(Boolean)) {
         distance += 28 * elapsed; changed = true; // CSS pixels of arc length per second.
       }
       if (changed) paint(phaseAt(distance, geometry));

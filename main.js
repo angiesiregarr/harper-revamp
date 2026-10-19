@@ -69,6 +69,7 @@ function renderCity() {
     const selector = document.getElementById('city-properties');
     selector.hidden = inCity.length < 2;
     selector.innerHTML = inCity.length < 2 ? '' : `<span>Hotels in ${hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span>${inCity.map(({item, i}) => `<button type="button" data-hotel="${i}" aria-pressed="${i === index}">${item.title}</button>`).join('')}`;
+    window.dispatchEvent(new Event('harper:city-change'));
   };
   const select = (index, updateUrl = false) => {
     committed = index;
@@ -189,7 +190,7 @@ function setupCityViewport() {
     update();
     const targetClearance = innerWidth > 800
       ? Math.max(clearance(), 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76))
-      : clearance();
+      : (nav.classList.contains('is-compact') ? clearance() : 56);
     const top = scrollY + section.getBoundingClientRect().top - targetClearance - 2;
     scrollTo({top, behavior});
   };
@@ -200,6 +201,7 @@ function setupCityViewport() {
   }));
   addEventListener('scroll', schedule, {passive:true});
   addEventListener('resize', schedule);
+  addEventListener('harper:booking-position', schedule);
   new ResizeObserver(schedule).observe(nav);
   new ResizeObserver(schedule).observe(booking);
   if (location.hash === '#hotels') {
@@ -455,6 +457,131 @@ function setupScrollMotion() {
   schedule();
 }
 
+function setupHeroCityHandoff() {
+  const hero = document.querySelector('.hero-orbit-stage');
+  const city = document.getElementById('hotels');
+  const nav = document.getElementById('site-nav');
+  const booking = document.querySelector('.hero-booking');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  new IntersectionObserver(entries => {
+    if (!reduced.matches) return;
+    for (const entry of entries) city.classList.toggle('handoff-reduced-enter', entry.isIntersecting);
+  }, { threshold: .12 }).observe(city);
+  const clamp = value => Math.min(1, Math.max(0, value));
+  const phase = (from, to, value) => {
+    const t = clamp((value - from) / (to - from));
+    return t * t * (3 - 2 * t);
+  };
+  const documentRect = element => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left, y: rect.top + scrollY, width: rect.width, height: rect.height };
+  };
+  let layer, fromImage, toImage, sourceCaption, geometry, frame = 0, ready = false;
+  const overlay = () => {
+    layer = document.createElement('div');
+    layer.className = 'hero-city-handoff';
+    layer.setAttribute('aria-hidden', 'true');
+    layer.innerHTML = '<img class="hero-city-handoff__source" alt="" /><img class="hero-city-handoff__destination" alt="" /><span class="hero-city-handoff__caption"><small></small><strong></strong></span>';
+    [fromImage, toImage] = layer.querySelectorAll('img');
+    sourceCaption = layer.querySelector('.hero-city-handoff__caption');
+    document.body.append(layer);
+  };
+  const measure = () => {
+    if (!ready) return;
+    const source = hero.querySelector('.rustic-orbit__card.is-featured');
+    const destination = city.querySelector('.prism-card.is-active');
+    if (!source || !destination) return;
+    const heroBottom = hero.getBoundingClientRect().bottom + scrollY;
+    const cityTop = city.getBoundingClientRect().top + scrollY;
+    const compactHeader = innerWidth > 800
+      ? 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76)
+      : nav.getBoundingClientRect().height;
+    const start = Math.max(0, heroBottom - innerHeight);
+    const end = Math.max(start + innerHeight * .55, cityTop - compactHeader - 2);
+    geometry = { start, end, source: documentRect(source), destination: documentRect(destination) };
+    const sourceUrl = source.querySelector('img')?.currentSrc || source.querySelector('img')?.src;
+    const destinationUrl = destination.querySelector('img')?.currentSrc || destination.querySelector('img')?.src;
+    if (sourceUrl && fromImage.src !== sourceUrl) fromImage.src = sourceUrl;
+    if (destinationUrl && toImage.src !== destinationUrl) toImage.src = destinationUrl;
+    fromImage.style.objectPosition = getComputedStyle(source.querySelector('img')).objectPosition;
+    toImage.style.objectPosition = getComputedStyle(destination.querySelector('img')).objectPosition;
+    sourceCaption.querySelector('small').textContent = source.querySelector('.rustic-orbit__hotel small')?.textContent || '';
+    sourceCaption.querySelector('strong').textContent = source.querySelector('.rustic-orbit__hotel strong')?.textContent || '';
+  };
+  const update = () => {
+    frame = 0;
+    if (!ready || !geometry) return;
+    if (reduced.matches) {
+      document.body.classList.remove('handoff-in-flight', 'handoff-mobile');
+      layer.style.display = 'none';
+      return;
+    }
+    const progress = clamp((scrollY - geometry.start) / (geometry.end - geometry.start));
+    const mobile = innerWidth <= 800;
+    const inFlight = progress >= .06 && progress < 1;
+    document.body.classList.toggle('handoff-in-flight', inFlight);
+    document.body.classList.toggle('handoff-mobile', mobile && inFlight);
+    layer.classList.toggle('is-focus-handoff', inFlight && !!hero.querySelector(':focus-visible'));
+    document.body.style.setProperty('--handoff-hero-title', (1 - .9 * phase(.06, .36, progress)).toFixed(4));
+    document.body.style.setProperty('--handoff-hero-rise', `${(-20 * phase(.06, .36, progress)).toFixed(2)}px`);
+    document.body.style.setProperty('--handoff-orbit', (1 - .86 * phase(.28, .76, progress)).toFixed(4));
+    city.style.setProperty('--handoff-heading', phase(.54, .79, progress).toFixed(4));
+    city.style.setProperty('--handoff-map', phase(.48, .86, progress).toFixed(4));
+    city.style.setProperty('--handoff-neighbors', phase(.68, .93, progress).toFixed(4));
+    city.style.setProperty('--handoff-caption', phase(.78, .98, progress).toFixed(4));
+    city.style.setProperty('--handoff-marker', phase(.74, .85, progress).toFixed(4));
+    city.style.setProperty('--handoff-route', phase(.86, .99, progress).toFixed(4));
+    city.style.setProperty('--handoff-real-card', (mobile ? phase(.64, .9, progress) : phase(.94, 1, progress)).toFixed(4));
+    city.style.setProperty('--handoff-mobile-scale', (1 - .07 * (1 - phase(.6, .93, progress))).toFixed(4));
+    city.querySelectorAll('.city-waypoint').forEach((waypoint, index) => {
+      waypoint.style.setProperty('--handoff-label', phase(.62 + index * .012, .84 + index * .012, progress).toFixed(4));
+    });
+    if (!inFlight || mobile) { layer.style.display = 'none'; return; }
+    const travel = phase(.06, .94, progress);
+    const source = geometry.source, destination = geometry.destination;
+    const x = source.x + (destination.x - source.x) * travel;
+    const y = source.y + (destination.y - source.y) * travel - scrollY;
+    const width = source.width + (destination.width - source.width) * travel;
+    const height = source.height + (destination.height - source.height) * travel;
+    layer.style.display = 'block';
+    layer.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0)`;
+    layer.style.width = `${width.toFixed(2)}px`;
+    layer.style.height = `${height.toFixed(2)}px`;
+    layer.style.opacity = (1 - phase(.94, 1, progress)).toFixed(4);
+    toImage.style.opacity = phase(.61, .76, progress).toFixed(4);
+    sourceCaption.style.opacity = (1 - phase(.48, .61, progress)).toFixed(4);
+  };
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  const refresh = () => { requestAnimationFrame(() => { measure(); schedule(); }); };
+  const initialize = () => {
+    if (ready || !hero.querySelector('.rustic-orbit__card.is-featured')) return;
+    ready = true;
+    overlay();
+    document.body.classList.add('hero-city-handoff-enabled');
+    measure();
+    update();
+    new ResizeObserver(refresh).observe(hero);
+    new ResizeObserver(refresh).observe(city);
+    new ResizeObserver(refresh).observe(nav);
+    new ResizeObserver(refresh).observe(booking);
+    document.fonts?.ready.then(refresh);
+    window.addEventListener('load', refresh, { once: true });
+    hero.addEventListener('load', refresh, true);
+    city.addEventListener('load', refresh, true);
+    window.addEventListener('resize', () => { refresh(); setTimeout(refresh, 100); });
+    window.addEventListener('orientationchange', refresh);
+    window.addEventListener('harper:hero-change', refresh);
+    window.addEventListener('harper:city-change', () => { refresh(); setTimeout(refresh, 650); });
+    window.addEventListener('harper:booking-position', refresh);
+    window.addEventListener('scroll', schedule, { passive: true });
+    reduced.addEventListener('change', () => { refresh(); schedule(); });
+  };
+  if (!hero.querySelector('.rustic-orbit__card.is-featured')) {
+    const observer = new MutationObserver(() => { if (hero.querySelector('.rustic-orbit__card.is-featured')) { observer.disconnect(); initialize(); } });
+    observer.observe(document.getElementById('hero-orbit'), { childList: true, subtree: true });
+  } else initialize();
+}
+
 renderCity();
 setupMenu();
 setupNews();
@@ -466,4 +593,5 @@ setupSectionPortalMotion();
 setupReveals();
 setupTextAnimations();
 setupScrollMotion();
+setupHeroCityHandoff();
 document.getElementById('year').textContent = new Date().getFullYear();

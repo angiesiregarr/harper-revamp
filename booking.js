@@ -44,6 +44,7 @@
     frame = 0;
     const scrolled = window.scrollY > 0;
     nav.classList.toggle('is-compact', scrolled);
+    heroBooking.classList.toggle('is-scrolled', scrolled && innerWidth > 800);
     const height = nav.getBoundingClientRect().height;
     nav.classList.toggle('is-over-hero', !scrolled && Boolean(hero && hero.getBoundingClientRect().bottom > height));
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
@@ -62,6 +63,7 @@
       heroBooking.classList.remove('is-docked');
     }
     document.documentElement.style.setProperty('--booking-offset',heroBooking.classList.contains('is-docked') ? `${heroBooking.getBoundingClientRect().height}px` : '0px');
+    if (docked !== heroBooking.classList.contains('is-docked')) window.dispatchEvent(new Event('harper:booking-position'));
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
   function openBooking(event, field = 'destination') {
