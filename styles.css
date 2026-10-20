@@ -1366,6 +1366,14 @@ html{overflow-anchor:none}
 @media(max-width:620px){.news-section,.news-section.portal-ready{width:calc(100% - 26px);margin-top:-14px;padding-bottom:48px}.news-section>.news-heading{display:block;padding:0 6px}.journal-controls{margin-top:12px}.journal-book{height:auto}.journal-spread.is-current{display:block}.journal-page{padding:24px 25px}.news-section .journal-feature{display:block}.news-section .journal-feature .news-copy{padding-top:10px}.news-section .journal-feature .news-photo{aspect-ratio:1.65}.news-section .news-track{grid-template-columns:1fr;gap:25px}.news-section .news-track .news-photo{aspect-ratio:1.8}.journal-bookmark{right:29%;height:45px;width:18px}.journal-cover{display:none}}
 @media(prefers-reduced-motion:reduce){.journal-book.is-closed .journal-cover,.journal-book.is-closed .journal-elastic,.journal-book.is-closed .journal-bookmark{animation:none}.journal-turn-sheet{display:none!important}.journal-drag-hint{display:none}}
 
+/* The Journal's pointer follows the supplied orange cursor treatment. */
+.journal-drag-hint{position:fixed;z-index:500;left:0;top:0;display:none;width:38px;height:38px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#fff;opacity:0;pointer-events:none;will-change:transform,opacity;transform:translate3d(-200px,-200px,0);transition:opacity .15s ease}
+.journal-drag-hint.is-visible{opacity:1}
+.journal-drag-pointer{position:absolute;left:0;top:0;width:38px;height:38px;background:#f08b1d;clip-path:polygon(0 0,86% 15%,49% 47%,32% 100%,18% 52%);transform:rotate(-14deg);filter:drop-shadow(0 2px 2px #2f241c3b)}
+.journal-drag-label{position:absolute;left:0;top:0;display:flex;align-items:center;justify-content:center;min-width:108px;height:34px;padding:0 14px;border-radius:19px;background:#f08b1d;color:#fff;font:700 17px/1 'Lato',Arial,sans-serif;letter-spacing:0;white-space:nowrap;box-shadow:0 2px 5px #50301733;will-change:transform}
+@media(hover:hover) and (pointer:fine){.journal-drag-hint{display:block}.news-section.has-journal-cursor,.news-section.has-journal-cursor *{cursor:none!important}}
+@media(hover:none),(pointer:coarse){.journal-drag-hint{display:none!important}}
+
 /* A single visual card bridges the existing hero and city gallery in normal page flow. */
 .hero-city-handoff{position:fixed;left:0;top:0;z-index:78;display:none;overflow:hidden;pointer-events:none;border:2px solid #fff8ec;border-radius:16px;background:#efe6da;box-shadow:0 20px 42px #4e302a24;transform-origin:top left;will-change:transform,opacity,width,height}
 .hero-city-handoff img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}

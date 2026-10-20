@@ -148,6 +148,7 @@ function setupNews() {
   const prevButton = document.getElementById('journal-prev');
   const nextButton = document.getElementById('journal-next');
   const pageCount = document.getElementById('journal-page-count');
+  const cursor = section.querySelector('.journal-drag-hint');
   const nav = document.getElementById('site-nav');
   const booking = document.querySelector('.hero-booking');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -261,9 +262,6 @@ function setupNews() {
   book.querySelectorAll('.journal-turn-zone').forEach(zone => {
     const direction = zone.classList.contains('journal-turn-zone-next') ? 1 : -1;
     zone.addEventListener('pointermove', event => {
-      const box = book.getBoundingClientRect();
-      book.style.setProperty('--journal-hint-x', `${event.clientX - box.left}px`);
-      book.style.setProperty('--journal-hint-y', `${event.clientY - box.top}px`);
       if (!drag || drag.pointerId !== event.pointerId) return;
       const travel = direction > 0 ? drag.x - event.clientX : event.clientX - drag.x;
       const vertical = Math.abs(event.clientY - drag.y);
@@ -314,6 +312,66 @@ function setupNews() {
     event.preventDefault();
     turn(dx < 0 ? 1 : -1);
   }, {passive:false});
+  if (cursor) {
+    document.body.append(cursor);
+    const label = cursor.querySelector('.journal-drag-label');
+    const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+    const point = {x:0,y:0,vx:0,vy:0};
+    const caption = {x:0,y:0,vx:0,vy:0};
+    let targetX = 0, targetY = 0, labelX = 0, labelY = 0;
+    let active = false, pressed = false, frame = 0, previous = 0;
+    const spring = (body, x, y, stiffness, damping, mass, dt) => {
+      body.vx += ((x - body.x) * stiffness - body.vx * damping) / mass * dt;
+      body.vy += ((y - body.y) * stiffness - body.vy * damping) / mass * dt;
+      body.x += body.vx * dt;
+      body.y += body.vy * dt;
+    };
+    const draw = time => {
+      frame = 0;
+      if (!active) return;
+      const dt = Math.min((time - (previous || time)) / 1000, .032);
+      previous = time;
+      if (reduced.matches) {
+        point.x = targetX; point.y = targetY;
+        caption.x = labelX; caption.y = labelY;
+      } else {
+        spring(point, targetX, targetY, 450, 34, .60, dt);
+        spring(caption, labelX, labelY, 220, 26, .70, dt);
+      }
+      cursor.style.transform = `translate3d(${point.x}px,${point.y}px,0) scale(${pressed ? .88 : 1})`;
+      label.style.transform = `translate3d(${caption.x - point.x}px,${caption.y - point.y}px,0)`;
+      frame = requestAnimationFrame(draw);
+    };
+    const move = event => {
+      if (!finePointer.matches || event.pointerType === 'touch') return;
+      targetX = event.clientX; targetY = event.clientY;
+      labelX = targetX + (targetX > innerWidth - 145 ? -127 : 30);
+      labelY = targetY + (targetY > innerHeight - 48 ? -38 : 8);
+      if (!active) {
+        active = true;
+        point.x = targetX; point.y = targetY;
+        caption.x = labelX; caption.y = labelY;
+        cursor.classList.add('is-visible');
+        section.classList.add('has-journal-cursor');
+        previous = 0;
+        frame = requestAnimationFrame(draw);
+      }
+    };
+    const hide = () => {
+      active = false; pressed = false;
+      cursor.classList.remove('is-visible');
+      section.classList.remove('has-journal-cursor');
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+    };
+    section.addEventListener('pointerenter', move);
+    section.addEventListener('pointermove', move, {passive:true});
+    section.addEventListener('pointerleave', hide);
+    section.addEventListener('pointerdown', () => { pressed = true; });
+    addEventListener('pointerup', () => { pressed = false; });
+    addEventListener('pointercancel', () => { pressed = false; });
+    finePointer.addEventListener('change', () => { if (!finePointer.matches) hide(); });
+  }
   update();
   setTimeout(update, 120);
 }
