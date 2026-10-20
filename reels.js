@@ -1,4 +1,4 @@
-/* Harper Reels. Permalinks are verified; local editorial covers are not Reel stills. */
+/* Harper Reels. User-supplied permalinks; local editorial covers are not Reel stills. */
 (() => {
   const section = document.getElementById('moments');
   if (!section) return;

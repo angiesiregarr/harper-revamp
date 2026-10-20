@@ -17,7 +17,7 @@ Run `npm install` once, then open <http://localhost:4173>. The build bundles the
 - The navigation stays at the top and becomes more compact on scroll without changing link font sizes. Its Book Now button opens the booking dialog.
 - Offer cards scroll past a pinned title on desktop. The title returns to normal flow on smaller screens.
 - The Journal presents linked articles in a raised editorial book over a matching floral paper surface. A separate linear-gradient frame blends the supplied grayscale cloud artwork into the warm-gray Reels section.
-- The Reels section reads verified permalinks from `data/reels.json`. Two user-supplied Reel links currently use editorial preview covers built from existing Harper imagery; these covers are not represented as official Reel thumbnails. The draggable, keyboard-accessible orbit has a visible-time reveal and pagination for future entries.
+- The Reels section reads user-supplied permalinks from `data/reels.json`. Two Reel links currently use editorial preview covers built from existing Harper imagery; these covers are not represented as official Reel thumbnails. The draggable, keyboard-accessible orbit has a visible-time reveal and pagination for future entries.
 - The hero has a two-line heading, orange membership accents, and a draggable React Bits image orbit. Each major section has a distinct scroll entrance; the supplied title ornaments change from color to white over darker backgrounds. Decorative motion is disabled or simplified for reduced-motion users.
 - Booking and membership links lead to the official Harper or Archipelago websites. Journal cards link to their article pages.
 
