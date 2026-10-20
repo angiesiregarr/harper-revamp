@@ -8,20 +8,18 @@
   const social = document.getElementById('reels-social');
   const empty = document.getElementById('reels-empty');
   const controls = document.getElementById('reels-controls');
-  const count = document.getElementById('reels-count');
-  const pageControls = document.getElementById('reels-page-controls');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const icons = {
     instagram: '<rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="18" cy="6.3" r="1" fill="currentColor" stroke="none"/>',
     facebook: '<path d="M14.4 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.5 1.6-1.5h1.7V3.3a22 22 0 0 0-2.5-.1c-2.5 0-4.2 1.5-4.2 4.3v2.3H8.3V13H11v8z" fill="currentColor" stroke="none"/>',
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
-  let cards = [], items = [], page = 0, pageSize = 8, state = 'idle';
+  let cards = [], items = [], state = 'idle';
   let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0;
-  let holdElapsed = 0, revealAt = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
+  let holdElapsed = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
   let geometry = {x:0,y:0,w:0,h:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
   const ease = t => { t = Math.max(0, Math.min(1,t)); return t*t*(3-2*t); };
-  const setState = next => { state = next; section.dataset.reelsState = next; social.inert = next !== 'revealing' && next !== 'spinning'; };
+  const setState = next => { state = next; section.dataset.reelsState = next; social.inert = next === 'idle'; };
   social.inert = true;
   const valid = item => item && typeof item.alt === 'string' && item.alt.trim() &&
     (item.preview === true
@@ -50,11 +48,9 @@
     stage.style.setProperty('--reels-orbit-height', `${geometry.y*2}px`);
     render(performance.now());
   }
-  function setPage(index) {
-    page = Math.max(0, Math.min(Math.ceil(items.length/pageSize)-1,index));
+  function renderCards() {
     orbit.replaceChildren();
-    const start = page*pageSize;
-    cards = items.slice(start,start+pageSize).map((item,i) => {
+    cards = items.map((item,i) => {
       const link = document.createElement('a');
       link.className = 'reels-card'; link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
       link.setAttribute('aria-label', item.preview ? `Browse Harper Reels on Instagram. Preview photo: ${item.alt}` : `Watch Harper Reel on Instagram. Preview photo: ${item.alt}`);
@@ -75,15 +71,15 @@
       link.addEventListener('click', e => { if (performance.now() < suppressClickUntil) e.preventDefault(); });
       return link;
     });
-    count.textContent = `${String(start+1).padStart(2,'0')}–${String(start+cards.length).padStart(2,'0')} / ${String(items.length).padStart(2,'0')}`;
-    pageControls.hidden = items.length <= pageSize;
-    pageControls.querySelector('[data-reels-page="-1"]').disabled = page === 0;
-    pageControls.querySelector('[data-reels-page="1"]').disabled = (page+1)*pageSize >= items.length;
     measure();
   }
   function render(now) {
     if (!cards.length) return;
     const spread = reduced.matches ? 1 : state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
+    const centerProgress = reduced.matches ? 1 : state === 'spreading' ? ease((now-spreadAt-100)/1050) : state === 'spinning' ? 1 : 0;
+    const compact = geometry.w < 100;
+    center.style.setProperty('--reels-center-y', `${((compact ? 38 : 68)*(1-centerProgress)).toFixed(1)}px`);
+    center.style.setProperty('--reels-center-scale', (1-(compact ? .18 : .37)*(1-centerProgress)).toFixed(3));
     const n = cards.length;
     cards.forEach((card,i) => {
       const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
@@ -99,17 +95,11 @@
       card.style.zIndex = String(Math.round(100+y));
       card.tabIndex = i === 0 || spread >= .95 ? 0 : -1;
     });
-    if (state === 'revealing') {
-      const title = ease((now-revealAt)/500);
-      center.style.setProperty('--reels-title-opacity', String(title));
-      center.style.setProperty('--reels-social-opacity', String(ease((now-revealAt-300)/500)));
-    }
   }
   function frame(now) {
     const dt = Math.min(250,Math.max(0,now-last)); last=now;
     if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 5000){setState('spreading');spreadAt=now;}}
-    if (state === 'spreading' && now-spreadAt > 900+(cards.length-1)*55){setState('revealing');revealAt=now;}
-    if (state === 'revealing' && now-revealAt > 900){setState('spinning');}
+    if (state === 'spreading' && now-spreadAt > Math.max(1250,900+(cards.length-1)*55)){setState('spinning');}
     if (stepAt) {
       const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
       angle = stepFrom+(stepTo-stepFrom)*progress;
@@ -123,15 +113,14 @@
   }
   function start() {
     if (state !== 'idle') return;
-    if (reduced.matches) {setState('spinning');center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');}
+    if (reduced.matches) setState('spinning');
     else setState('holding');
   }
   function initialize(data) {
     items=(data.items || []).filter(valid);
-    pageSize=Math.max(1,Math.min(innerWidth<650?5:8,Number(data.pageSize)||8));
     renderSocial(data.profiles);
-    if (!items.length) {empty.hidden=false;section.dataset.reelsState='empty';center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');return;}
-    controls.hidden=false;setPage(0);
+    if (!items.length) {empty.hidden=false;setState('empty');return;}
+    controls.hidden=false;renderCards();
     const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();},{threshold:.35});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();});
     orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
@@ -148,11 +137,11 @@
     });
     const finish=()=>{if(dragging)suppressClickUntil=performance.now()+350;dragging=false;pointerActive=false;};
     orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
-    const step = dir => {if(state!=='spinning')return;if(cards.length>1){stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;}else setPage(page+dir);};
+    const step = dir => {if(state!=='spinning'||cards.length<2)return;stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;};
     controls.querySelectorAll('[data-reels-step]').forEach(button=>button.addEventListener('click',()=>step(Number(button.dataset.reelsStep))));
-    pageControls.querySelectorAll('[data-reels-page]').forEach(button=>button.addEventListener('click',()=>setPage(page+Number(button.dataset.reelsPage))));
     orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowRight'?1:-1);}});
-    addEventListener('resize',()=>{const nextSize=Math.max(1,Math.min(innerWidth<650?5:8,Number(data.pageSize)||8));if(nextSize!==pageSize){const first=page*pageSize;pageSize=nextSize;setPage(Math.floor(first/pageSize));}else measure();});reduced.addEventListener('change',()=>{if(reduced.matches){setState('spinning');center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');}render(performance.now());});
+    addEventListener('resize',measure);
+    reduced.addEventListener('change',()=>{if(reduced.matches)setState('spinning');render(performance.now());});
     last=performance.now();raf=requestAnimationFrame(frame);
   }
   fetch('./data/reels.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Reel manifest unavailable');return r.json();}).then(initialize).catch(()=>initialize({profiles:{instagram:'https://www.instagram.com/harperhotels/reels/'},items:[]}));
