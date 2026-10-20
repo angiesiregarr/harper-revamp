@@ -1509,7 +1509,7 @@ html{scroll-padding-top:var(--top-nav-height)}
 @media(max-width:620px){.journal-book .journal-bookmark{width:16px;height:49px}.journal-bookmark-front{height:42px}}
 
 /* Every supporting article uses the same inset row frame on both kinds of spread. */
-.news-section .news-card.journal-supporting-story{display:grid!important;grid-template-columns:minmax(0,36%) minmax(0,1fr);column-gap:21px;align-items:start;align-self:stretch;min-width:0;width:100%;box-sizing:border-box;padding:20px 0!important}
+.news-section .news-card.journal-supporting-story{display:grid!important;grid-template-columns:minmax(0,36%) minmax(0,1fr);column-gap:21px;align-items:start;align-self:stretch;min-width:0;width:calc(100% - 16px);margin-inline:auto;box-sizing:border-box;padding:20px 10px!important}
 .news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:minmax(0,min(34%,21.75svh,226px)) minmax(0,1fr)}
 .news-section .journal-supporting-story .news-photo{min-width:0;width:100%;height:auto;margin:0}
 .news-section .journal-supporting-story .news-copy{min-width:0;padding:0;overflow-wrap:break-word}
@@ -1521,4 +1521,4 @@ html{scroll-padding-top:var(--top-nav-height)}
 .news-section .journal-supporting-story .news-read{margin-top:9px}
 .news-section .news-track .journal-supporting-story:first-child,.news-section .journal-story-list .journal-supporting-story:first-child{border-bottom:1px solid #d9c6b2}
 @media(max-width:1100px){.news-section .news-card.journal-supporting-story,.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:minmax(0,36%) minmax(0,1fr)}}
-@media(max-width:620px){.news-section .news-card.journal-supporting-story,.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:1fr;row-gap:10px;padding:20px 0!important}}
+@media(max-width:620px){.news-section .news-card.journal-supporting-story,.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:1fr;row-gap:10px;padding:20px 10px!important}}
