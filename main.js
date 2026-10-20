@@ -162,6 +162,14 @@ function setupNews() {
   let hideCursor = () => {};
   const headerBottom = () => nav?.getBoundingClientRect().bottom || 0;
   const measureHeader = () => section.style.setProperty('--journal-header-clearance', `${Math.max(0, headerBottom()).toFixed(1)}px`);
+  const placeBookmark = () => {
+    const page = spreads[current]?.querySelector('.journal-page-right');
+    if (!page) return;
+    const pageRect = page.getBoundingClientRect();
+    const bookRect = book.getBoundingClientRect();
+    book.style.setProperty('--journal-ribbon-x', `${pageRect.left - bookRect.left + pageRect.width * .43}px`);
+    book.style.setProperty('--journal-ribbon-y', `${pageRect.top - bookRect.top}px`);
+  };
   const showPage = index => {
     current = index;
     spreads.forEach((spread, i) => {
@@ -172,6 +180,7 @@ function setupNews() {
     pageCount.textContent = `${String(index + 1).padStart(2, '0')} / ${String(spreads.length).padStart(2, '0')}`;
     prevButton.disabled = index === 0;
     nextButton.disabled = index === spreads.length - 1;
+    placeBookmark();
   };
   const open = (immediate = false) => {
     if (book.classList.contains('is-open') || book.classList.contains('is-opening')) return;
@@ -219,6 +228,7 @@ function setupNews() {
   }
   const update = () => {
     measureHeader();
+    placeBookmark();
   };
   addEventListener('scroll', () => requestAnimationFrame(update), {passive:true});
   addEventListener('harper:booking-position', update);

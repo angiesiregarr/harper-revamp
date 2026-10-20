@@ -1497,3 +1497,28 @@ html{scroll-padding-top:var(--top-nav-height)}
 .news-section .journal-feature .news-photo{flex:none}
 @media(max-height:820px) and (min-width:1101px){.news-section .journal-feature .news-photo{aspect-ratio:3.65;max-height:165px}}
 @media(max-width:620px){.journal-page{--journal-page-x:25px;padding:24px var(--journal-page-x)}.news-section .journal-feature{display:block}.news-section .news-card.journal-feature{margin-bottom:32px}.news-section .journal-feature .news-photo{aspect-ratio:1.65;max-height:none}.journal-bookmark,.journal-bookmark-tail{width:14px;right:29%}.journal-bookmark{height:34px}}
+
+/* A single ribbon folded over the right leaf, with its tail tucked into the paper stack. */
+.journal-book .journal-bookmark{position:absolute;z-index:auto;left:var(--journal-ribbon-x,72%);top:var(--journal-ribbon-y,0px);right:auto;width:19px;height:57px;background:none;clip-path:none;filter:none;box-shadow:none;transform:none;animation:none!important;pointer-events:none}
+.journal-book .journal-bookmark::before,.journal-book .journal-bookmark::after{content:none}
+.journal-bookmark-back,.journal-bookmark-fold,.journal-bookmark-front{position:absolute;display:block;left:0;width:100%;box-sizing:border-box}
+.journal-bookmark-back{z-index:0;top:-9px;height:22px;border-radius:3px 3px 0 0;background:linear-gradient(90deg,#a95017,#ce6820 55%,#a64c15);box-shadow:1px -1px 2px #61401d28}
+.journal-bookmark-fold{z-index:3;top:-10px;height:15px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#f5994b 0%,#e47a29 40%,#aa4d15 100%);box-shadow:0 3px 3px #65402530,inset 0 1px 1px #ffd19a8c}
+.journal-bookmark-fold::after{content:"";position:absolute;inset:2px 3px auto;height:2px;border-radius:100%;background:#ffbf7b91}
+.journal-bookmark-front{z-index:3;top:2px;height:50px;clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%);background:linear-gradient(90deg,#c7611d 0%,#e47b2a 18%,#e27a29 76%,#ba571b 100%);box-shadow:1px 2px 3px #6540252c;filter:drop-shadow(1px 2px 1px #6540252c)}
+@media(max-width:620px){.journal-book .journal-bookmark{width:16px;height:49px}.journal-bookmark-front{height:42px}}
+
+/* Every supporting article uses the same inset row frame on both kinds of spread. */
+.news-section .news-card.journal-supporting-story{display:grid!important;grid-template-columns:minmax(0,36%) minmax(0,1fr);column-gap:21px;align-items:start;align-self:stretch;min-width:0;width:100%;box-sizing:border-box;padding:20px 0!important}
+.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:minmax(0,min(34%,21.75svh,226px)) minmax(0,1fr)}
+.news-section .journal-supporting-story .news-photo{min-width:0;width:100%;height:auto;margin:0}
+.news-section .journal-supporting-story .news-copy{min-width:0;padding:0;overflow-wrap:break-word}
+.news-section .journal-supporting-story .news-meta{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:nowrap;gap:8px;min-width:0;margin:0 0 8px}
+.news-section .journal-supporting-story .news-meta span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.news-section .journal-supporting-story .news-meta time{display:block;flex:none;margin:0;white-space:nowrap}
+.news-section .journal-supporting-story h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-width:0;max-width:100%;margin:0}
+.news-section .journal-supporting-story .news-excerpt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:8px 0 0}
+.news-section .journal-supporting-story .news-read{margin-top:9px}
+.news-section .news-track .journal-supporting-story:first-child,.news-section .journal-story-list .journal-supporting-story:first-child{border-bottom:1px solid #d9c6b2}
+@media(max-width:1100px){.news-section .news-card.journal-supporting-story,.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:minmax(0,36%) minmax(0,1fr)}}
+@media(max-width:620px){.news-section .news-card.journal-supporting-story,.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:1fr;row-gap:10px;padding:20px 0!important}}
