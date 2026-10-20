@@ -22,7 +22,7 @@
   let geometry = {x:0,y:0,w:0,h:0};
   const ease = t => { t = Math.max(0, Math.min(1,t)); return t*t*(3-2*t); };
   const setState = next => { state = next; section.dataset.reelsState = next; };
-  const valid = item => item && /^https:\/\/www\.instagram\.com\/reel\/[\w-]+\/?(?:\?.*)?$/.test(item.url || '') && typeof item.thumbnail === 'string' && item.thumbnail.trim() && typeof item.alt === 'string' && item.alt.trim();
+  const valid = item => item && /^https:\/\/www\.instagram\.com\/(?:harperhotels\/)?reel\/[\w-]+\/?(?:\?.*)?$/.test(item.url || '') && typeof item.alt === 'string' && item.alt.trim();
   function renderSocial(profiles) {
     social.replaceChildren();
     for (const name of ['instagram','facebook','x']) {
@@ -52,8 +52,15 @@
       const link = document.createElement('a');
       link.className = 'reels-card'; link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
       link.setAttribute('aria-label', `Watch Harper Reel: ${item.alt}`);
-      const img = document.createElement('img'); img.src = item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
-      link.append(img); orbit.append(link);
+      if (item.thumbnail) {
+        const img = document.createElement('img'); img.src = item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
+        link.append(img);
+      } else {
+        const placeholder = document.createElement('span'); placeholder.className = 'reels-card-placeholder';
+        placeholder.innerHTML = '<span class="reels-card-play" aria-hidden="true"><svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M6 3.5v13l10-6.5z"/></svg></span><span>Watch this Reel</span><small>On Instagram ↗</small>';
+        link.append(placeholder);
+      }
+      orbit.append(link);
       link.addEventListener('click', e => { if (dragDistance > 7) e.preventDefault(); });
       return link;
     });
@@ -68,7 +75,7 @@
     const spread = reduced.matches ? 1 : state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
     const n = cards.length;
     cards.forEach((card,i) => {
-      const phase = i * Math.PI*2/n - Math.PI/2 + angle;
+      const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
       const stagger = reduced.matches ? 1 : state === 'spreading' ? ease((now-spreadAt-i*55)/900) : spread;
       const radius = i === 0 ? spread : stagger;
       const x = Math.cos(phase)*geometry.x*radius;
