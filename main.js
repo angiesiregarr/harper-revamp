@@ -500,55 +500,6 @@ function setupMembershipMotion() {
   update();
 }
 
-function setupMoments() {
-  const track = document.getElementById('moments-track');
-  const cards = [...track.querySelectorAll('a')];
-  const position = document.querySelector('.moments-position');
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let active = 2;
-  let touchStart = null;
-  function render() {
-    const step = Math.min(285, Math.max(120, track.clientWidth * (window.innerWidth <= 650 ? .32 : .22)));
-    cards.forEach((card, index) => {
-      let offset = index - active;
-      if (offset > cards.length / 2) offset -= cards.length;
-      if (offset < -cards.length / 2) offset += cards.length;
-      const distance = Math.abs(offset);
-      card.style.setProperty('--x', `${offset * step}px`);
-      card.style.setProperty('--card-scale', distance === 0 ? (window.innerWidth <= 650 ? '1.12' : '1.28') : distance === 1 ? '1.01' : '.78');
-      card.style.setProperty('--card-opacity', distance === 2 ? '.76' : '1');
-      card.style.zIndex = String(5 - distance);
-      card.classList.toggle('is-current', distance === 0);
-      card.setAttribute('aria-current', distance === 0 ? 'true' : 'false');
-    });
-    position.textContent = `${String(active + 1).padStart(2, '0')} / ${String(cards.length).padStart(2, '0')}`;
-  }
-  function go(step) { active = (active + step + cards.length) % cards.length; render(); }
-  document.querySelectorAll('[data-moment-direction]').forEach(button => button.addEventListener('click', () => go(Number(button.dataset.momentDirection))));
-  cards.forEach((card, index) => card.addEventListener('click', event => {
-    if (index === active) return;
-    event.preventDefault();
-    active = index;
-    render();
-  }));
-  track.addEventListener('keydown', event => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    event.preventDefault();
-    go(event.key === 'ArrowRight' ? 1 : -1);
-    cards[active].focus({preventScroll: true});
-  });
-  track.addEventListener('touchstart', event => { touchStart = event.changedTouches[0].clientX; }, {passive:true});
-  track.addEventListener('touchend', event => {
-    if (touchStart === null) return;
-    const difference = event.changedTouches[0].clientX - touchStart;
-    touchStart = null;
-    if (Math.abs(difference) > 40) go(difference < 0 ? 1 : -1);
-  }, {passive:true});
-  reduced.addEventListener('change', render);
-  window.addEventListener('resize', render);
-  render();
-}
-
 function setupSectionPortalMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const sections = [...document.querySelectorAll('.hero, .hotels, .offers, .news-section, .journal-cloud-transition, .moments, .membership, .footer')];
@@ -618,10 +569,10 @@ function setupReveals() {
 function setupTextAnimations() {
   const selectors = [
     '#hero-title', '#hotels-title', '#offers-title', '#journal-title',
-    '#moments-title', '.footer-invite h2',
+    '.footer-invite h2',
     '.hotels .section-kicker', '.offers-intro .section-kicker',
     '.offers-intro > p:not(.section-kicker)', '.news-heading .section-kicker',
-    '.moments .section-kicker', '.moments-hint',
+    '.moments-hint',
     '.footer-invite p:not(.section-kicker)',
   ];
   const items = [...document.querySelectorAll(selectors.join(','))];
@@ -828,7 +779,7 @@ setupNews();
 setupSectionAnchors();
 setupCityViewport();
 setupMembershipMotion();
-setupMoments();
+
 setupSectionPortalMotion();
 setupReveals();
 setupTextAnimations();

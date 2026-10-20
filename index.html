@@ -8,10 +8,11 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=7b128f4e6586" />
+    <link rel="stylesheet" href="./styles.css?v=02ba2f6c0a47" />
     <link rel="stylesheet" href="./offers-pixel.css?v=2619944de854" />
     <script>document.documentElement.classList.add('js');</script>
-    <script src="./main.js?v=57174a8e0866" defer></script>
+    <script src="./reels.js?v=f23119810ec5" defer></script>
+    <script src="./main.js?v=83439b43f036" defer></script>
     <script src="./hero-carousel.js?v=30cb5a467da0" defer></script>
     <script src="./offers-pixel.js?v=911307990b3b" defer></script>
   </head>
@@ -149,21 +150,15 @@
       </div>
       <div class="journal-cloud-transition" aria-hidden="true"></div>
 
-      <section class="moments section-pad" id="moments" aria-labelledby="moments-title">
-        <div class="section-heading reveal">
-          <p class="section-kicker"><span>✣</span> Unscripted Harper <span>✣</span></p>
-          <h2 id="moments-title">Your moments.<br />Our inspiration.</h2>
+      <section class="moments harper-reels" id="moments" aria-labelledby="moments-title" data-reels-state="idle">
+        <div class="reels-intro"><p class="section-kicker">Unscripted Harper</p><p class="reels-eyebrow">From the Harper community</p></div>
+        <div class="reels-stage" id="reels-stage" aria-label="Harper Reels gallery">
+          <div class="reels-orbit" id="reels-orbit"></div>
+          <div class="reels-center" id="reels-center"><h2 id="moments-title">MOMENTS TO<br />REMEMBER.</h2><div class="reels-social" id="reels-social" aria-label="Harper social profiles"></div></div>
+          <div class="reels-empty" id="reels-empty" hidden><span class="reels-empty-mark" aria-hidden="true">H</span><p>See the latest moments from Harper.</p><a href="https://www.instagram.com/harperhotels/reels/" target="_blank" rel="noopener noreferrer">Explore official Reels <span aria-hidden="true">↗</span></a></div>
         </div>
-        <div class="moments-window" aria-label="Harper social moments gallery">
-          <div class="moments-track" id="moments-track">
-            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper moments on Instagram"><img src="./assets/moment-1.png" alt="Guest enjoying a quiet moment" loading="lazy" /></a>
-            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper dining moments on Instagram"><img src="./assets/moment-2.png" alt="Guests dining together" loading="lazy" /></a>
-            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper stay moments on Instagram"><img src="./assets/moment-3.png" alt="Friends enjoying their hotel room" loading="lazy" /></a>
-            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See more Harper moments on Instagram"><img src="./assets/moment-4.png" alt="Guest relaxing by a window" loading="lazy" /></a>
-            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="See Harper team moments on Instagram"><img src="./assets/moment-5.png" alt="Harper team member smiling" loading="lazy" /></a>
-          </div>
-        </div>
-        <div class="moments-controls" aria-label="Moments navigation"><button type="button" data-moment-direction="-1" aria-label="Previous moment" aria-controls="moments-track">←</button><span class="moments-position" aria-live="polite">01 / 05</span><button type="button" data-moment-direction="1" aria-label="Next moment" aria-controls="moments-track">→</button></div>
+        <div class="reels-controls" id="reels-controls" hidden><button type="button" data-reels-step="-1" aria-label="Previous Reel">←</button><span id="reels-count" aria-live="polite"></span><button type="button" data-reels-step="1" aria-label="Next Reel">→</button></div><div class="reels-page-controls" id="reels-page-controls" hidden><button type="button" data-reels-page="-1">Previous set</button><button type="button" data-reels-page="1">More Reels</button></div>
+        <a class="reels-feed-link" href="https://www.instagram.com/harperhotels/reels/" target="_blank" rel="noopener noreferrer">View Harper on Instagram <span aria-hidden="true">↗</span></a>
       </section>
 
       <section class="membership" id="membership" aria-labelledby="membership-title">
