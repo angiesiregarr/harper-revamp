@@ -1477,3 +1477,23 @@ html{scroll-padding-top:var(--top-nav-height)}
 .journal-bookmark::before{content:"";position:absolute;inset:0 3px 13px 4px;border-left:1px solid #fff5c68c;border-right:1px solid #76361366;pointer-events:none}
 .journal-bookmark::after{content:"";position:absolute;left:0;right:0;bottom:0;height:24%;background:linear-gradient(135deg,#ffc17277,#8e3f0b66);clip-path:polygon(0 0,50% 15%,100% 0,50% 100%);pointer-events:none}
 @media(max-width:620px){.news-section .journal-feature .news-photo{aspect-ratio:1.65;max-height:none}}
+
+/* All paper leaves use one page grid; the ribbon sits partly inside the stack. */
+.journal-page{--journal-page-x:clamp(25px,2.3vw,40px);--journal-row-gap:clamp(16px,2.5vh,28px);padding:clamp(21px,2.1vw,34px) var(--journal-page-x) 18px}
+.journal-page-right{padding-right:var(--journal-page-x)}
+.journal-page-rule,.journal-right-heading{min-height:39px;margin:0 0 12px;padding:8px 0;border-top:1px solid #ba9b7e;border-bottom:1px solid #d9c6b2}
+.journal-right-heading .journal-eyebrow{margin:0}
+.journal-story-list,.news-section .news-track{gap:var(--journal-row-gap)}
+.news-section .news-track{flex:1;grid-template-rows:repeat(2,minmax(0,1fr));margin:0;padding:0}
+.news-section .news-track .news-card{align-self:center}
+.journal-folio{min-height:27px;margin-top:auto;padding-top:10px}
+.news-section .journal-feature .news-photo{aspect-ratio:2.85;max-height:245px}
+.news-section .journal-feature .news-read{margin-top:8px}
+.journal-bookmark-tail{position:absolute;z-index:1;top:-8px;right:29%;width:15px;height:28px;background:linear-gradient(90deg,#b6531c,#dc6d25 55%,#bd571b);box-shadow:1px 2px 3px #4f2a1833;transform:skewX(-3deg);pointer-events:none}
+.journal-bookmark{z-index:4;top:5px;right:29%;width:15px;height:35px;clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%);background:linear-gradient(100deg,#bf5a20 0 48%,#e47a2d 49% 68%,#c55c1e 100%);box-shadow:none;filter:drop-shadow(1px 2px 2px #5c331d45)}
+.journal-bookmark::before{inset:0 0 auto;height:3px;border:0;background:#70351950;filter:blur(1px)}
+.journal-bookmark::after{left:0;right:0;bottom:0;height:22%;background:linear-gradient(160deg,#f18c3c7a,#a4491556);clip-path:polygon(0 0,50% 10%,100% 0,50% 100%)}
+.journal-spread.is-current:has(.is-lifting-page){background:transparent}
+.news-section .journal-feature .news-photo{flex:none}
+@media(max-height:820px) and (min-width:1101px){.news-section .journal-feature .news-photo{aspect-ratio:3.65;max-height:165px}}
+@media(max-width:620px){.journal-page{--journal-page-x:25px;padding:24px var(--journal-page-x)}.news-section .journal-feature{display:block}.news-section .news-card.journal-feature{margin-bottom:32px}.news-section .journal-feature .news-photo{aspect-ratio:1.65;max-height:none}.journal-bookmark,.journal-bookmark-tail{width:14px;right:29%}.journal-bookmark{height:34px}}

@@ -227,10 +227,7 @@ function setupNews() {
   mobile.addEventListener('change', () => { if (mobile.matches) open(true); });
   openButton.addEventListener('click', () => open(false));
   cover.addEventListener('click', () => open(false));
-  const turnTransform = (direction, progress, shift) => {
-    const travel = (direction > 0 ? -1 : 1)*shift*Math.sin(Math.PI*progress);
-    return `translateX(${travel}px) rotateY(${(direction > 0 ? -1 : 1)*165*progress}deg)`;
-  };
+  const turnTransform = (direction, progress) => `rotateY(${(direction > 0 ? -1 : 1)*180*progress}deg)`;
   const turnShadow = progress => `${(sheet.dataset.direction === 'next' ? -1 : 1)*Math.round(8+22*Math.sin(Math.PI*progress))}px 9px ${Math.round(18+24*Math.sin(Math.PI*progress))}px rgba(57,40,27,${(.12+.18*Math.sin(Math.PI*progress)).toFixed(3)})`;
   const clearSheet = () => {
     sheet.classList.remove('is-turning');
@@ -245,7 +242,9 @@ function setupNews() {
     const source = spreads[current].querySelector(direction > 0 ? '.journal-page-right' : '.journal-page-left');
     const destination = spreads[current + direction].querySelector(direction > 0 ? '.journal-page-left' : '.journal-page-right');
     const bookBox = book.getBoundingClientRect();
-    const sourceBox = source.getBoundingClientRect();
+    const spreadBox = spreads[current].getBoundingClientRect();
+    const pageWidth = spreadBox.width / 2;
+    const gutter = spreadBox.left + pageWidth;
     const clonePage = page => {
       const clone = page.cloneNode(true);
       clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
@@ -254,19 +253,20 @@ function setupNews() {
     };
     frontFace.replaceChildren(clonePage(source));
     backFace.replaceChildren(clonePage(destination));
-    sheet.style.left = `${sourceBox.left - bookBox.left}px`;
-    sheet.style.width = `${sourceBox.width}px`;
+    sheet.style.left = `${(direction > 0 ? gutter : spreadBox.left) - bookBox.left}px`;
+    sheet.style.top = `${spreadBox.top - bookBox.top}px`;
+    sheet.style.width = `${pageWidth}px`;
+    sheet.style.height = `${spreadBox.height}px`;
     sheet.style.transformOrigin = direction > 0 ? 'left center' : 'right center';
-    const shift = Math.min(85,sourceBox.width*.16);
     sheet.dataset.direction = direction > 0 ? 'next' : 'prev';
-    sheet.style.transform = turnTransform(direction,0,shift);
+    sheet.style.transform = turnTransform(direction,0);
     sheet.style.boxShadow = turnShadow(0);
     sheet.classList.add('is-turning');
     const from = current;
     spreads[current + direction].classList.add('is-under-page');
     source.classList.add('is-lifting-page');
-    if (fromDrag) return {from, direction, width:sourceBox.width,shift};
-    try { await sheet.animate([{transform:turnTransform(direction,0,shift),boxShadow:turnShadow(0)},{transform:turnTransform(direction,1,shift),boxShadow:turnShadow(1)}],{duration:1300,easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
+    if (fromDrag) return {from, direction, width:pageWidth};
+    try { await sheet.animate([{transform:turnTransform(direction,0),boxShadow:turnShadow(0)},{transform:turnTransform(direction,1),boxShadow:turnShadow(1)}],{duration:1300,easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
     showPage(from + direction);
     clearSheet();
   };
@@ -287,7 +287,7 @@ function setupNews() {
       const vertical = Math.abs(event.clientY - drag.y);
       if (vertical > Math.abs(travel) * 1.2 && vertical > 18) return;
       drag.progress = Math.max(0, Math.min(1, travel / drag.width));
-      sheet.style.transform = turnTransform(direction,drag.progress,drag.shift);
+      sheet.style.transform = turnTransform(direction,drag.progress);
       sheet.style.boxShadow = turnShadow(drag.progress);
     });
     zone.addEventListener('pointerdown', async event => {
@@ -308,7 +308,7 @@ function setupNews() {
       const speed = distance / Math.max(1, performance.now() - state.time);
       const complete = event.type !== 'pointercancel' && (state.progress >= .26 || (distance > 35 && speed > .55));
       const endProgress = complete ? 1 : 0;
-      try { await sheet.animate([{transform:sheet.style.transform,boxShadow:sheet.style.boxShadow},{transform:turnTransform(direction,endProgress,state.shift),boxShadow:turnShadow(endProgress)}],{duration:Math.max(360,1300*Math.abs(endProgress-state.progress)),easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
+      try { await sheet.animate([{transform:sheet.style.transform,boxShadow:sheet.style.boxShadow},{transform:turnTransform(direction,endProgress),boxShadow:turnShadow(endProgress)}],{duration:Math.max(360,1300*Math.abs(endProgress-state.progress)),easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
       if (complete) showPage(state.from + direction);
       clearSheet();
     };
