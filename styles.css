@@ -1522,3 +1522,14 @@ html{scroll-padding-top:var(--top-nav-height)}
 .news-section .news-track .journal-supporting-story:first-child,.news-section .journal-story-list .journal-supporting-story:first-child{border-bottom:1px solid #d9c6b2}
 @media(max-width:1100px){.news-section .news-card.journal-supporting-story,.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:minmax(0,36%) minmax(0,1fr)}}
 @media(max-width:620px){.news-section .news-card.journal-supporting-story,.news-section .journal-story-list .news-card.journal-supporting-story{grid-template-columns:1fr;row-gap:10px;padding:20px 10px!important}}
+
+/* Give every leaf heading and folio the same inset as its story frames. */
+.journal-page .journal-page-rule,.journal-page .journal-right-heading{margin-left:8px;margin-right:8px;padding-left:10px;padding-right:10px}
+.journal-page .journal-folio{margin-left:8px;margin-right:8px;padding-left:10px;padding-right:10px}
+/* The featured photograph grows into the unused space below its link. */
+@media(min-width:1101px){.news-section .journal-feature .news-photo{height:clamp(190px,27svh,290px);max-height:none;aspect-ratio:auto}}
+/* The cover carries the same folded fabric marker as the inner leaves. */
+.journal-cover-bookmark{position:absolute;top:0;left:70%;width:19px;height:57px;pointer-events:none}
+@media(max-width:620px){.journal-cover-bookmark{width:16px;height:49px}}
+.journal-book.is-closed > .journal-bookmark,.journal-book.is-opening > .journal-bookmark{visibility:hidden}
+@media(max-height:820px) and (min-width:1101px){.news-section .journal-feature .news-photo{height:clamp(180px,calc(27svh - 16px),250px)}}
