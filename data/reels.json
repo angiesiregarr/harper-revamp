@@ -5,7 +5,7 @@
     "facebook": null,
     "x": null
   },
-  "pageSize": 7,
+  "pageSize": 8,
   "items": [
     {
       "url": "https://www.instagram.com/harperhotels/reel/DeeKFpoSKX7/",
@@ -16,6 +16,42 @@
       "url": "https://www.instagram.com/reel/DeLPJSDvDuZ/",
       "cover": "./assets/moment-5.png",
       "alt": "Harper editorial cover showing a warm welcome from hotel staff"
+    },
+    {
+      "url": "https://www.instagram.com/harperhotels/reels/",
+      "preview": true,
+      "cover": "./assets/moment-1.png",
+      "alt": "Harper hotel guest reading in a room"
+    },
+    {
+      "url": "https://www.instagram.com/harperhotels/reels/",
+      "preview": true,
+      "cover": "./assets/orbit-breakfast.webp",
+      "alt": "Breakfast by a hotel window"
+    },
+    {
+      "url": "https://www.instagram.com/harperhotels/reels/",
+      "preview": true,
+      "cover": "./assets/moment-3.png",
+      "alt": "Guests enjoying a playful moment in a hotel room"
+    },
+    {
+      "url": "https://www.instagram.com/harperhotels/reels/",
+      "preview": true,
+      "cover": "./assets/orbit-dining.webp",
+      "alt": "Dinner served in a warmly lit hotel restaurant"
+    },
+    {
+      "url": "https://www.instagram.com/harperhotels/reels/",
+      "preview": true,
+      "cover": "./assets/moment-2.png",
+      "alt": "Guest enjoying a meal at a Harper hotel"
+    },
+    {
+      "url": "https://www.instagram.com/harperhotels/reels/",
+      "preview": true,
+      "cover": "./assets/orbit-welcome.webp",
+      "alt": "Flowers and a welcoming hotel lounge"
     }
   ]
 }

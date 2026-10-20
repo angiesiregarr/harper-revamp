@@ -16,14 +16,17 @@
     facebook: '<path d="M14.4 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.5 1.6-1.5h1.7V3.3a22 22 0 0 0-2.5-.1c-2.5 0-4.2 1.5-4.2 4.3v2.3H8.3V13H11v8z" fill="currentColor" stroke="none"/>',
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
-  let cards = [], items = [], page = 0, pageSize = 7, state = 'idle';
+  let cards = [], items = [], page = 0, pageSize = 8, state = 'idle';
   let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0;
   let holdElapsed = 0, revealAt = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
   let geometry = {x:0,y:0,w:0,h:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
   const ease = t => { t = Math.max(0, Math.min(1,t)); return t*t*(3-2*t); };
   const setState = next => { state = next; section.dataset.reelsState = next; social.inert = next !== 'revealing' && next !== 'spinning'; };
   social.inert = true;
-  const valid = item => item && /^https:\/\/www\.instagram\.com\/(?:harperhotels\/)?reel\/[\w-]+\/?(?:\?.*)?$/.test(item.url || '') && typeof item.alt === 'string' && item.alt.trim();
+  const valid = item => item && typeof item.alt === 'string' && item.alt.trim() &&
+    (item.preview === true
+      ? item.url === 'https://www.instagram.com/harperhotels/reels/' && typeof item.cover === 'string'
+      : /^https:\/\/www\.instagram\.com\/(?:harperhotels\/)?reel\/[\w-]+\/?(?:\?.*)?$/.test(item.url || ''));
   function renderSocial(profiles) {
     social.replaceChildren();
     for (const name of ['instagram','facebook','x']) {
@@ -54,16 +57,15 @@
     cards = items.slice(start,start+pageSize).map((item,i) => {
       const link = document.createElement('a');
       link.className = 'reels-card'; link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-      link.setAttribute('aria-label', `Watch Harper Reel on Instagram. ${item.alt}`);
+      link.setAttribute('aria-label', item.preview ? `Browse Harper Reels on Instagram. Preview photo: ${item.alt}` : `Watch Harper Reel on Instagram. Preview photo: ${item.alt}`);
       if (item.cover || item.thumbnail) {
         const img = document.createElement('img'); img.src = item.cover || item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
         link.append(img);
-        if (item.cover) {
-          const cover = document.createElement('span');
-          cover.className = 'reels-cover-type';
-          cover.innerHTML = '<img class="reels-cover-brand" src="./assets/harper-logo-white.png" alt="" aria-hidden="true"><span class="reels-cover-footer">A moment at Harper <span aria-hidden="true">↗</span></span>';
-          link.append(cover);
-        }
+        const badge = document.createElement('span');
+        badge.className = 'reels-card-badge';
+        badge.setAttribute('aria-hidden', 'true');
+        badge.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 5l3 5M15 5l3 5"/><path d="m10 13 5 2.5-5 2.5z" fill="currentColor" stroke="none"/></svg>';
+        link.append(badge);
       } else {
         const placeholder = document.createElement('span'); placeholder.className = 'reels-card-placeholder';
         placeholder.innerHTML = '<span class="reels-card-play" aria-hidden="true"><svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M6 3.5v13l10-6.5z"/></svg></span><span>Watch this Reel</span><small>On Instagram ↗</small>';
@@ -105,7 +107,7 @@
   }
   function frame(now) {
     const dt = Math.min(250,Math.max(0,now-last)); last=now;
-    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 20000){setState('spreading');spreadAt=now;}}
+    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 5000){setState('spreading');spreadAt=now;}}
     if (state === 'spreading' && now-spreadAt > 900+(cards.length-1)*55){setState('revealing');revealAt=now;}
     if (state === 'revealing' && now-revealAt > 900){setState('spinning');}
     if (stepAt) {
@@ -125,8 +127,8 @@
     else setState('holding');
   }
   function initialize(data) {
-    const verified = (data.items || []).filter(valid);
-    items=verified;pageSize=Math.max(1,Math.min(innerWidth<650?5:7,Number(data.pageSize)||7));
+    items=(data.items || []).filter(valid);
+    pageSize=Math.max(1,Math.min(innerWidth<650?5:8,Number(data.pageSize)||8));
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;section.dataset.reelsState='empty';center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');return;}
     controls.hidden=false;setPage(0);
@@ -150,7 +152,7 @@
     controls.querySelectorAll('[data-reels-step]').forEach(button=>button.addEventListener('click',()=>step(Number(button.dataset.reelsStep))));
     pageControls.querySelectorAll('[data-reels-page]').forEach(button=>button.addEventListener('click',()=>setPage(page+Number(button.dataset.reelsPage))));
     orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowRight'?1:-1);}});
-    addEventListener('resize',()=>{const nextSize=Math.max(1,Math.min(innerWidth<650?5:7,Number(data.pageSize)||7));if(nextSize!==pageSize){const first=page*pageSize;pageSize=nextSize;setPage(Math.floor(first/pageSize));}else measure();});reduced.addEventListener('change',()=>{if(reduced.matches){setState('spinning');center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');}render(performance.now());});
+    addEventListener('resize',()=>{const nextSize=Math.max(1,Math.min(innerWidth<650?5:8,Number(data.pageSize)||8));if(nextSize!==pageSize){const first=page*pageSize;pageSize=nextSize;setPage(Math.floor(first/pageSize));}else measure();});reduced.addEventListener('change',()=>{if(reduced.matches){setState('spinning');center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');}render(performance.now());});
     last=performance.now();raf=requestAnimationFrame(frame);
   }
   fetch('./data/reels.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Reel manifest unavailable');return r.json();}).then(initialize).catch(()=>initialize({profiles:{instagram:'https://www.instagram.com/harperhotels/reels/'},items:[]}));
