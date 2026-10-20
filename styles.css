@@ -1462,3 +1462,18 @@ html{scroll-padding-top:var(--top-nav-height)}
 }
 @media(max-width:850px) and (prefers-reduced-motion:no-preference){body.hero-city-handoff-enabled .hotels.portal-ready>.city-map{opacity:calc(.19 * var(--handoff-map,1))}}
 @media(prefers-reduced-motion:reduce){.hotels.handoff-reduced-enter .city-heading,.hotels.handoff-reduced-enter .hotel-content{animation:city-reduced-handoff .16s ease-out both}@keyframes city-reduced-handoff{from{opacity:.86}to{opacity:1}}}
+
+/* Journal story hierarchy and quiet, tactile book details. */
+.news-section .journal-feature .news-photo{aspect-ratio:2.55;max-height:285px}
+.news-section .journal-feature .news-copy{justify-content:flex-start}
+.news-section .news-track .news-excerpt{font-size:11px;line-height:1.35;margin-top:6px}
+.news-section .news-track .news-read{margin-top:8px}
+.journal-controls .journal-page-button{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:0;background:transparent;color:#744f36;font:400 26px/1 Arial,sans-serif!important;letter-spacing:0}
+.journal-controls .journal-page-button:hover:not(:disabled){background:transparent;color:var(--orange-ink);transform:translateX(2px)}
+.journal-controls .journal-page-button#journal-prev:hover:not(:disabled){transform:translateX(-2px)}
+.journal-controls .journal-page-button:active:not(:disabled){transform:scale(.9)}
+.journal-controls .journal-page-button:disabled,.journal-controls .journal-page-button:disabled:hover{background:transparent;color:#9d9184;opacity:.42;transform:none}
+.journal-bookmark{background:linear-gradient(90deg,#a64c11 0%,#ed8124 20%,#ffa84c 45%,#d46418 78%,#8f390b 100%);box-shadow:none;filter:drop-shadow(2px 5px 4px #6c3c1f70)}
+.journal-bookmark::before{content:"";position:absolute;inset:0 3px 13px 4px;border-left:1px solid #fff5c68c;border-right:1px solid #76361366;pointer-events:none}
+.journal-bookmark::after{content:"";position:absolute;left:0;right:0;bottom:0;height:24%;background:linear-gradient(135deg,#ffc17277,#8e3f0b66);clip-path:polygon(0 0,50% 15%,100% 0,50% 100%);pointer-events:none}
+@media(max-width:620px){.news-section .journal-feature .news-photo{aspect-ratio:1.65;max-height:none}}
