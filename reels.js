@@ -1,4 +1,4 @@
-/* Harper Reels. Only entries with a verified Instagram permalink and thumbnail render. */
+/* Harper Reels. Permalinks are verified; local editorial covers are not Reel stills. */
 (() => {
   const section = document.getElementById('moments');
   if (!section) return;
@@ -17,11 +17,12 @@
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
   let cards = [], items = [], page = 0, pageSize = 7, state = 'idle';
-  let visible = false, hover = false, focused = false, dragging = false, angle = 0, velocity = 0, spreadAt = 0;
-  let holdElapsed = 0, revealAt = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, dragDistance = 0;
-  let geometry = {x:0,y:0,w:0,h:0};
+  let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0;
+  let holdElapsed = 0, revealAt = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
+  let geometry = {x:0,y:0,w:0,h:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
   const ease = t => { t = Math.max(0, Math.min(1,t)); return t*t*(3-2*t); };
-  const setState = next => { state = next; section.dataset.reelsState = next; };
+  const setState = next => { state = next; section.dataset.reelsState = next; social.inert = next !== 'revealing' && next !== 'spinning'; };
+  social.inert = true;
   const valid = item => item && /^https:\/\/www\.instagram\.com\/(?:harperhotels\/)?reel\/[\w-]+\/?(?:\?.*)?$/.test(item.url || '') && typeof item.alt === 'string' && item.alt.trim();
   function renderSocial(profiles) {
     social.replaceChildren();
@@ -39,9 +40,11 @@
   function measure() {
     const box = stage.getBoundingClientRect();
     const mobile = box.width < 650;
-    const w = Math.min(mobile ? 82 : 108, Math.max(64, box.width * (mobile ? .21 : .14)));
+    const w = Math.min(mobile ? 82 : 124, Math.max(64, box.width * (mobile ? .21 : .14)));
     const h = w * 340 / 190;
-    geometry = {w,h,x:Math.max(0,Math.min(box.width*.38,box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.38,box.height/2-h/2-22))};
+    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.38,box.height/2-h/2-22))};
+    stage.style.setProperty('--reels-orbit-width', `${geometry.x*2}px`);
+    stage.style.setProperty('--reels-orbit-height', `${geometry.y*2}px`);
     render(performance.now());
   }
   function setPage(index) {
@@ -51,17 +54,23 @@
     cards = items.slice(start,start+pageSize).map((item,i) => {
       const link = document.createElement('a');
       link.className = 'reels-card'; link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-      link.setAttribute('aria-label', `Watch Harper Reel: ${item.alt}`);
-      if (item.thumbnail) {
-        const img = document.createElement('img'); img.src = item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
+      link.setAttribute('aria-label', `Watch Harper Reel on Instagram. ${item.alt}`);
+      if (item.cover || item.thumbnail) {
+        const img = document.createElement('img'); img.src = item.cover || item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
         link.append(img);
+        if (item.cover) {
+          const cover = document.createElement('span');
+          cover.className = 'reels-cover-type';
+          cover.innerHTML = '<img class="reels-cover-brand" src="./assets/harper-logo-white.png" alt="" aria-hidden="true"><span class="reels-cover-footer">A moment at Harper <span aria-hidden="true">↗</span></span>';
+          link.append(cover);
+        }
       } else {
         const placeholder = document.createElement('span'); placeholder.className = 'reels-card-placeholder';
         placeholder.innerHTML = '<span class="reels-card-play" aria-hidden="true"><svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M6 3.5v13l10-6.5z"/></svg></span><span>Watch this Reel</span><small>On Instagram ↗</small>';
         link.append(placeholder);
       }
       orbit.append(link);
-      link.addEventListener('click', e => { if (dragDistance > 7) e.preventDefault(); });
+      link.addEventListener('click', e => { if (performance.now() < suppressClickUntil) e.preventDefault(); });
       return link;
     });
     count.textContent = `${String(start+1).padStart(2,'0')}–${String(start+cards.length).padStart(2,'0')} / ${String(items.length).padStart(2,'0')}`;
@@ -82,7 +91,8 @@
       const y = Math.sin(phase)*geometry.y*radius;
       card.style.width = `${geometry.w}px`;
       card.style.height = `${geometry.h}px`;
-      card.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
+      const scale = i === 0 ? 1 + (1-spread)*Math.min(.65, Math.max(.35, 210/geometry.w-1)) : .72 + .28*stagger;
+      card.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${scale.toFixed(3)})`;
       card.style.opacity = i === 0 || reduced.matches ? '1' : String(stagger);
       card.style.zIndex = String(Math.round(100+y));
       card.tabIndex = i === 0 || spread >= .95 ? 0 : -1;
@@ -94,11 +104,15 @@
     }
   }
   function frame(now) {
-    const dt = Math.min(50,Math.max(0,now-last)); last=now;
+    const dt = Math.min(250,Math.max(0,now-last)); last=now;
     if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 20000){setState('spreading');spreadAt=now;}}
     if (state === 'spreading' && now-spreadAt > 900+(cards.length-1)*55){setState('revealing');revealAt=now;}
     if (state === 'revealing' && now-revealAt > 900){setState('spinning');}
-    if (state === 'spinning' && visible && !document.hidden && !dragging && !reduced.matches) {
+    if (stepAt) {
+      const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
+      angle = stepFrom+(stepTo-stepFrom)*progress;
+      if (progress >= 1) stepAt = 0;
+    } else if (state === 'spinning' && visible && !document.hidden && !dragging && !reduced.matches) {
       if (Math.abs(velocity) > .00008) {angle += velocity*dt;velocity *= Math.exp(-dt*.014);}
       else {velocity=0;if (!hover && !focused) angle += dt * (5*Math.PI/180)/1000;}
     }
@@ -116,16 +130,26 @@
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;section.dataset.reelsState='empty';center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');return;}
     controls.hidden=false;setPage(0);
-    const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();},{threshold:.5});observer.observe(section);
+    const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();},{threshold:.35});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();});
-    stage.addEventListener('pointerenter',()=>{hover=true;});stage.addEventListener('pointerleave',()=>{hover=false;});
+    orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
+    orbit.addEventListener('pointerout',e=>{if(e.target.closest('.reels-card') && !e.relatedTarget?.closest?.('.reels-card'))hover=false;});
     stage.addEventListener('focusin',()=>{focused=true;});stage.addEventListener('focusout',()=>{focused=stage.contains(document.activeElement);});
-    orbit.addEventListener('pointerdown',e=>{if(state!=='spinning')return;dragging=true;dragDistance=0;pointerX=e.clientX;pointerAt=performance.now();velocity=0;orbit.setPointerCapture(e.pointerId);});
-    orbit.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-pointerX;const elapsed=Math.max(1,performance.now()-pointerAt);const delta=dx/Math.max(110,stage.clientWidth*.38);angle+=delta;velocity=delta/elapsed*.25;dragDistance+=Math.abs(dx);pointerX=e.clientX;pointerAt=performance.now();});
-    const finish=()=>{dragging=false;};orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
-    controls.querySelectorAll('[data-reels-step]').forEach(button=>button.addEventListener('click',()=>{const dir=Number(button.dataset.reelsStep);if(cards.length>1)angle+=dir*2*Math.PI/cards.length;else setPage(page+dir);}));
+    orbit.addEventListener('pointerdown',e=>{if(state!=='spinning'||e.button!==0)return;pointerActive=true;stepAt=0;pointerStart=e.clientX;pointerX=e.clientX;pointerAt=performance.now();velocity=0;});
+    orbit.addEventListener('pointermove',e=>{
+      if (!pointerActive || e.buttons!==1 || state!=='spinning') return;
+      if (!dragging && Math.abs(e.clientX-pointerStart)>7) {dragging=true;orbit.setPointerCapture(e.pointerId);}
+      if (!dragging) return;
+      const dx=e.clientX-pointerX, elapsed=Math.max(1,performance.now()-pointerAt);
+      const delta=dx/Math.max(110,stage.clientWidth*.38);
+      angle+=delta;velocity=delta/elapsed*.25;pointerX=e.clientX;pointerAt=performance.now();
+    });
+    const finish=()=>{if(dragging)suppressClickUntil=performance.now()+350;dragging=false;pointerActive=false;};
+    orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
+    const step = dir => {if(state!=='spinning')return;if(cards.length>1){stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;}else setPage(page+dir);};
+    controls.querySelectorAll('[data-reels-step]').forEach(button=>button.addEventListener('click',()=>step(Number(button.dataset.reelsStep))));
     pageControls.querySelectorAll('[data-reels-page]').forEach(button=>button.addEventListener('click',()=>setPage(page+Number(button.dataset.reelsPage))));
-    orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();angle+=(e.key==='ArrowRight'?1:-1)*2*Math.PI/cards.length;}});
+    orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowRight'?1:-1);}});
     addEventListener('resize',()=>{const nextSize=Math.max(1,Math.min(innerWidth<650?5:7,Number(data.pageSize)||7));if(nextSize!==pageSize){const first=page*pageSize;pageSize=nextSize;setPage(Math.floor(first/pageSize));}else measure();});reduced.addEventListener('change',()=>{if(reduced.matches){setState('spinning');center.style.setProperty('--reels-title-opacity','1');center.style.setProperty('--reels-social-opacity','1');}render(performance.now());});
     last=performance.now();raf=requestAnimationFrame(frame);
   }

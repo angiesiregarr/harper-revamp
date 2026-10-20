@@ -1576,3 +1576,12 @@ html{scroll-padding-top:var(--top-nav-height)}
 .reels-card-play{display:grid;place-items:center;width:39px;height:39px;border:1px solid #fff9eb;border-radius:50%;font:400 15px var(--sans)}
 .reels-card-placeholder small{font:700 9px var(--sans);letter-spacing:.08em;text-transform:uppercase}
 @media(max-width:650px){.reels-card-placeholder{gap:6px;padding:7px;font-size:11px}.reels-card-play{width:27px;height:27px}.reels-card-play svg{width:11px;height:11px}.reels-card-placeholder small{font-size:7px}}
+.reels-cover-type{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;padding:12px 10px;color:#fffaf3;text-align:left;pointer-events:none;background:linear-gradient(180deg,rgba(24,20,18,.38),transparent 27%,transparent 59%,rgba(24,20,18,.68));text-shadow:0 1px 4px rgba(0,0,0,.36)}
+.reels-card .reels-cover-brand{display:block;width:100%;max-width:94px;height:auto;object-fit:contain;object-position:left top}
+.reels-cover-footer{display:flex;align-items:end;justify-content:space-between;gap:4px;font:700 10px/1.15 var(--sans);letter-spacing:.04em}
+.reels-cover-footer span{display:grid;place-items:center;flex:none;width:22px;height:22px;border:1px solid rgba(255,255,255,.8);border-radius:50%;font-size:16px;font-weight:400}
+.reels-card:hover{box-shadow:0 24px 50px #36291e38}
+@media(max-width:650px){.reels-cover-type{padding:8px 6px}.reels-card .reels-cover-brand{max-width:65px}.reels-cover-footer{font-size:8px}.reels-cover-footer span{width:18px;height:18px;font-size:12px}}
+.harper-reels[data-reels-state="idle"] .reels-stage::before,.harper-reels[data-reels-state="holding"] .reels-stage::before{opacity:0}
+.reels-stage::before{width:var(--reels-orbit-width,76%);height:var(--reels-orbit-height,62%);transition:opacity .9s ease}
+.harper-reels[data-reels-state="idle"] .reels-controls,.harper-reels[data-reels-state="holding"] .reels-controls,.harper-reels[data-reels-state="spreading"] .reels-controls,.harper-reels[data-reels-state="revealing"] .reels-controls{visibility:hidden}

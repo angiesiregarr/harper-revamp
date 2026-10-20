@@ -9,13 +9,13 @@
   "items": [
     {
       "url": "https://www.instagram.com/harperhotels/reel/DeeKFpoSKX7/",
-      "thumbnail": null,
-      "alt": "Open Instagram Reel DeeKFpoSKX7"
+      "cover": "./assets/moment-4.png",
+      "alt": "Harper editorial cover showing a guest enjoying a quiet moment"
     },
     {
       "url": "https://www.instagram.com/reel/DeLPJSDvDuZ/",
-      "thumbnail": null,
-      "alt": "Open Instagram Reel DeLPJSDvDuZ"
+      "cover": "./assets/moment-5.png",
+      "alt": "Harper editorial cover showing a warm welcome from hotel staff"
     }
   ]
 }
