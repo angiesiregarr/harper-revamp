@@ -1414,6 +1414,22 @@ html{scroll-padding-top:var(--top-nav-height)}
 @media(max-width:620px){.news-section,.news-section.portal-ready{width:calc(100% - 26px);padding:44px 0 64px}.news-section>.news-heading{margin-bottom:26px}.journal-spread.is-current{min-height:0}.journal-story-list{gap:30px}.journal-next-story{grid-template-columns:1fr}.journal-next-story .news-photo{aspect-ratio:1.7;max-height:none}.journal-next-story .news-copy{padding:10px 0 0}.journal-next-story .news-meta{display:flex}.journal-next-story .news-meta time{margin:0}}
 @media(prefers-reduced-motion:reduce){.hero-booking{transition:none}.journal-book.is-opening .journal-elastic,.journal-book.is-opening .journal-bookmark{animation:none}}
 
+/* Journal cover and article metadata. Keep the existing book and turn mechanics. */
+.journal-cover{background:radial-gradient(ellipse at 64% 34%,#ffffff24,transparent 48%),repeating-linear-gradient(120deg,#ffffff19 0 1px,transparent 1px 14px),linear-gradient(116deg,#696c70,#96989a 65%,#74777b);color:#fffaf1}
+.journal-cover::before{border-color:#fff5e28c}
+.journal-cover-content{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:clamp(14px,2.1vw,26px);height:100%;max-width:min(680px,75%);margin-left:clamp(8px,1.3vw,22px)}
+.journal-cover-logo{display:block;width:clamp(152px,12vw,190px);height:auto;object-fit:contain}
+.journal-cover-title{margin:0;font-size:clamp(58px,6.8vw,106px);line-height:1.02}
+.journal-cover-description{max-width:520px;font:400 clamp(15px,1.1vw,18px)/1.45 var(--sans);letter-spacing:.02em;color:#fffaf1}
+.news-section .news-meta{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;column-gap:10px;row-gap:2px}
+.news-section .news-meta>span{min-width:0}
+.news-section .news-meta time{flex:none;white-space:nowrap}
+.news-section .news-track .news-card{grid-template-columns:minmax(0,36%) minmax(0,1fr);gap:20px}
+.journal-next-story{grid-template-columns:minmax(0,min(34%,21.75svh,226px)) minmax(0,1fr);gap:20px;align-items:start;align-self:center}
+.journal-next-story .news-meta,.journal-next-story .news-meta time{display:flex;margin-top:0}
+@media(max-width:1100px){.journal-next-story{grid-template-columns:minmax(0,34%) minmax(0,1fr)}}
+@media(max-width:620px){.journal-next-story{grid-template-columns:1fr}.journal-cover-content{max-width:80%}}
+
 /* A single visual card bridges the existing hero and city gallery in normal page flow. */
 .hero-city-handoff{position:fixed;left:0;top:0;z-index:78;display:none;overflow:hidden;pointer-events:none;border:2px solid #fff8ec;border-radius:16px;background:#efe6da;box-shadow:0 20px 42px #4e302a24;transform-origin:top left;will-change:transform,opacity,width,height}
 .hero-city-handoff img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
