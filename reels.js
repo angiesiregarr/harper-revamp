@@ -7,7 +7,6 @@
   const center = document.getElementById('reels-center');
   const social = document.getElementById('reels-social');
   const empty = document.getElementById('reels-empty');
-  const controls = document.getElementById('reels-controls');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const icons = {
     instagram: '<rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="18" cy="6.3" r="1" fill="currentColor" stroke="none"/>',
@@ -17,7 +16,7 @@
   let cards = [], items = [], state = 'idle';
   let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0;
   let holdElapsed = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
-  let geometry = {x:0,y:0,w:0,h:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
+  let geometry = {x:0,y:0,w:0,h:0,titleShift:0,socialShift:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
   const ease = t => { t = Math.max(0, Math.min(1,t)); return t*t*(3-2*t); };
   const setState = next => { state = next; section.dataset.reelsState = next; social.inert = next === 'idle'; };
   social.inert = true;
@@ -43,7 +42,16 @@
     const mobile = box.width < 650;
     const w = Math.min(mobile ? 82 : 124, Math.max(64, box.width * (mobile ? .21 : .14)));
     const h = w * 340 / 190;
-    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.38,box.height/2-h/2-22))};
+    const scale = 1 + Math.min(.65, Math.max(.35, 210/w-1));
+    const centerHeight = center.offsetHeight;
+    const titleHeight = center.querySelector('h2').offsetHeight;
+    const socialHeight = social.offsetHeight;
+    const socialMargin = parseFloat(getComputedStyle(social).marginTop) || 0;
+    const cardTop = box.height/2 - h*scale/2;
+    const cardBottom = box.height/2 + h*scale/2;
+    const titleBottom = box.height/2 - centerHeight/2 + titleHeight;
+    const socialTop = titleBottom + socialMargin;
+    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.38,box.height/2-h/2-22)),titleShift:cardTop-14-titleBottom,socialShift:cardBottom-socialHeight-Math.max(20,h*scale*.1)-socialTop};
     stage.style.setProperty('--reels-orbit-width', `${geometry.x*2}px`);
     stage.style.setProperty('--reels-orbit-height', `${geometry.y*2}px`);
     render(performance.now());
@@ -77,9 +85,8 @@
     if (!cards.length) return;
     const spread = reduced.matches ? 1 : state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
     const centerProgress = reduced.matches ? 1 : state === 'spreading' ? ease((now-spreadAt-100)/1050) : state === 'spinning' ? 1 : 0;
-    const compact = geometry.w < 100;
-    center.style.setProperty('--reels-center-y', `${((compact ? 38 : 68)*(1-centerProgress)).toFixed(1)}px`);
-    center.style.setProperty('--reels-center-scale', (1-(compact ? .18 : .37)*(1-centerProgress)).toFixed(3));
+    center.style.setProperty('--reels-title-y', `${(geometry.titleShift*(1-centerProgress)).toFixed(1)}px`);
+    center.style.setProperty('--reels-social-y', `${(geometry.socialShift*(1-centerProgress)).toFixed(1)}px`);
     const n = cards.length;
     cards.forEach((card,i) => {
       const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
@@ -98,7 +105,7 @@
   }
   function frame(now) {
     const dt = Math.min(250,Math.max(0,now-last)); last=now;
-    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 5000){setState('spreading');spreadAt=now;}}
+    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 750){setState('spreading');spreadAt=now;}}
     if (state === 'spreading' && now-spreadAt > Math.max(1250,900+(cards.length-1)*55)){setState('spinning');}
     if (stepAt) {
       const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
@@ -120,7 +127,7 @@
     items=(data.items || []).filter(valid);
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
-    controls.hidden=false;renderCards();
+    renderCards();
     const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();},{threshold:.35});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();});
     orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
@@ -138,7 +145,6 @@
     const finish=()=>{if(dragging)suppressClickUntil=performance.now()+350;dragging=false;pointerActive=false;};
     orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
     const step = dir => {if(state!=='spinning'||cards.length<2)return;stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;};
-    controls.querySelectorAll('[data-reels-step]').forEach(button=>button.addEventListener('click',()=>step(Number(button.dataset.reelsStep))));
     orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowRight'?1:-1);}});
     addEventListener('resize',measure);
     reduced.addEventListener('change',()=>{if(reduced.matches)setState('spinning');render(performance.now());});
