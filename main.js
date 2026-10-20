@@ -153,20 +153,14 @@ function setupNews() {
   const pageCount = document.getElementById('journal-page-count');
   const cursor = section.querySelector('.journal-drag-hint');
   const nav = document.getElementById('site-nav');
-  const booking = document.querySelector('.hero-booking');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = matchMedia('(max-width: 620px)');
-  let introTimer = 0;
-  let openingTimer = 0;
-  let started = false;
   let current = 0;
   let turning = false;
   let drag = null;
-  let coverDrag = null;
   let coverAnimation = null;
-  let lastY = scrollY;
-  const headerBottom = () => Math.max(nav?.getBoundingClientRect().bottom || 0,
-    booking?.classList.contains('is-docked') ? booking.getBoundingClientRect().bottom : 0);
+  let hideCursor = () => {};
+  const headerBottom = () => nav?.getBoundingClientRect().bottom || 0;
   const measureHeader = () => section.style.setProperty('--journal-header-clearance', `${Math.max(0, headerBottom()).toFixed(1)}px`);
   const showPage = index => {
     current = index;
@@ -179,25 +173,28 @@ function setupNews() {
     prevButton.disabled = index === 0;
     nextButton.disabled = index === spreads.length - 1;
   };
-  const open = (immediate = false, fromProgress = 0) => {
-    clearTimeout(introTimer);
-    clearTimeout(openingTimer);
-    started = true;
-    if (book.classList.contains('is-open')) return;
+  const open = (immediate = false) => {
+    if (book.classList.contains('is-open') || book.classList.contains('is-opening')) return;
+    hideCursor();
     coverAnimation?.cancel();
     book.classList.remove('is-closed', 'is-opening');
+    book.tabIndex = 0;
+    cover.tabIndex = -1;
+    spreads[current].removeAttribute('inert');
+    spreads[current].setAttribute('aria-hidden','false');
     if (immediate || reduced.matches || mobile.matches) {
       cover.style.transform = '';
       cover.style.opacity = '';
       book.classList.add('is-open');
       section.classList.add('journal-is-open');
+      showPage(current);
       return;
     }
     book.classList.add('is-opening');
     coverAnimation = cover.animate([
-      {transform:`rotateY(${-165 * fromProgress}deg)`,opacity:1},
+      {transform:'rotateY(0deg)',opacity:1},
       {transform:'rotateY(-165deg)',opacity:0}
-    ],{duration:Math.max(400,1300*(1-fromProgress)),easing:'cubic-bezier(.2,.7,.2,1)',fill:'forwards'});
+    ],{duration:1600,easing:'cubic-bezier(.2,.7,.2,1)',fill:'forwards'});
     coverAnimation.finished.catch(() => {}).then(() => {
       if (!book.classList.contains('is-opening')) return;
       coverAnimation?.cancel();
@@ -206,65 +203,30 @@ function setupNews() {
       book.classList.remove('is-opening');
       book.classList.add('is-open');
       section.classList.add('journal-is-open');
+      showPage(current);
     });
   };
   showPage(0);
   measureHeader();
-  const direct = location.hash === '#journal' || performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
-  if (reduced.matches || mobile.matches || direct || section.getBoundingClientRect().top < innerHeight * .6) {
+  if (reduced.matches || mobile.matches) {
     open(true);
   } else {
     book.classList.add('is-closed');
+    book.tabIndex = -1;
+    spreads[0].setAttribute('inert','');
+    spreads[0].setAttribute('aria-hidden','true');
+    nextButton.disabled = true;
   }
   const update = () => {
     measureHeader();
-    if (book.classList.contains('is-open')) return;
-    if (reduced.matches || mobile.matches) { open(true); return; }
-    const bounds = section.getBoundingClientRect();
-    if (bounds.bottom <= headerBottom()) { open(true); return; }
-    const skipped = Math.abs(scrollY - lastY) > innerHeight * .62 || bounds.top < headerBottom() + 4;
-    if (bounds.top < innerHeight * .68 && bounds.bottom > headerBottom()) {
-      if (skipped) open(true);
-      else if (!started) {
-        started = true;
-        introTimer = setTimeout(() => open(false), 8000);
-      }
-    }
-    lastY = scrollY;
   };
   addEventListener('scroll', () => requestAnimationFrame(update), {passive:true});
   addEventListener('harper:booking-position', update);
   addEventListener('resize', update);
   reduced.addEventListener('change', () => { if (reduced.matches) open(true); });
   mobile.addEventListener('change', () => { if (mobile.matches) open(true); });
-  addEventListener('harper:journal-direct', () => open(true));
   openButton.addEventListener('click', () => open(false));
-  book.addEventListener('focusin', event => { if (event.target.closest('.news-card')) open(true); });
-  book.addEventListener('click', event => { if (event.target.closest('.news-card')) open(true); });
-  cover.addEventListener('pointerdown', event => {
-    if (!book.classList.contains('is-closed') || reduced.matches || mobile.matches) return;
-    event.preventDefault();
-    cover.setPointerCapture(event.pointerId);
-    coverDrag = {id:event.pointerId,x:event.clientX,time:performance.now(),progress:0,width:Math.max(180,cover.getBoundingClientRect().width*.5)};
-    book.classList.add('is-cover-dragging');
-  });
-  cover.addEventListener('pointermove', event => {
-    if (!coverDrag || coverDrag.id !== event.pointerId) return;
-    coverDrag.progress = Math.max(0,Math.min(1,(coverDrag.x-event.clientX)/coverDrag.width));
-    cover.style.transform = `rotateY(${-165*coverDrag.progress}deg)`;
-  });
-  const finishCoverDrag = event => {
-    if (!coverDrag || coverDrag.id !== event.pointerId) return;
-    const state = coverDrag;
-    coverDrag = null;
-    book.classList.remove('is-cover-dragging');
-    const velocity = (state.x-event.clientX)/Math.max(1,performance.now()-state.time);
-    if (event.type !== 'pointercancel' && (state.progress > .24 || velocity > .65)) { open(false,state.progress); return; }
-    const reset = cover.animate([{transform:cover.style.transform},{transform:'rotateY(0deg)'}],{duration:360,easing:'ease-out'});
-    reset.finished.catch(() => {}).then(() => { if (book.classList.contains('is-closed')) cover.style.transform = ''; });
-  };
-  cover.addEventListener('pointerup',finishCoverDrag);
-  cover.addEventListener('pointercancel',finishCoverDrag);
+  cover.addEventListener('click', () => open(false));
   const turnTransform = (direction, progress, shift) => {
     const travel = (direction > 0 ? -1 : 1)*shift*Math.sin(Math.PI*progress);
     return `translateX(${travel}px) rotateY(${(direction > 0 ? -1 : 1)*165*progress}deg)`;
@@ -277,8 +239,7 @@ function setupNews() {
     turning = false;
   };
   const turn = async (direction, fromDrag = false) => {
-    if (turning || current + direction < 0 || current + direction >= spreads.length) return;
-    open(true);
+    if (!book.classList.contains('is-open') || turning || current + direction < 0 || current + direction >= spreads.length) return;
     if (reduced.matches || mobile.matches) { showPage(current + direction); return; }
     turning = true;
     const source = spreads[current].querySelector(direction > 0 ? '.journal-page-right' : '.journal-page-left');
@@ -330,7 +291,7 @@ function setupNews() {
       sheet.style.boxShadow = turnShadow(drag.progress);
     });
     zone.addEventListener('pointerdown', async event => {
-      if (turning || (direction > 0 && current === spreads.length - 1) || (direction < 0 && current === 0)) return;
+      if (!book.classList.contains('is-open') || turning || (direction > 0 && current === spreads.length - 1) || (direction < 0 && current === 0)) return;
       event.preventDefault();
       zone.setPointerCapture(event.pointerId);
       const state = await turn(direction, true);
@@ -402,7 +363,10 @@ function setupNews() {
     };
     const move = event => {
       if (!finePointer.matches || event.pointerType === 'touch') return;
-      if (event.target.closest('a,button')) { hide(); return; }
+      const overCover = book.classList.contains('is-closed') && event.target.closest('.journal-cover');
+      const overEdge = book.classList.contains('is-open') && event.target.closest('.journal-turn-zone');
+      if (!overCover && !overEdge) { hide(); return; }
+      label.textContent = overCover ? 'Click me' : 'Drag me';
       targetX = event.clientX; targetY = event.clientY;
       labelX = targetX + (targetX > innerWidth - 145 ? -127 : 30);
       labelY = targetY + (targetY > innerHeight - 48 ? -38 : 8);
@@ -423,6 +387,7 @@ function setupNews() {
       if (frame) cancelAnimationFrame(frame);
       frame = 0;
     };
+    hideCursor = hide;
     section.addEventListener('pointerenter', move);
     section.addEventListener('pointermove', move, {passive:true});
     section.addEventListener('pointerleave', hide);
@@ -437,11 +402,10 @@ function setupNews() {
 
 function setupSectionAnchors() {
   const nav = document.getElementById('site-nav');
-  const booking = document.querySelector('.hero-booking');
   document.querySelectorAll('a[href="#journal"], a[href="#membership"]').forEach(link => link.addEventListener('click', event => {
     event.preventDefault();
     const section = document.querySelector(link.getAttribute('href'));
-    const clearance = (innerWidth > 800 ? 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76) : nav.getBoundingClientRect().height) + 16;
+    const clearance = nav.getBoundingClientRect().height + 16;
     const top = window.scrollY + section.getBoundingClientRect().top - clearance;
     history.pushState(null, '', link.getAttribute('href'));
     if (link.getAttribute('href') === '#journal') dispatchEvent(new Event('harper:journal-direct'));
@@ -452,18 +416,9 @@ function setupSectionAnchors() {
 function setupCityViewport() {
   const section = document.getElementById('hotels');
   const nav = document.getElementById('site-nav');
-  const booking = document.querySelector('.hero-booking');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
-  const clearance = () => {
-    let bottom = nav.getBoundingClientRect().bottom;
-    const position = getComputedStyle(booking).position;
-    if (position === 'sticky' || position === 'fixed') {
-      const bounds = booking.getBoundingClientRect();
-      if (bounds.top <= bottom + 2 && bounds.bottom > bottom) bottom = bounds.bottom;
-    }
-    return Math.max(0, bottom);
-  };
+  const clearance = () => Math.max(0,nav.getBoundingClientRect().bottom);
   const update = () => {
     frame = 0;
     document.documentElement.style.setProperty('--city-header-clearance', `${clearance().toFixed(1)}px`);
@@ -471,9 +426,7 @@ function setupCityViewport() {
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
   const align = behavior => {
     update();
-    const targetClearance = innerWidth > 800
-      ? Math.max(clearance(), 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76))
-      : (nav.classList.contains('is-compact') ? clearance() : 56);
+    const targetClearance = clearance();
     const top = scrollY + section.getBoundingClientRect().top - targetClearance - 2;
     scrollTo({top, behavior});
   };
@@ -486,7 +439,6 @@ function setupCityViewport() {
   addEventListener('resize', schedule);
   addEventListener('harper:booking-position', schedule);
   new ResizeObserver(schedule).observe(nav);
-  new ResizeObserver(schedule).observe(booking);
   if (location.hash === '#hotels') {
     const alignAfterNavSettles = () => requestAnimationFrame(() => {
       align('instant');
@@ -508,8 +460,7 @@ function setupMembershipMotion() {
   let frame = 0;
   function update() {
     frame = 0;
-    const header = document.getElementById('site-nav').getBoundingClientRect().height +
-      (document.querySelector('.hero-booking.is-docked')?.getBoundingClientRect().height || 0);
+    const header = document.getElementById('site-nav').getBoundingClientRect().height;
     const distance = Math.max(1, section.getBoundingClientRect().height - stage.getBoundingClientRect().height);
     const progress = clamp((header - section.getBoundingClientRect().top) / distance);
     const width = visual.clientWidth;
@@ -744,7 +695,6 @@ function setupHeroCityHandoff() {
   const hero = document.querySelector('.hero-orbit-stage');
   const city = document.getElementById('hotels');
   const nav = document.getElementById('site-nav');
-  const booking = document.querySelector('.hero-booking');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   new IntersectionObserver(entries => {
     if (!reduced.matches) return;
@@ -776,9 +726,7 @@ function setupHeroCityHandoff() {
     if (!source || !destination) return;
     const heroBottom = hero.getBoundingClientRect().bottom + scrollY;
     const cityTop = city.getBoundingClientRect().top + scrollY;
-    const compactHeader = innerWidth > 800
-      ? 58 + (booking.classList.contains('is-docked') ? booking.getBoundingClientRect().height : 76)
-      : nav.getBoundingClientRect().height;
+    const compactHeader = nav.getBoundingClientRect().height;
     const start = Math.max(0, heroBottom - innerHeight);
     const end = Math.max(start + innerHeight * .55, cityTop - compactHeader - 2);
     geometry = { start, end, source: documentRect(source), destination: documentRect(destination) };
@@ -846,7 +794,6 @@ function setupHeroCityHandoff() {
     new ResizeObserver(refresh).observe(hero);
     new ResizeObserver(refresh).observe(city);
     new ResizeObserver(refresh).observe(nav);
-    new ResizeObserver(refresh).observe(booking);
     document.fonts?.ready.then(refresh);
     window.addEventListener('load', refresh, { once: true });
     hero.addEventListener('load', refresh, true);
