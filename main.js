@@ -460,46 +460,6 @@ function setupCityViewport() {
   update();
 }
 
-function setupMembershipMotion() {
-  const section = document.getElementById('membership');
-  const stage = section.querySelector('.membership-stage');
-  const visual = section.querySelector('.membership-visual');
-  const prints = [...section.querySelectorAll('.membership-print')];
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const clamp = value => Math.max(0, Math.min(1, value));
-  let frame = 0;
-  function update() {
-    frame = 0;
-    const header = document.getElementById('site-nav').getBoundingClientRect().height;
-    const distance = Math.max(1, section.getBoundingClientRect().height - stage.getBoundingClientRect().height);
-    const progress = clamp((header - section.getBoundingClientRect().top) / distance);
-    const width = visual.clientWidth;
-    const height = visual.clientHeight;
-    const radiusX = width * .48;
-    const radiusY = height * .48;
-    prints.forEach((print, index) => {
-      // Photos develop out of the phone's center and curl toward the edges.
-      // The short fade at either end of the cycle conceals each reset.
-      const phase = reduced.matches ? (index + .5) / prints.length : ((index + .5) / prints.length + progress * .58) % 1;
-      const angle = phase * Math.PI * 3.4 - 1.2;
-      const radius = .28 + phase * .7;
-      const x = Math.cos(angle) * radiusX * radius;
-      const y = Math.sin(angle) * radiusY * radius;
-      const scale = .77 + phase * .3;
-      const fadeIn = clamp((phase - .02) / .13);
-      const fadeOut = clamp((1 - phase) / .12);
-      print.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${(Math.sin(angle) * 4).toFixed(1)}deg) scale(${scale.toFixed(3)})`;
-      print.style.opacity = (reduced.matches ? .78 : fadeIn * fadeOut * .92).toFixed(3);
-      print.style.zIndex = String(Math.round(phase * 10));
-    });
-  }
-  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
-  window.addEventListener('scroll', schedule, {passive:true});
-  window.addEventListener('resize', schedule);
-  reduced.addEventListener('change', schedule);
-  update();
-}
-
 function setupSectionPortalMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const sections = [...document.querySelectorAll('.hero, .hotels, .offers, .news-section, .journal-cloud-transition, .moments, .membership, .footer')];
@@ -778,7 +738,6 @@ setupMenu();
 setupNews();
 setupSectionAnchors();
 setupCityViewport();
-setupMembershipMotion();
 
 setupSectionPortalMotion();
 setupReveals();
