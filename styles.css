@@ -1305,7 +1305,7 @@ html{overflow-anchor:none}
 /* Journal refinement: the masthead sits outside a viewport-sized, paged book. */
 .journal-paper-area{background:#f5f2ec;overflow:hidden}
 .journal-paper-area::before{background-size:min(1100px,86vw) auto;opacity:.18}
-.news-section,.news-section.portal-ready{width:min(1480px,calc(100% - clamp(60px,10vw,220px)));margin:-22px auto 0;padding:clamp(31px,3.5vh,38px) 0 clamp(24px,3vh,38px)}
+.news-section,.news-section.portal-ready{width:min(1480px,calc(100% - clamp(60px,10vw,220px)));margin:0 auto;padding:clamp(46px,6vh,74px) 0 clamp(54px,7vh,92px)}
 .news-section::after{content:"";position:absolute;z-index:-1;left:-7%;right:-7%;top:52%;height:1px;background:linear-gradient(90deg,transparent,#e0833233 18%,#e0833233 82%,transparent);pointer-events:none}
 .news-section>.news-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;max-width:none;margin:0 0 clamp(13px,2vh,22px);padding:0 8px;text-align:left}
 .news-section>.news-heading h2{font-size:clamp(35px,3vw,43px)}
@@ -1313,21 +1313,24 @@ html{overflow-anchor:none}
 .journal-controls{display:flex;align-items:center;gap:10px;flex:none;padding-bottom:2px}
 .journal-controls button{font:700 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#9e4d11;background:#fff9f0;border:1px solid #d1ad8a;cursor:pointer;transition:background .2s ease,color .2s ease,transform .2s ease}
 .journal-controls button:hover{background:#e9791b;color:#fff;transform:translateY(-2px)}
-.journal-controls button:focus-visible,.journal-book:focus-visible{outline:2px solid #e9791b;outline-offset:4px}
+.journal-controls button:focus-visible{outline:2px solid #e9791b;outline-offset:4px}
+.journal-book:focus-visible{outline:2px solid #4d4035;outline-offset:5px}
 .journal-open-button{padding:12px 14px}.journal-open-button span{margin-left:7px}
 .journal-page-button{width:38px;height:38px;border-radius:50%;font-size:17px!important}
 .journal-page-button:disabled{opacity:.38;cursor:default;transform:none;background:#fff9f0;color:#9e4d11}
 .journal-page-count{min-width:46px;text-align:center;color:#8a7059;font:700 10px var(--sans);letter-spacing:.15em}
 .news-section.journal-is-open .journal-open-button{display:none}
-.journal-book{height:clamp(455px,calc(100svh - var(--journal-header-clearance,134px) - 164px),610px);min-height:0}
+.journal-book{height:clamp(445px,calc(100svh - var(--journal-header-clearance,134px) - 238px),600px);min-height:0;perspective:1300px}
 .journal-book::before{inset:8px 10px -6px 35px}
 .journal-spread{position:absolute;inset:0 0 0 37px;z-index:1;display:grid;grid-template-columns:1fr 1fr;width:auto;height:100%;min-height:0;margin:0;visibility:hidden;pointer-events:none}
-.journal-spread.is-current{visibility:visible;pointer-events:auto}
+.journal-spread.is-current{visibility:visible;pointer-events:auto;z-index:2}
+.journal-spread.is-under-page{visibility:visible;z-index:1}
+.journal-page.is-lifting-page{visibility:hidden}
 .journal-page{overflow:hidden;padding:clamp(21px,2.1vw,34px) clamp(25px,2.3vw,40px) 18px}
 .journal-page-right{padding-right:clamp(44px,3.8vw,62px)}
 .journal-page-rule{padding:8px 0;margin-bottom:12px}
 .journal-right-heading{padding-bottom:8px;margin-bottom:12px}
-.news-section .journal-feature .news-photo{aspect-ratio:2.45}
+.news-section .journal-feature .news-photo{aspect-ratio:2.75;max-height:clamp(130px,calc((100svh - var(--journal-header-clearance,134px) - 300px)*.43),255px)}
 .news-section .news-copy{padding-top:9px}
 .news-section .news-meta{margin-bottom:6px}
 .news-section .journal-feature h3{font-size:clamp(22px,1.65vw,27px);line-height:1.18}
@@ -1336,14 +1339,16 @@ html{overflow-anchor:none}
 .journal-folio{padding-top:10px}
 .news-section .news-track{grid-template-columns:1fr;grid-template-rows:1fr 1fr;gap:12px;margin-bottom:10px}
 .news-section .news-track .news-card{display:grid;grid-template-columns:42% minmax(0,1fr);gap:14px;align-items:start}
-.news-section .news-track .news-photo{aspect-ratio:1.5;height:100%;max-height:min(210px,calc((100svh - var(--journal-header-clearance,134px) - 320px)/2))}
+.news-section .news-track .news-photo{aspect-ratio:1.5;height:100%;max-height:clamp(110px,calc((100svh - var(--journal-header-clearance,134px) - 300px)*.34),190px)}
 .news-section .news-track .news-copy{padding:0}
 .news-section .news-track .news-meta{font-size:9px;margin-bottom:7px}
 .news-section .news-card:not(.journal-feature) h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:clamp(16px,1.18vw,19px);line-height:1.22}
 .news-section .news-card:hover h3,.news-section .news-card:focus-visible h3{text-decoration:underline;text-decoration-color:#e77c24;text-decoration-thickness:1px;text-underline-offset:3px}
 .journal-bookmark{right:29%;height:59px;width:22px}
 .journal-cover{inset:0 0 0 37px;background:radial-gradient(ellipse at 64% 34%,#6d5b4d4d,transparent 48%),repeating-linear-gradient(120deg,#ffffff07 0 1px,transparent 1px 14px),linear-gradient(116deg,#272726,#48413a 65%,#292827)}
-.js .journal-book.is-opening .journal-cover{animation:journal-open-cover 1.4s cubic-bezier(.2,.72,.22,1) both}
+.js .journal-book.is-opening .journal-cover{animation:none;pointer-events:none}
+.js .journal-book.is-closed .journal-cover{pointer-events:auto;touch-action:pan-y;cursor:grab}
+.js .journal-book.is-cover-dragging .journal-cover{cursor:grabbing;animation:none}
 .js .journal-book.is-opening .journal-page>*:not(.journal-folio){animation:journal-content-in .68s ease .68s both}
 .journal-book.is-closed .journal-cover{animation:journal-cover-light 8s ease-in-out both}
 .journal-book.is-closed .journal-elastic{animation:journal-elastic-breathe 8s ease-in-out both}
@@ -1358,12 +1363,16 @@ html{overflow-anchor:none}
 .journal-turn-zone-prev{left:37px}.journal-turn-zone-next{right:0}
 .journal-drag-hint{position:absolute;z-index:11;left:var(--journal-hint-x,50%);top:var(--journal-hint-y,50%);display:flex;align-items:center;justify-content:center;width:86px;height:36px;border-radius:50%;border:1px solid #e48b46;background:#fbf2e3ee;box-shadow:0 3px 10px #52382622;pointer-events:none;color:#9a4b15;font:700 11px var(--sans);letter-spacing:.07em;opacity:0;transform:translate(-50%,-50%);transition:opacity .15s ease}
 .journal-book:has(.journal-turn-zone:hover) .journal-drag-hint,.journal-book.is-dragging .journal-drag-hint{opacity:1}
-.journal-turn-sheet{position:absolute;z-index:8;top:0;display:none;height:100%;background:#f7f2e9;pointer-events:none;backface-visibility:hidden;transform-style:preserve-3d;box-shadow:-7px 0 15px #4d392422}
-.journal-turn-sheet .journal-page{height:100%;width:100%;border-radius:0}
+.journal-turn-sheet{position:absolute;z-index:8;top:0;display:none;height:100%;pointer-events:none;transform-style:preserve-3d;border-radius:9px;box-shadow:-7px 9px 18px #4d392433}
+.journal-turn-face{position:absolute;inset:0;overflow:hidden;border-radius:9px;backface-visibility:hidden;background:#f7f2e9}
+.journal-turn-back{transform:rotateY(180deg)}
+.journal-turn-sheet .journal-page{height:100%;width:100%;border-radius:9px}
 .journal-turn-sheet.is-turning{display:block}
-@media(max-height:820px) and (min-width:1101px){.news-section .journal-feature .news-photo{aspect-ratio:3.35}.news-section .journal-feature .news-photo img{object-position:center 18%}.news-section .journal-feature h3{font-size:22px}.news-excerpt{font-size:12px}.news-section .news-track .news-photo{max-height:152px}}
+.journal-book:not(.is-dragging):has(.journal-turn-zone-next:hover) .journal-spread.is-current .journal-page-right{transform-origin:left center;transform:rotateY(-10deg);transition:transform .32s ease-out}
+.journal-book:not(.is-dragging):has(.journal-turn-zone-prev:hover) .journal-spread.is-current .journal-page-left{transform-origin:right center;transform:rotateY(10deg);transition:transform .32s ease-out}
+@media(max-height:820px) and (min-width:1101px){.news-section .journal-feature .news-photo{aspect-ratio:3.35}.news-section .journal-feature .news-photo img{object-position:center 18%}.news-section .journal-feature h3{font-size:22px}.news-excerpt{font-size:12px}.news-section .news-track .news-photo{max-height:132px}}
 @media(max-width:1100px){.journal-book{height:auto;min-height:0}.journal-spread,.journal-spread.is-current{position:relative;inset:auto;display:block;width:auto;height:auto;margin-left:3px}.journal-spread:not(.is-current){position:absolute;inset:0 0 0 30px;display:block}.journal-page{overflow:visible}.news-section .journal-feature{display:grid;grid-template-columns:47% minmax(0,1fr);gap:19px}.news-section .journal-feature .news-copy{padding:0}.news-section .news-track{grid-template-columns:1fr 1fr;grid-template-rows:auto}.news-section .news-track .news-card{display:block}.news-section .news-track .news-photo{aspect-ratio:1.8;height:auto}.news-section .news-track .news-copy{padding-top:8px}.journal-turn-zone{display:none}.journal-drag-hint{display:none}}
-@media(max-width:620px){.news-section,.news-section.portal-ready{width:calc(100% - 26px);margin-top:-14px;padding-bottom:48px}.news-section>.news-heading{display:block;padding:0 6px}.journal-controls{margin-top:12px}.journal-book{height:auto}.journal-spread.is-current{display:block}.journal-page{padding:24px 25px}.news-section .journal-feature{display:block}.news-section .journal-feature .news-copy{padding-top:10px}.news-section .journal-feature .news-photo{aspect-ratio:1.65}.news-section .news-track{grid-template-columns:1fr;gap:25px}.news-section .news-track .news-photo{aspect-ratio:1.8}.journal-bookmark{right:29%;height:45px;width:18px}.journal-cover{display:none}}
+@media(max-width:620px){.news-section,.news-section.portal-ready{width:calc(100% - 26px);margin-top:0;padding:42px 0 64px}.news-section>.news-heading{display:block;padding:0 6px}.journal-controls{margin-top:12px}.journal-book{height:auto}.journal-spread.is-current{display:block}.journal-page{padding:24px 25px}.news-section .journal-feature{display:block}.news-section .journal-feature .news-copy{padding-top:10px}.news-section .journal-feature .news-photo{aspect-ratio:1.65}.news-section .news-track{grid-template-columns:1fr;gap:25px}.news-section .news-track .news-photo{aspect-ratio:1.8}.journal-bookmark{right:29%;height:45px;width:18px}.journal-cover{display:none}}
 @media(prefers-reduced-motion:reduce){.journal-book.is-closed .journal-cover,.journal-book.is-closed .journal-elastic,.journal-book.is-closed .journal-bookmark{animation:none}.journal-turn-sheet{display:none!important}.journal-drag-hint{display:none}}
 
 /* The Journal's pointer follows the supplied orange cursor treatment. */

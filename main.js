@@ -144,6 +144,9 @@ function setupNews() {
   if (!section || !book) return;
   const spreads = [...book.querySelectorAll('[data-journal-spread]')];
   const sheet = book.querySelector('.journal-turn-sheet');
+  const frontFace = sheet.querySelector('.journal-turn-front');
+  const backFace = sheet.querySelector('.journal-turn-back');
+  const cover = book.querySelector('.journal-cover');
   const openButton = document.getElementById('journal-open');
   const prevButton = document.getElementById('journal-prev');
   const nextButton = document.getElementById('journal-next');
@@ -159,6 +162,8 @@ function setupNews() {
   let current = 0;
   let turning = false;
   let drag = null;
+  let coverDrag = null;
+  let coverAnimation = null;
   let lastY = scrollY;
   const headerBottom = () => Math.max(nav?.getBoundingClientRect().bottom || 0,
     booking?.classList.contains('is-docked') ? booking.getBoundingClientRect().bottom : 0);
@@ -174,23 +179,34 @@ function setupNews() {
     prevButton.disabled = index === 0;
     nextButton.disabled = index === spreads.length - 1;
   };
-  const open = (immediate = false) => {
+  const open = (immediate = false, fromProgress = 0) => {
     clearTimeout(introTimer);
     clearTimeout(openingTimer);
     started = true;
     if (book.classList.contains('is-open')) return;
+    coverAnimation?.cancel();
     book.classList.remove('is-closed', 'is-opening');
     if (immediate || reduced.matches || mobile.matches) {
+      cover.style.transform = '';
+      cover.style.opacity = '';
       book.classList.add('is-open');
       section.classList.add('journal-is-open');
       return;
     }
     book.classList.add('is-opening');
-    openingTimer = setTimeout(() => {
+    coverAnimation = cover.animate([
+      {transform:`rotateY(${-165 * fromProgress}deg)`,opacity:1},
+      {transform:'rotateY(-165deg)',opacity:0}
+    ],{duration:Math.max(400,1300*(1-fromProgress)),easing:'cubic-bezier(.2,.7,.2,1)',fill:'forwards'});
+    coverAnimation.finished.catch(() => {}).then(() => {
+      if (!book.classList.contains('is-opening')) return;
+      coverAnimation?.cancel();
+      cover.style.transform = '';
+      cover.style.opacity = '';
       book.classList.remove('is-opening');
       book.classList.add('is-open');
       section.classList.add('journal-is-open');
-    }, 1450);
+    });
   };
   showPage(0);
   measureHeader();
@@ -225,30 +241,73 @@ function setupNews() {
   openButton.addEventListener('click', () => open(false));
   book.addEventListener('focusin', event => { if (event.target.closest('.news-card')) open(true); });
   book.addEventListener('click', event => { if (event.target.closest('.news-card')) open(true); });
+  cover.addEventListener('pointerdown', event => {
+    if (!book.classList.contains('is-closed') || reduced.matches || mobile.matches) return;
+    event.preventDefault();
+    cover.setPointerCapture(event.pointerId);
+    coverDrag = {id:event.pointerId,x:event.clientX,time:performance.now(),progress:0,width:Math.max(180,cover.getBoundingClientRect().width*.5)};
+    book.classList.add('is-cover-dragging');
+  });
+  cover.addEventListener('pointermove', event => {
+    if (!coverDrag || coverDrag.id !== event.pointerId) return;
+    coverDrag.progress = Math.max(0,Math.min(1,(coverDrag.x-event.clientX)/coverDrag.width));
+    cover.style.transform = `rotateY(${-165*coverDrag.progress}deg)`;
+  });
+  const finishCoverDrag = event => {
+    if (!coverDrag || coverDrag.id !== event.pointerId) return;
+    const state = coverDrag;
+    coverDrag = null;
+    book.classList.remove('is-cover-dragging');
+    const velocity = (state.x-event.clientX)/Math.max(1,performance.now()-state.time);
+    if (event.type !== 'pointercancel' && (state.progress > .24 || velocity > .65)) { open(false,state.progress); return; }
+    const reset = cover.animate([{transform:cover.style.transform},{transform:'rotateY(0deg)'}],{duration:360,easing:'ease-out'});
+    reset.finished.catch(() => {}).then(() => { if (book.classList.contains('is-closed')) cover.style.transform = ''; });
+  };
+  cover.addEventListener('pointerup',finishCoverDrag);
+  cover.addEventListener('pointercancel',finishCoverDrag);
+  const turnTransform = (direction, progress, shift) => {
+    const travel = (direction > 0 ? -1 : 1)*shift*Math.sin(Math.PI*progress);
+    return `translateX(${travel}px) rotateY(${(direction > 0 ? -1 : 1)*165*progress}deg)`;
+  };
+  const turnShadow = progress => `${(sheet.dataset.direction === 'next' ? -1 : 1)*Math.round(8+22*Math.sin(Math.PI*progress))}px 9px ${Math.round(18+24*Math.sin(Math.PI*progress))}px rgba(57,40,27,${(.12+.18*Math.sin(Math.PI*progress)).toFixed(3)})`;
+  const clearSheet = () => {
+    sheet.classList.remove('is-turning');
+    frontFace.replaceChildren(); backFace.replaceChildren();
+    book.querySelectorAll('.is-under-page,.is-lifting-page').forEach(el => el.classList.remove('is-under-page','is-lifting-page'));
+    turning = false;
+  };
   const turn = async (direction, fromDrag = false) => {
     if (turning || current + direction < 0 || current + direction >= spreads.length) return;
     open(true);
     if (reduced.matches || mobile.matches) { showPage(current + direction); return; }
     turning = true;
     const source = spreads[current].querySelector(direction > 0 ? '.journal-page-right' : '.journal-page-left');
+    const destination = spreads[current + direction].querySelector(direction > 0 ? '.journal-page-left' : '.journal-page-right');
     const bookBox = book.getBoundingClientRect();
     const sourceBox = source.getBoundingClientRect();
-    const clone = source.cloneNode(true);
-    clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-    clone.querySelectorAll('a').forEach(el => { el.removeAttribute('href'); el.tabIndex = -1; });
-    sheet.replaceChildren(clone);
+    const clonePage = page => {
+      const clone = page.cloneNode(true);
+      clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+      clone.querySelectorAll('a').forEach(el => { el.removeAttribute('href'); el.tabIndex = -1; });
+      return clone;
+    };
+    frontFace.replaceChildren(clonePage(source));
+    backFace.replaceChildren(clonePage(destination));
     sheet.style.left = `${sourceBox.left - bookBox.left}px`;
     sheet.style.width = `${sourceBox.width}px`;
     sheet.style.transformOrigin = direction > 0 ? 'left center' : 'right center';
-    sheet.style.transform = 'rotateY(0deg)';
+    const shift = Math.min(85,sourceBox.width*.16);
+    sheet.dataset.direction = direction > 0 ? 'next' : 'prev';
+    sheet.style.transform = turnTransform(direction,0,shift);
+    sheet.style.boxShadow = turnShadow(0);
     sheet.classList.add('is-turning');
     const from = current;
-    showPage(current + direction);
-    if (fromDrag) return {from, direction, width:sourceBox.width};
-    try { await sheet.animate([{transform:'rotateY(0deg)'},{transform:`rotateY(${direction > 0 ? -180 : 180}deg)`}],{duration:750,easing:'cubic-bezier(.22,.72,.2,1)'}).finished; } catch {}
-    sheet.classList.remove('is-turning');
-    sheet.replaceChildren();
-    turning = false;
+    spreads[current + direction].classList.add('is-under-page');
+    source.classList.add('is-lifting-page');
+    if (fromDrag) return {from, direction, width:sourceBox.width,shift};
+    try { await sheet.animate([{transform:turnTransform(direction,0,shift),boxShadow:turnShadow(0)},{transform:turnTransform(direction,1,shift),boxShadow:turnShadow(1)}],{duration:1300,easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
+    showPage(from + direction);
+    clearSheet();
   };
   prevButton.addEventListener('click', () => turn(-1));
   nextButton.addEventListener('click', () => turn(1));
@@ -267,7 +326,8 @@ function setupNews() {
       const vertical = Math.abs(event.clientY - drag.y);
       if (vertical > Math.abs(travel) * 1.2 && vertical > 18) return;
       drag.progress = Math.max(0, Math.min(1, travel / drag.width));
-      sheet.style.transform = `rotateY(${(direction > 0 ? -180 : 180) * drag.progress}deg)`;
+      sheet.style.transform = turnTransform(direction,drag.progress,drag.shift);
+      sheet.style.boxShadow = turnShadow(drag.progress);
     });
     zone.addEventListener('pointerdown', async event => {
       if (turning || (direction > 0 && current === spreads.length - 1) || (direction < 0 && current === 0)) return;
@@ -286,12 +346,10 @@ function setupNews() {
       const distance = direction > 0 ? state.x - event.clientX : event.clientX - state.x;
       const speed = distance / Math.max(1, performance.now() - state.time);
       const complete = event.type !== 'pointercancel' && (state.progress >= .26 || (distance > 35 && speed > .55));
-      const endAngle = complete ? (direction > 0 ? -180 : 180) : 0;
-      try { await sheet.animate([{transform:sheet.style.transform},{transform:`rotateY(${endAngle}deg)`}],{duration:complete ? 420 : 300,easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
-      if (!complete) showPage(state.from);
-      sheet.classList.remove('is-turning');
-      sheet.replaceChildren();
-      turning = false;
+      const endProgress = complete ? 1 : 0;
+      try { await sheet.animate([{transform:sheet.style.transform,boxShadow:sheet.style.boxShadow},{transform:turnTransform(direction,endProgress,state.shift),boxShadow:turnShadow(endProgress)}],{duration:Math.max(360,1300*Math.abs(endProgress-state.progress)),easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
+      if (complete) showPage(state.from + direction);
+      clearSheet();
     };
     zone.addEventListener('pointerup', finish);
     zone.addEventListener('pointercancel', finish);
@@ -344,6 +402,7 @@ function setupNews() {
     };
     const move = event => {
       if (!finePointer.matches || event.pointerType === 'touch') return;
+      if (event.target.closest('a,button')) { hide(); return; }
       targetX = event.clientX; targetY = event.clientY;
       labelX = targetX + (targetX > innerWidth - 145 ? -127 : 30);
       labelY = targetY + (targetY > innerHeight - 48 ? -38 : 8);
