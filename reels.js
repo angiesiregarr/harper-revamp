@@ -14,7 +14,7 @@
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
   let cards = [], items = [], state = 'idle';
-  let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0;
+  let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0, currentSpread = 0;
   let holdElapsed = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
   let geometry = {x:0,y:0,w:0,h:0,titleShift:0,socialShift:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
   const ease = t => { t = Math.max(0, Math.min(1,t)); return t*t*(3-2*t); };
@@ -83,14 +83,18 @@
   }
   function render(now) {
     if (!cards.length) return;
-    const spread = reduced.matches ? 1 : state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
-    const centerProgress = reduced.matches ? 1 : state === 'spreading' ? ease((now-spreadAt-100)/1050) : state === 'spinning' ? 1 : 0;
+    const scrollDriven = section.classList.contains('motion-ready') && !reduced.matches;
+    const sectionProgress = parseFloat(section.style.getPropertyValue('--handoff-enter')) || 0;
+    const spread = reduced.matches ? 1 : scrollDriven ? ease((sectionProgress - .12) / .82) : state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
+    currentSpread = spread;
+    const centerProgress = reduced.matches ? 1 : scrollDriven ? ease((spread - .18) / .77) : state === 'spreading' ? ease((now-spreadAt-100)/1050) : state === 'spinning' ? 1 : 0;
+    social.inert = state === 'idle' || (spread < .9 && !social.contains(document.activeElement));
     center.style.setProperty('--reels-title-y', `${(geometry.titleShift*(1-centerProgress)).toFixed(1)}px`);
     center.style.setProperty('--reels-social-y', `${(geometry.socialShift*(1-centerProgress)).toFixed(1)}px`);
     const n = cards.length;
     cards.forEach((card,i) => {
       const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
-      const stagger = reduced.matches ? 1 : state === 'spreading' ? ease((now-spreadAt-i*55)/900) : spread;
+      const stagger = reduced.matches ? 1 : scrollDriven ? ease((spread - i * .045) / Math.max(.65, 1 - i * .045)) : state === 'spreading' ? ease((now-spreadAt-i*55)/900) : spread;
       const radius = i === 0 ? spread : stagger;
       const x = Math.cos(phase)*geometry.x*radius;
       const y = Math.sin(phase)*geometry.y*radius;
@@ -111,7 +115,7 @@
       const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
       angle = stepFrom+(stepTo-stepFrom)*progress;
       if (progress >= 1) stepAt = 0;
-    } else if (state === 'spinning' && visible && !document.hidden && !dragging && !reduced.matches) {
+    } else if (state === 'spinning' && visible && currentSpread >= .98 && !document.hidden && !dragging && !reduced.matches) {
       if (Math.abs(velocity) > .00008) {angle += velocity*dt;velocity *= Math.exp(-dt*.014);}
       else {velocity=0;if (!hover && !focused) angle += dt * (5*Math.PI/180)/1000;}
     }
@@ -120,7 +124,7 @@
   }
   function start() {
     if (state !== 'idle') return;
-    if (reduced.matches) setState('spinning');
+    if (reduced.matches || section.classList.contains('motion-ready')) setState('spinning');
     else setState('holding');
   }
   function initialize(data) {
@@ -128,12 +132,12 @@
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
     renderCards();
-    const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();},{threshold:.35});observer.observe(stage);
+    const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();},{threshold:.01});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();});
     orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
     orbit.addEventListener('pointerout',e=>{if(e.target.closest('.reels-card') && !e.relatedTarget?.closest?.('.reels-card'))hover=false;});
     stage.addEventListener('focusin',()=>{focused=true;});stage.addEventListener('focusout',()=>{focused=stage.contains(document.activeElement);});
-    orbit.addEventListener('pointerdown',e=>{if(state!=='spinning'||e.button!==0)return;pointerActive=true;stepAt=0;pointerStart=e.clientX;pointerX=e.clientX;pointerAt=performance.now();velocity=0;});
+    orbit.addEventListener('pointerdown',e=>{if(state!=='spinning'||currentSpread<.95||e.button!==0)return;pointerActive=true;stepAt=0;pointerStart=e.clientX;pointerX=e.clientX;pointerAt=performance.now();velocity=0;});
     orbit.addEventListener('pointermove',e=>{
       if (!pointerActive || e.buttons!==1 || state!=='spinning') return;
       if (!dragging && Math.abs(e.clientX-pointerStart)>7) {dragging=true;orbit.setPointerCapture(e.pointerId);}
@@ -144,7 +148,7 @@
     });
     const finish=()=>{if(dragging)suppressClickUntil=performance.now()+350;dragging=false;pointerActive=false;};
     orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
-    const step = dir => {if(state!=='spinning'||cards.length<2)return;stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;};
+    const step = dir => {if(state!=='spinning'||currentSpread<.95||cards.length<2)return;stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;};
     orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowRight'?1:-1);}});
     addEventListener('resize',measure);
     reduced.addEventListener('change',()=>{if(reduced.matches)setState('spinning');render(performance.now());});

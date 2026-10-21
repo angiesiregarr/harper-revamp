@@ -1622,3 +1622,28 @@ html{scroll-padding-top:var(--top-nav-height)}
 .footer-brand-marquee:hover .footer-brand-track,.footer-brand-marquee:focus-within .footer-brand-track{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){.footer-brand-track{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.footer-brand-marquee{overflow-x:auto;mask-image:none}.footer-brand-track{animation:none;will-change:auto}.footer-brand-set[aria-hidden="true"]{display:none}.footer-availability,.footer-social a{transition:none}}
+
+/* The same element progress runs in either scroll direction; interactive motion stays independent. */
+@media (prefers-reduced-motion:no-preference){
+  .hotels.motion-ready>.city-map{opacity:calc(.27 * var(--portal-progress,1) * var(--map-exit-opacity,1))}
+  body.hero-city-handoff-enabled .hotels.motion-ready>.city-map{opacity:calc(.27 * var(--handoff-map,1) * var(--map-exit-opacity,1))}
+  .offers.motion-ready .offer-card.scroll-reveal{opacity:var(--item-enter,1);translate:0 calc(26px * (1 - var(--item-enter,1)));transition:none}
+  .offers.motion-ready .offers-intro.scroll-reveal{opacity:1;translate:none;transition:none}
+  .offers.motion-ready .offer-image img{transform:translateY(calc(var(--offer-drift,0px) - 8px * var(--handoff-exit,0))) scale(1.08)}
+  .offers.motion-ready .section-scroll-text,.journal.motion-ready .section-scroll-text{opacity:var(--text-enter,1);transform:translateY(calc(16px * (1 - var(--text-enter,1))));filter:none;transition:none}
+  .moments.motion-ready .reels-stage{opacity:calc(var(--handoff-enter,1) * (1 - .18 * var(--handoff-exit,0)))}
+  .membership.motion-ready .membership-visual{opacity:calc(var(--handoff-enter,1) * (1 - .12 * var(--handoff-exit,0)));transform:translateY(calc(20px * (1 - var(--handoff-enter,1)) - 12px * var(--handoff-exit,0)))}
+  .membership.motion-ready .membership-contact-sheet{opacity:var(--photo-enter,1)}
+  .membership.motion-ready .membership-device,.membership.motion-ready .membership-device.is-awake{animation:none;opacity:var(--phone-enter,1);transform:translate(-50%,-50%) translateY(calc(46px * (1 - var(--phone-enter,1))))}
+  .membership.motion-ready .membership-screen,.membership.motion-ready .membership-device.is-awake .membership-screen{animation:none;filter:brightness(calc(.1 + .9 * var(--phone-wake,1)))}
+  .footer.motion-ready .footer-navigation{opacity:var(--navigation-enter,1);transform:translateY(calc(20px * (1 - var(--navigation-enter,1))))}
+  .footer.motion-ready .footer-links>div{opacity:var(--column-enter,1);transform:translateY(calc(16px * (1 - var(--column-enter,1))))}
+}
+@media (max-width:800px) and (prefers-reduced-motion:no-preference){
+  .hotels.motion-ready>.city-map{opacity:calc(.19 * var(--portal-progress,1) * var(--map-exit-opacity,1))}
+  body.hero-city-handoff-enabled .hotels.motion-ready>.city-map{opacity:calc(.19 * var(--handoff-map,1) * var(--map-exit-opacity,1))}
+  .offers.motion-ready .offer-card.scroll-reveal{translate:0 calc(13px * (1 - var(--item-enter,1)))}
+  .offers.motion-ready .section-scroll-text,.journal.motion-ready .section-scroll-text{transform:translateY(calc(8px * (1 - var(--text-enter,1))))}
+  .membership.motion-ready .membership-visual{transform:translateY(calc(12px * (1 - var(--handoff-enter,1)) - 6px * var(--handoff-exit,0)))}
+  .footer.motion-ready .footer-links>div{transform:translateY(calc(8px * (1 - var(--column-enter,1))))}
+}

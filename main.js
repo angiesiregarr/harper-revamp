@@ -607,6 +607,13 @@ function setupSectionPortalMotion() {
     .map(id => document.getElementById(id)).filter(Boolean);
   const cloud = document.querySelector('.journal-cloud-transition');
   const marquee = document.querySelector('.footer-brand-marquee');
+  const offerText = [...document.querySelectorAll('.offers-intro .section-kicker, #offers-title, .offers-intro > p:not(.section-kicker)')];
+  const journalText = [...document.querySelectorAll('.news-heading .section-kicker, #journal-title')];
+  const membershipVisual = document.querySelector('.membership-visual');
+  const footerNavigation = document.querySelector('.footer-navigation');
+  const footerColumns = [...document.querySelectorAll('.footer-links > div')];
+  const initialTarget = ['#offers', '#journal', '#moments', '#membership', '#footer'].includes(location.hash)
+    ? document.querySelector(location.hash) : null;
   city.classList.add('portal-ready');
   const clamp = value => Math.max(0, Math.min(1, value));
   const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
@@ -637,7 +644,10 @@ function setupSectionPortalMotion() {
     const bounds = [city, ...sections].map(section => section.getBoundingClientRect());
     const cityProgress = ease((innerHeight - bounds[0].top - top) / (usable * (mobile ? .5 : .55)));
     set(city, '--portal-progress', cityProgress);
-    set(city, '--handoff-exit', ease((innerHeight - bounds[1].top) / span));
+    const offersArrival = ease((innerHeight - bounds[1].top) / span);
+    const cityExit = ease((offersArrival - .73) / .27);
+    set(city, '--handoff-exit', cityExit);
+    set(city, '--map-exit-opacity', 1 - .18 * cityExit);
     for (let i = 0; i < sections.length; i++) {
       const section = sections[i];
       const enter = ease((innerHeight - bounds[i + 1].top) / span);
@@ -647,10 +657,35 @@ function setupSectionPortalMotion() {
       set(section, '--handoff-enter-late', late);
       set(section, '--handoff-exit', nextTop === undefined ? 0 : ease((innerHeight - nextTop) / span));
     }
+    // Individual elements use the same viewport measurements, so their stagger also rewinds.
+    // The offer-card enhancement replaces its original nodes after startup.
+    [...document.querySelectorAll('.offers .offer-card')].forEach((card, index) => {
+      card.classList.add('scroll-reveal');
+      const rect = card.getBoundingClientRect();
+      set(card, '--item-enter', ease((innerHeight - rect.top - index * (mobile ? 8 : 18)) / (usable * .32)));
+    });
+    offerText.forEach((element, index) => set(element, '--text-enter', ease((offersArrival - index * .10) / .62)));
+    const journalArrival = Number(sections[1].style.getPropertyValue('--handoff-enter'));
+    journalText.forEach((element, index) => set(element, '--text-enter', ease((journalArrival - index * .12) / .63)));
+    if (membershipVisual) {
+      const visual = membershipVisual.getBoundingClientRect();
+      const photo = ease((innerHeight - visual.top) / (usable * .62));
+      const phoneTop = visual.top + visual.height * .18;
+      const phone = ease((innerHeight - phoneTop) / (usable * .5));
+      const membership = sections.find(section => section.id === 'membership');
+      set(membership, '--photo-enter', photo);
+      set(membership, '--phone-enter', phone);
+      set(membership, '--phone-wake', ease((phone - .28) / .6));
+    }
+    if (footerNavigation) {
+      const progress = ease((innerHeight - footerNavigation.getBoundingClientRect().top) / (usable * .58));
+      set(footerNavigation, '--navigation-enter', progress);
+      footerColumns.forEach((column, index) => set(column, '--column-enter', ease((progress - index * .075) / (1 - index * .075))));
+    }
     if (cloud) {
       const paper = ease((innerHeight - cloud.getBoundingClientRect().top) / (usable * .8));
       set(cloud, '--handoff-enter', paper);
-      set(cloud, '--portal-cloud-opacity', .55 + .45 * paper);
+      set(cloud, '--portal-cloud-opacity', 1 - .65 * ease((paper - .3) / .7));
     }
     if (marquee) marquee.classList.toggle('is-in-view', marquee.getBoundingClientRect().top < innerHeight && marquee.getBoundingClientRect().bottom > top);
     [city, ...sections].forEach(section => section.classList.add('motion-ready'));
@@ -663,13 +698,26 @@ function setupSectionPortalMotion() {
   new ResizeObserver(schedule).observe(nav);
   document.fonts?.ready.then(schedule);
   addEventListener('load', schedule, {once:true});
+  if (initialTarget) {
+    const alignInitial = () => {
+      const top = scrollY + initialTarget.getBoundingClientRect().top - nav.getBoundingClientRect().bottom - 2;
+      scrollTo({top, behavior:'instant'});
+      schedule();
+    };
+    requestAnimationFrame(alignInitial);
+    addEventListener('load', alignInitial, {once:true});
+    document.fonts?.ready.then(alignInitial);
+  }
   schedule();
 }
 
 function setupReveals() {
   const items = [...document.querySelectorAll('.reveal')];
+  const scrollItems = items.filter(item => item.closest('.offers'));
+  scrollItems.forEach(item => item.classList.add('is-visible', 'scroll-reveal'));
+  const observed = items.filter(item => !item.closest('.offers'));
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-    items.forEach((item) => item.classList.add('is-visible'));
+    observed.forEach((item) => item.classList.add('is-visible'));
     return;
   }
   const observer = new IntersectionObserver((entries) => {
@@ -680,7 +728,7 @@ function setupReveals() {
       }
     });
   }, { threshold: 0.08, rootMargin: '0px 0px 50px 0px' });
-  items.forEach((item) => observer.observe(item));
+  observed.forEach((item) => observer.observe(item));
 }
 
 function setupTextAnimations() {
@@ -691,6 +739,8 @@ function setupTextAnimations() {
     '.moments-hint',
   ];
   const items = [...document.querySelectorAll(selectors.join(','))];
+  const scrollItems = items.filter(item => item.closest('.offers, .journal'));
+  scrollItems.forEach(item => item.classList.add('section-scroll-text'));
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -699,7 +749,7 @@ function setupTextAnimations() {
       observer.unobserve(entry.target);
     });
   }, { threshold: 0.12, rootMargin: '0px 0px 36px 0px' });
-  items.forEach((item, index) => {
+  items.filter(item => !item.closest('.offers, .journal')).forEach((item, index) => {
     item.classList.add('text-motion', index % 2 ? 'text-motion-fold' : 'text-motion-blur');
     observer.observe(item);
   });
