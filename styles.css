@@ -1550,3 +1550,53 @@ html{scroll-padding-top:var(--top-nav-height)}
 .news-heading .journal-eyebrow.framed-kicker{margin:0 0 15px}
 .membership-content .section-kicker.framed-kicker{margin:0 0 2px;color:var(--kicker-text);font-size:12px;letter-spacing:.14em;white-space:normal}
 @media(max-width:600px){.framed-kicker,.section-kicker.framed-kicker{padding:7px 31px 7px 12px;font-size:11px;letter-spacing:.12em}.framed-kicker::after,.section-kicker.framed-kicker::after{right:10px}}
+
+/* Footer rebuilt from the supplied Harper artwork; the brand row alone moves. */
+.footer{overflow:hidden;background:#f08b1d;color:#fff}
+.footer-contact.footer-main{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;min-height:260px;padding:85px max(4.2vw,24px) 47px;border-bottom:1px solid #ffffff24}
+.footer-kicker{margin:0 0 12px;font-size:12px;letter-spacing:.13em;text-transform:uppercase}
+.footer-kicker span{margin-right:7px;font-size:17px;line-height:0}
+.footer-contact h2{margin:0 0 14px;color:#fff;font:700 clamp(24px,2.1vw,32px)/1.2 var(--serif);text-transform:uppercase}
+.footer-contact p:last-child{margin:0;font-size:14px;line-height:1.35}
+.footer-availability{display:inline-flex;align-items:center;justify-content:space-between;gap:28px;min-width:212px;min-height:41px;margin-top:5px;padding:10px 24px;background:#808285;color:#fff;font-size:13px;text-transform:uppercase;transition:background .2s ease,transform .2s ease}
+.footer-availability:hover,.footer-availability:focus-visible{background:#66696c;transform:translateY(-2px)}
+.footer-availability span{font-size:18px;line-height:1}
+.footer-navigation{display:flex;align-items:flex-start;justify-content:space-between;gap:60px;min-height:276px;padding:55px max(4.2vw,24px) 56px}
+.footer-identity{display:flex;flex-direction:column;align-items:flex-start;gap:28px;flex:none}
+.footer-navigation .footer-brand{align-self:auto;width:280px;margin:0}
+.footer-navigation .footer-brand img{display:block;width:100%;height:auto}
+.footer-social{display:flex;align-items:center;gap:15px}
+.footer-social a{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;transition:transform .2s ease,opacity .2s ease}
+.footer-social a:hover,.footer-social a:focus-visible{transform:translateY(-3px);opacity:.82}
+.footer-social img{width:28px;height:28px;object-fit:contain}
+.footer-navigation .footer-links{display:grid;grid-template-columns:repeat(3,minmax(100px,1fr));gap:clamp(36px,6vw,100px);width:min(590px,58%);margin:28px 0 0}
+.footer-navigation .footer-links>div{display:flex;flex-direction:column;gap:7px;min-width:0}
+.footer-navigation .footer-links h3{margin:0 0 4px;color:#fff;font:400 12px/1.3 var(--serif);text-transform:uppercase}
+.footer-navigation .footer-links a{width:max-content;max-width:100%;color:#fff;font-size:14px;line-height:1.4}
+.footer-navigation .footer-links a:hover,.footer-navigation .footer-links a:focus-visible{text-decoration:underline;text-underline-offset:4px}
+.footer-brand-marquee{position:relative;height:72px;overflow:hidden;background:#808285}
+.footer-brand-track{display:flex;width:max-content;height:100%;animation:footer-marquee 31s linear infinite;will-change:transform}
+.footer-brand-set{display:flex;align-items:center;gap:24px;flex:none;height:100%;margin:0;padding:0 24px 0 0;list-style:none}
+.footer-brand-set li{display:grid;place-items:center;flex:none;width:110px;height:100%}
+.footer-brand-set img{display:block;width:auto;max-width:104px;max-height:42px;object-fit:contain}
+.footer-brand-set img[src$="park-lane.png"]{width:100px}
+.footer-brand-marquee:hover .footer-brand-track,.footer-brand-marquee:focus-within .footer-brand-track{animation-play-state:paused}
+@keyframes footer-marquee{to{transform:translateX(-50%)}}
+.footer-corporate{min-height:198px;padding:34px max(4.2vw,24px) 28px;background:#62380e}
+.footer-corporate-heading{display:flex;align-items:center;justify-content:space-between;margin:0 0 26px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.footer-corporate-heading>a:hover{text-decoration:underline;text-underline-offset:4px}
+.footer-corporate-heading>span{font-size:18px;color:#34200c}
+.footer-corporate-content{display:flex;justify-content:space-between;gap:30px}
+.footer-corporate-links{display:grid;grid-template-columns:repeat(3,max-content);gap:24px;max-width:50%;color:#f6e6d0}
+.footer-corporate-links>div{display:flex;flex-direction:column;gap:15px}
+.footer-corporate-links span{font-size:10px;letter-spacing:.09em;line-height:1.3;text-transform:uppercase}
+.footer-certifications{display:grid;grid-template-columns:70px repeat(3,minmax(100px,1fr));align-items:start;gap:20px;width:min(630px,50%)}
+.footer-certifications>img{width:60px;height:47px;object-fit:contain}
+.footer-certifications figure{min-width:0;margin:0}
+.footer-certifications figure img{display:block;width:79px;height:47px;object-fit:contain}
+.footer-certifications figcaption{max-width:19ch;margin-top:5px;color:#d9bea1;font-size:11px;line-height:1.3}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:64px;margin:0;padding:16px max(4.2vw,24px);border-top:1px solid #d9b78c;background:#62380e;color:#f8ece0;font-size:11px}
+.footer-bottom a:hover{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:1050px){.footer-navigation .footer-links{gap:24px;width:min(520px,60%)}.footer-corporate-content{flex-direction:column}.footer-corporate-links,.footer-certifications{max-width:none;width:100%}.footer-certifications{max-width:650px}}
+@media(max-width:700px){.footer-contact.footer-main{flex-direction:column;gap:22px;min-height:0;padding:calc(var(--top-nav-height) + 24px) 24px 48px}.footer-navigation{flex-direction:column;gap:34px;min-height:0;padding:48px 24px 52px}.footer-navigation .footer-brand{width:min(280px,80vw)}.footer-navigation .footer-links{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;width:100%;margin:0}.footer-navigation .footer-links a{font-size:13px}.footer-social{gap:12px}.footer-brand-marquee{height:68px}.footer-corporate{padding:30px 24px}.footer-corporate-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.footer-certifications{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.footer-bottom{padding-inline:24px}}
+@media(prefers-reduced-motion:reduce){.footer-brand-marquee{overflow-x:auto;mask-image:none}.footer-brand-track{animation:none;will-change:auto}.footer-brand-set[aria-hidden="true"]{display:none}.footer-availability,.footer-social a{transition:none}}

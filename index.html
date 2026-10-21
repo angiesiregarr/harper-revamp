@@ -8,7 +8,7 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=8c2d05ea7312" />
+    <link rel="stylesheet" href="./styles.css?v=806558585d55" />
     <link rel="stylesheet" href="./offers-pixel.css?v=2619944de854" />
     <script>document.documentElement.classList.add('js');</script>
     <script src="./reels.js?v=9a8210f75965" defer></script>
@@ -202,9 +202,77 @@
       </section>
 
     </main>
-    <footer class="footer">
-        <div class="footer-main"><a class="footer-brand" href="#main" aria-label="Harper Hotels, back to top"><img src="./assets/harper-logo-white.png" alt="Harper by Aston" /></a><div class="footer-links"><div><p>Stay</p><a href="#hotels">Our hotels</a><a href="#offers">Offers</a></div><div><p>Explore</p><a href="#journal">Journal</a><a href="#moments">Moments</a></div><div><p>Connect</p><a href="#membership">Membership</a><a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer">Instagram</a></div></div></div>
-        <div class="footer-bottom"><span>© <span id="year">2026</span> Harper Hotels</span><span>Come home to harmony.</span></div>
+    <footer class="footer" id="footer">
+      <div class="footer-contact footer-main">
+        <div>
+          <p class="footer-kicker"><span aria-hidden="true">◇</span> Get in touch</p>
+          <h2>Let’s plan your stay</h2>
+          <p>Speak directly with our reservations team.<br />No call centers, no hold music.</p>
+        </div>
+        <a class="footer-availability" href="#booking-form" data-booking-open>Check availability <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="footer-navigation">
+        <div class="footer-identity">
+          <a class="footer-brand" href="#main" aria-label="Harper by Aston, back to top"><img src="./assets/harper-logo-white.png" alt="Harper by Aston" /></a>
+          <div class="footer-social" aria-label="Harper social profiles">
+            <a href="https://www.facebook.com/HARPERHotels" target="_blank" rel="noopener noreferrer" aria-label="Harper on Facebook"><img src="./assets/footer-social/facebook.png" alt="" /></a>
+            <a href="https://www.instagram.com/harperhotels/" target="_blank" rel="noopener noreferrer" aria-label="Harper on Instagram"><img src="./assets/footer-social/instagram.png" alt="" /></a>
+            <a href="https://www.tiktok.com/@harperhotels" target="_blank" rel="noopener noreferrer" aria-label="Harper on TikTok"><img src="./assets/footer-social/tiktok.png" alt="" /></a>
+            <a href="https://twitter.com/harperhotels" target="_blank" rel="noopener noreferrer" aria-label="Harper on X"><img src="./assets/footer-social/x.png" alt="" /></a>
+            <a href="https://www.youtube.com/@HarperHotels" target="_blank" rel="noopener noreferrer" aria-label="Harper on YouTube"><img src="./assets/footer-social/youtube.png" alt="" /></a>
+          </div>
+        </div>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <div><h3>Stay</h3><a href="#hotels">Hotels</a><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Meetings</a><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Weddings</a></div>
+          <div><h3>Explore</h3><a href="#journal">News</a><a href="#journal">Articles</a><a href="#offers">Offers</a></div>
+          <div><h3>Reach us</h3><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Contact</a></div>
+        </nav>
+      </div>
+      <div class="footer-brand-marquee" aria-label="Archipelago brands, in order: Aston, Huxley, Park Lane, Alana, Avanika, Kamuela Villas, Harper, Aston Collection Hotels, Quest, Four Corners">
+        <div class="footer-brand-track">
+        <ul class="footer-brand-set">
+          <li><img src="./assets/footer-brands/aston.svg" alt="Aston" /></li>
+          <li><img src="./assets/footer-brands/huxley.svg" alt="Huxley" /></li>
+          <li><img src="./assets/footer-brands/park-lane.png" alt="Park Lane" /></li>
+          <li><img src="./assets/footer-brands/alana.svg" alt="Alana" /></li>
+          <li><img src="./assets/footer-brands/avanika.png" alt="Avanika" /></li>
+          <li><img src="./assets/footer-brands/kamuela.svg" alt="Kamuela Villas" /></li>
+          <li><img src="./assets/footer-brands/harper.svg" alt="Harper" /></li>
+          <li><img src="./assets/footer-brands/collection.svg" alt="Aston Collection Hotels" /></li>
+          <li><img src="./assets/footer-brands/quest.svg" alt="Quest" /></li>
+          <li><img src="./assets/footer-brands/four-corners.svg" alt="Four Corners" /></li>
+        </ul>
+        <ul class="footer-brand-set" aria-hidden="true">
+          <li><img src="./assets/footer-brands/aston.svg" alt="" /></li>
+          <li><img src="./assets/footer-brands/huxley.svg" alt="" /></li>
+          <li><img src="./assets/footer-brands/park-lane.png" alt="" /></li>
+          <li><img src="./assets/footer-brands/alana.svg" alt="" /></li>
+          <li><img src="./assets/footer-brands/avanika.png" alt="" /></li>
+          <li><img src="./assets/footer-brands/kamuela.svg" alt="" /></li>
+          <li><img src="./assets/footer-brands/harper.svg" alt="" /></li>
+          <li><img src="./assets/footer-brands/collection.svg" alt="" /></li>
+          <li><img src="./assets/footer-brands/quest.svg" alt="" /></li>
+          <li><img src="./assets/footer-brands/four-corners.svg" alt="" /></li>
+        </ul>
+        </div>
+      </div>
+      <div class="footer-corporate">
+        <div class="footer-corporate-heading"><a href="https://www.archipelagointernational.com/" target="_blank" rel="noopener noreferrer">Archipelago</a><span aria-hidden="true">⌄</span></div>
+        <div class="footer-corporate-content">
+          <div class="footer-corporate-links" aria-label="Archipelago information">
+            <div><span>E-commerce &amp; global distribution</span><span>Technology</span><span>Legal</span></div>
+            <div><span>Architecture &amp; interior design</span><span>Careers</span><span>Condotels</span></div>
+            <div><span>Good governance</span><span>Franchise plus</span></div>
+          </div>
+          <div class="footer-certifications" aria-label="Archipelago recognitions and certifications">
+            <img src="./assets/footer-award-2025.png" alt="2025 recognition" loading="lazy" />
+            <figure><img src="./assets/footer-hospitality.png" alt="" loading="lazy" /><figcaption>Hospitality Management Company</figcaption></figure>
+            <figure><img src="./assets/footer-safety.png" alt="" loading="lazy" /><figcaption>Occupational Health and Safety Management System</figcaption></figure>
+            <figure><img src="./assets/footer-environment.png" alt="" loading="lazy" /><figcaption>Environmental Management System</figcaption></figure>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom"><span>Copyright <span id="year">2026</span> © Archipelago</span><a href="#main">Back to top ↑</a></div>
     </footer>
 
     <dialog id="booking-sheet" class="booking-sheet" aria-labelledby="booking-title">
