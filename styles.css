@@ -593,7 +593,10 @@ html{scroll-padding-top:calc(var(--top-nav-height) + var(--booking-offset) + 24p
 .hero-orbit-stage::after{right:0;background:linear-gradient(270deg,rgb(240 139 29 / 31%),transparent)}
 .hero-orbit-stage .hero-heading{position:absolute;inset:0;display:grid;place-items:center;z-index:8;text-align:center;pointer-events:none;transform:translateY(-70px)}
 .hero-orbit-stage h1{margin:0;display:grid;gap:.04em;max-width:90%;font:400 clamp(40px,4.1vw,62px)/.98 var(--serif);letter-spacing:-.045em;text-transform:uppercase;white-space:normal;color:#28221d;text-shadow:0 2px 22px rgb(255 235 197 / 95%),0 0 3px rgb(255 244 228 / 75%)}
-.hero-orbit-stage h1 span{display:block;white-space:nowrap}
+.hero-orbit-stage h1 > span{display:block;white-space:nowrap;min-height:1em}
+.hero-orbit-stage h1 .text-type{display:inline-block;line-height:inherit;vertical-align:top}
+.hero-orbit-stage h1 .text-type__content{display:inline}
+.hero-orbit-stage h1 .text-type__char,.hero-orbit-stage h1 .text-type__caret{display:inline}
 .hero-orbit-stage .hero-orbit{position:absolute;inset:3% 0 2%;z-index:5}
 .hero-orbit-stage .circular-carousel__view{-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 3%,#000 97%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 3%,#000 97%,transparent 100%)}
 .hero-orbit-stage .circular-carousel__photo{filter:grayscale(var(--cc-muted, 0)) saturate(calc(1 - var(--cc-muted, 0) * .52))}
@@ -848,7 +851,7 @@ body{background:#f5f2ec}
 .hero-orbit-stage .hero-heading{position:absolute;inset:auto;top:calc(var(--top-nav-height) + 49px - clamp(18px,2.4svh,27px));left:8%;right:8%;display:block;z-index:9;transform:none;text-align:center;pointer-events:none}
 .hero-orbit-stage .hero-heading::before{content:none}
 .hero-orbit-stage h1{display:grid;gap:0;margin:0 auto;max-width:none;font:400 clamp(49px,4.4vw,72px)/.92 var(--serif);letter-spacing:-.055em;text-transform:uppercase;color:#38261c;text-shadow:none;white-space:normal}
-.hero-orbit-stage h1 span{display:block;white-space:nowrap}
+.hero-orbit-stage h1 > span{display:block;white-space:nowrap}
 .hero-orbit-stage .hero-heading p{margin:13px auto 0;max-width:660px;color:#6a6059;font:400 clamp(14px,1.18vw,18px)/1.42 var(--sans);letter-spacing:.01em}
 .hero-orbit-stage .hero-orbit{position:absolute;inset:auto 0 auto;top:calc(var(--top-nav-height) + clamp(218px,25.5svh,240px) - clamp(18px,2.4svh,27px));height:350px;z-index:5;isolation:isolate}
 .rustic-orbit{position:absolute;inset:0;outline:none;touch-action:pan-y}

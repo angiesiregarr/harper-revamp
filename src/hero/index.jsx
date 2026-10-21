@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import TextType from './TextType';
 
 // These files are verified Harper room photographs bundled with the site.
 const rooms = [
@@ -215,3 +216,12 @@ function RusticOrbit() {
 
 const mount = document.getElementById('hero-orbit');
 if (mount) createRoot(mount).render(<RusticOrbit />);
+
+// The title stays in its existing two-line layout; only its lettering is typed.
+[['hero-title-line-one', 'Come Home', 180], ['hero-title-line-two', 'to Harmony', 900]].forEach(([id, text, initialDelay]) => {
+  const line = document.getElementById(id);
+  if (!line) return;
+  createRoot(line).render(<TextType text={text} as="span" typingSpeed={68} initialDelay={initialDelay}
+    loop={false} typeEffect="fade" mistakes={0} cursorStyle="bar" cursorColor="currentColor"
+    cursorBlinkDuration={0.55} showCursor />);
+});
