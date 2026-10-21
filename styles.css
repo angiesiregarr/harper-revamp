@@ -1665,3 +1665,13 @@ html{scroll-padding-top:var(--top-nav-height)}
   }
 }
 @media (prefers-reduced-motion:reduce){.scroll-blur-word{display:inline;color:inherit;filter:none;opacity:1;transform:none}}
+
+/* React Bits AnimatedContent timing, applied to existing section children. */
+@media (prefers-reduced-motion:no-preference){
+  .animated-content-item{
+    --ac-progress:0;
+    opacity:calc(.12 + .88 * var(--ac-progress,1));
+    translate:0 calc((1 - var(--ac-progress,1)) * var(--ac-distance,40px));
+  }
+}
+@media (prefers-reduced-motion:reduce){.animated-content-item{opacity:1;translate:none}}
