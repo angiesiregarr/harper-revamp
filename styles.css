@@ -1650,3 +1650,18 @@ html{scroll-padding-top:var(--top-nav-height)}
   .membership.motion-ready .membership-visual{transform:translateY(calc(12px * (1 - var(--handoff-enter,1)) - 6px * var(--handoff-exit,0)))}
   .footer.motion-ready .footer-links>div{transform:translateY(calc(8px * (1 - var(--column-enter,1))))}
 }
+
+/* Scroll-linked BlurText: word spacing remains natural and progress reverses on scroll-up. */
+.section-kicker>.scroll-blur-line{display:inline;font:inherit;line-height:inherit}
+.section-kicker .scroll-blur-word{font:inherit;line-height:inherit}
+@media (prefers-reduced-motion:no-preference){
+  .scroll-blur-word{
+    --word-progress:clamp(0,calc(var(--blur-progress,1) * 1.22 - var(--blur-rank,0) * .22),1);
+    display:inline-block;
+    opacity:calc(.12 + .88 * var(--word-progress));
+    filter:blur(calc((1 - var(--word-progress)) * 5px));
+    transform:translateY(calc((1 - var(--word-progress)) * 12px));
+    color:color-mix(in srgb,var(--blur-from,#f08b1d) calc((1 - var(--word-progress)) * 100%),currentColor);
+  }
+}
+@media (prefers-reduced-motion:reduce){.scroll-blur-word{display:inline;color:inherit;filter:none;opacity:1;transform:none}}

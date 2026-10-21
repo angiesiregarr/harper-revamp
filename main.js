@@ -731,30 +731,6 @@ function setupReveals() {
   observed.forEach((item) => observer.observe(item));
 }
 
-function setupTextAnimations() {
-  const selectors = [
-    '#hero-title', '#hotels-title', '#offers-title', '#journal-title',
-    '.hotels .section-kicker', '.offers-intro .section-kicker',
-    '.offers-intro > p:not(.section-kicker)', '.news-heading .section-kicker',
-    '.moments-hint',
-  ];
-  const items = [...document.querySelectorAll(selectors.join(','))];
-  const scrollItems = items.filter(item => item.closest('.offers, .journal'));
-  scrollItems.forEach(item => item.classList.add('section-scroll-text'));
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('text-motion-shown');
-      observer.unobserve(entry.target);
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px 36px 0px' });
-  items.filter(item => !item.closest('.offers, .journal')).forEach((item, index) => {
-    item.classList.add('text-motion', index % 2 ? 'text-motion-fold' : 'text-motion-blur');
-    observer.observe(item);
-  });
-}
-
 function setupScrollMotion() {
   const nav = document.getElementById('site-nav');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -946,7 +922,6 @@ setupSectionPortalMotion();
 setupMembershipOrbit();
 setupMembershipDevice();
 setupReveals();
-setupTextAnimations();
 setupScrollMotion();
 setupHeroCityHandoff();
 document.getElementById('year').textContent = new Date().getFullYear();
