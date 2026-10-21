@@ -460,6 +460,62 @@ function setupCityViewport() {
   update();
 }
 
+function setupMembershipOrbit() {
+  const visual = document.querySelector('.membership-visual');
+  if (!visual) return;
+  const cards = [...visual.querySelectorAll('.membership-print')];
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let activeCards = [], radiusX = 0, radiusY = 0;
+  let angle = 0, last = 0, frame = 0, visible = false;
+
+  function draw() {
+    const count = activeCards.length;
+    activeCards.forEach((card, index) => {
+      const phase = angle - Math.PI / 2 + index * Math.PI * 2 / count;
+      const x = Math.cos(phase) * radiusX;
+      const y = Math.sin(phase) * radiusY;
+      // Positions orbit one center. The cards themselves never rotate.
+      card.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+      card.style.zIndex = String(Math.round(y + radiusY));
+    });
+  }
+
+  function measure() {
+    activeCards = cards.filter(card => getComputedStyle(card).display !== 'none');
+    if (!activeCards.length) return;
+    const card = activeCards[0];
+    radiusX = Math.max(0, visual.clientWidth / 2 - card.offsetWidth / 2 - 12);
+    radiusY = Math.max(0, visual.clientHeight / 2 - card.offsetHeight / 2 - 12);
+    draw();
+  }
+
+  function tick(now) {
+    frame = 0;
+    if (!visible || motion.matches || document.hidden) return;
+    if (last) angle = (angle + Math.min(now - last, 64) * Math.PI / 18000) % (Math.PI * 2);
+    last = now;
+    draw();
+    frame = requestAnimationFrame(tick);
+  }
+
+  function updatePlayback() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    last = 0;
+    if (motion.matches) { angle = 0; draw(); }
+    else if (visible && !document.hidden) frame = requestAnimationFrame(tick);
+  }
+
+  new IntersectionObserver(entries => {
+    visible = entries[0].isIntersecting;
+    updatePlayback();
+  }, { threshold: .05 }).observe(visual);
+  window.addEventListener('resize', measure);
+  document.addEventListener('visibilitychange', updatePlayback);
+  motion.addEventListener('change', updatePlayback);
+  measure();
+}
+
 function setupSectionPortalMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const sections = [...document.querySelectorAll('.hero, .hotels, .offers, .news-section, .journal-cloud-transition, .moments, .membership, .footer')];
@@ -529,11 +585,9 @@ function setupReveals() {
 function setupTextAnimations() {
   const selectors = [
     '#hero-title', '#hotels-title', '#offers-title', '#journal-title',
-    '.footer-invite h2',
     '.hotels .section-kicker', '.offers-intro .section-kicker',
     '.offers-intro > p:not(.section-kicker)', '.news-heading .section-kicker',
     '.moments-hint',
-    '.footer-invite p:not(.section-kicker)',
   ];
   const items = [...document.querySelectorAll(selectors.join(','))];
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
@@ -561,8 +615,6 @@ function setupScrollMotion() {
     ['.offers', '--offer-turn', -12, 24, 'deg'],
     ['.story-media', '--journal-lift', 12, -12, 'px'],
     ['.moments', '--moments-lift', 18, -18, 'px'],
-    ['.membership-photo', '--member-shift', -16, 16, 'px'],
-    ['.membership-points', '--benefit-lift', 10, 0, 'px'],
     ['.footer', '--footer-lift', 18, 0, 'px'],
     ['.footer', '--footer-brand-lift', 10, -6, 'px'],
   ];
@@ -740,6 +792,7 @@ setupSectionAnchors();
 setupCityViewport();
 
 setupSectionPortalMotion();
+setupMembershipOrbit();
 setupReveals();
 setupTextAnimations();
 setupScrollMotion();
