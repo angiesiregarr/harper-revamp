@@ -477,6 +477,8 @@ function setupMembershipOrbit() {
       // Positions orbit one center. The cards themselves never rotate.
       card.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(.90)`;
       card.style.zIndex = String(Math.round(y + radiusY));
+      // Cards recede into the gray atmosphere as they rise behind the phone.
+      card.style.opacity = (Math.min(1, Math.max(0, 1 + y / Math.max(radiusY, 1))) * .75 + .25).toFixed(3);
     });
   }
 
