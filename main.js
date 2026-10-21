@@ -475,7 +475,7 @@ function setupMembershipOrbit() {
       const x = Math.cos(phase) * radiusX;
       const y = Math.sin(phase) * radiusY;
       // Positions orbit one center. The cards themselves never rotate.
-      card.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+      card.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(.90)`;
       card.style.zIndex = String(Math.round(y + radiusY));
     });
   }
@@ -484,8 +484,8 @@ function setupMembershipOrbit() {
     activeCards = cards.filter(card => getComputedStyle(card).display !== 'none');
     if (!activeCards.length) return;
     const card = activeCards[0];
-    radiusX = Math.max(0, visual.clientWidth / 2 - card.offsetWidth / 2 - 12);
-    radiusY = Math.max(0, visual.clientHeight / 2 - card.offsetHeight / 2 - 12);
+    radiusX = Math.max(0, Math.min(visual.clientWidth * .30, visual.clientWidth / 2 - card.offsetWidth * .45 - 12));
+    radiusY = Math.max(0, Math.min(visual.clientHeight * .30, visual.clientHeight / 2 - card.offsetHeight * .45 - 12));
     draw();
   }
 
@@ -514,6 +514,87 @@ function setupMembershipOrbit() {
   document.addEventListener('visibilitychange', updatePlayback);
   motion.addEventListener('change', updatePlayback);
   measure();
+}
+
+function setupMembershipDevice() {
+  const device = document.getElementById('membership-device');
+  if (!device) return;
+  const phone = device.querySelector('.membership-phone');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let dragging = false, startX = 0, startY = 0, x = 8, y = 0, vx = 0, vy = 0, lastX = 0, lastY = 0, lastTime = 0;
+  let settleFrame = 0, nudgeTimer = 0;
+  const clamp = (value, limit) => Math.max(-limit, Math.min(limit, value));
+  function render() {
+    phone.style.setProperty('--phone-x', `${x.toFixed(2)}deg`);
+    phone.style.setProperty('--phone-y', `${y.toFixed(2)}deg`);
+    phone.style.setProperty('--phone-reflection', `${(50 + y * 1.2).toFixed(1)}%`);
+  }
+  function settle() {
+    if (reduced.matches) return;
+    cancelAnimationFrame(settleFrame);
+    const step = () => {
+      vx = (vx + (8 - x) * .045) * .81;
+      vy = (vy - y * .045) * .81;
+      x += vx; y += vy;
+      render();
+      if (Math.abs(x - 8) + Math.abs(y) + Math.abs(vx) + Math.abs(vy) > .08) settleFrame = requestAnimationFrame(step);
+      else { x = 8; y = 0; render(); }
+    };
+    settleFrame = requestAnimationFrame(step);
+  }
+  device.addEventListener('pointerdown', event => {
+    if (reduced.matches) return;
+    dragging = true;
+    cancelAnimationFrame(settleFrame);
+    device.setPointerCapture(event.pointerId);
+    startX = event.clientX; startY = event.clientY;
+    lastX = event.clientX; lastY = event.clientY; lastTime = performance.now();
+    vx = 0; vy = 0;
+    device.classList.add('is-dragging');
+  });
+  device.addEventListener('pointermove', event => {
+    if (reduced.matches) return;
+    if (dragging) {
+      const now = performance.now();
+      const elapsed = Math.max(8, now - lastTime);
+      const nextX = clamp(8 - (event.clientY - startY) * .18, 28);
+      const nextY = clamp((event.clientX - startX) * .20, 32);
+      vx = clamp((lastY - event.clientY) * .18 * 16 / elapsed, 3);
+      vy = clamp((event.clientX - lastX) * .20 * 16 / elapsed, 3);
+      x = nextX; y = nextY;
+      lastX = event.clientX; lastY = event.clientY; lastTime = now;
+      render();
+    } else if (event.pointerType === 'mouse') {
+      const bounds = device.getBoundingClientRect();
+      x = 8 - ((event.clientY - bounds.top) / bounds.height - .5) * 12;
+      y = ((event.clientX - bounds.left) / bounds.width - .5) * 16;
+      render();
+    }
+  });
+  const release = () => { if (!dragging) return; dragging = false; device.classList.remove('is-dragging'); settle(); };
+  device.addEventListener('pointerup', release);
+  device.addEventListener('pointercancel', release);
+  device.addEventListener('lostpointercapture', release);
+  device.addEventListener('pointerleave', () => { if (!dragging) settle(); });
+  device.addEventListener('click', event => {
+    if (reduced.matches || Math.abs(event.clientX - startX) + Math.abs(event.clientY - startY) > 8) return;
+    clearTimeout(nudgeTimer);
+    const bounds = device.getBoundingClientRect();
+    y = event.clientX < bounds.left + bounds.width / 2 ? -10 : 10;
+    render(); nudgeTimer = setTimeout(settle, 170);
+  });
+  device.addEventListener('keydown', event => {
+    if (reduced.matches) return;
+    const delta = {ArrowLeft:[0,-8],ArrowRight:[0,8],ArrowUp:[-8,0],ArrowDown:[8,0]}[event.key];
+    if (delta) { event.preventDefault(); cancelAnimationFrame(settleFrame); x = clamp(x + delta[0], 28); y = clamp(y + delta[1], 32); render(); clearTimeout(nudgeTimer); nudgeTimer = setTimeout(settle, 450); }
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); cancelAnimationFrame(settleFrame); y = y >= 0 ? -10 : 10; render(); clearTimeout(nudgeTimer); nudgeTimer = setTimeout(settle, 450); }
+    if (event.key === 'Escape') { x = 8; y = 0; render(); }
+  });
+  new IntersectionObserver((entries, observer) => {
+    if (entries[0].isIntersecting) { device.classList.add('is-awake'); observer.disconnect(); }
+  }, {threshold:.2}).observe(device);
+  reduced.addEventListener('change', () => { if (reduced.matches) { cancelAnimationFrame(settleFrame); x = 8; y = 0; render(); device.classList.add('is-awake'); } });
+  render();
 }
 
 function setupSectionPortalMotion() {
@@ -793,6 +874,7 @@ setupCityViewport();
 
 setupSectionPortalMotion();
 setupMembershipOrbit();
+setupMembershipDevice();
 setupReveals();
 setupTextAnimations();
 setupScrollMotion();
