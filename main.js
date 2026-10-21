@@ -20,13 +20,41 @@ function renderCity() {
   const positions = [[8,16],[24,61],[49,23],[43,70],[65,71],[75,35],[8,76],[29,9],[83,13],[91,75],[59,6],[79,59]];
   waypointHost.innerHTML = cityHotels.map((hotel,index) => `<button class="city-waypoint" type="button" data-city="${hotel.city}" style="--x:${positions[index][0]}%;--y:${positions[index][1]}%" aria-label="Preview ${hotel.title} in ${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}"><span class="city-point" aria-hidden="true"></span><span class="city-label">${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span></button>`).join('');
   const routeHost = document.querySelector('.city-routes');
-  routeHost.innerHTML = cityHotels.map((hotel,index) => {
+  const routePoints = cityHotels.map((hotel,index) => {
     const [px,py] = positions[index];
     const x = px * 16 + 6;
     const y = py * 2.4;
     const endX = Math.max(610,Math.min(990,x));
-    return `<path class="city-route" data-city="${hotel.city}" pathLength="1" d="M ${x.toFixed(1)} ${y.toFixed(1)} L ${endX.toFixed(1)} 240" />`;
-  }).join('');
+    const span = endX - x;
+    return [x,y,x + span * .2,y + (240-y) * .46,endX - span * .28,240 - (240-y) * .3,endX,240];
+  });
+  routeHost.innerHTML = '<path class="city-route is-active" pathLength="1" />';
+  const route = routeHost.querySelector('.city-route');
+  const reducedRouteMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let routeCurrent = null, routeTarget = null, routeFrame = 0, routeBend = 0;
+  const routePath = values => `M ${values[0].toFixed(1)} ${values[1].toFixed(1)} C ${values[2].toFixed(1)} ${values[3].toFixed(1)}, ${values[4].toFixed(1)} ${values[5].toFixed(1)}, ${values[6].toFixed(1)} ${values[7].toFixed(1)}`;
+  function animateRoute() {
+    routeFrame = 0;
+    const moving = routeCurrent.some((value, index) => Math.abs(routeTarget[index] - value) > .08);
+    routeCurrent = routeCurrent.map((value, index) => {
+      const difference = routeTarget[index] - value;
+      return Math.abs(difference) > .08 ? value + difference * .18 : routeTarget[index];
+    });
+    route.setAttribute('d', routePath(routeCurrent));
+    if (moving) routeFrame = requestAnimationFrame(animateRoute);
+  }
+  function setRoute(index, bend = 0) {
+    routeBend = bend;
+    routeTarget = [...routePoints[index]];
+    routeTarget[2] += bend * 18;
+    routeTarget[4] += bend * 35;
+    if (!routeCurrent || reducedRouteMotion.matches) {
+      cancelAnimationFrame(routeFrame);
+      routeFrame = 0;
+      routeCurrent = [...routeTarget];
+      route.setAttribute('d', routePath(routeCurrent));
+    } else if (!routeFrame) routeFrame = requestAnimationFrame(animateRoute);
+  }
   view.innerHTML = `<div class="prism-gallery" aria-label="Explore Harper hotels">${cityHotels.map((hotel, i) => `<button class="prism-card" type="button" data-index="${i}" aria-label="Show ${hotel.title} in ${hotel.place}"><img src="${hotel.src}" alt="${hotel.alt}" width="900" height="600" loading="lazy" /></button>`).join('')}</div><div class="prism-footer"><button class="prism-arrow" type="button" data-step="-1" aria-label="Previous hotel"><span aria-hidden="true">←</span></button><div class="prism-caption"><p id="hotel-location"></p><h3 id="hotel-name"></h3><div class="city-properties" id="city-properties" aria-label="Hotels in selected city"></div></div><button class="prism-arrow" type="button" data-step="1" aria-label="Next hotel"><span aria-hidden="true">→</span></button></div>`;
   const panels = [...view.querySelectorAll('.prism-card')];
   const imagePreloader = new IntersectionObserver(entries => {
@@ -36,7 +64,6 @@ function renderCity() {
   }, {rootMargin: '600px'});
   imagePreloader.observe(document.getElementById('hotels'));
   const waypoints = [...waypointHost.querySelectorAll('.city-waypoint')];
-  const routes = [...routeHost.querySelectorAll('.city-route')];
   let committed = 0;
   let hovered = null;
   let focused = null;
@@ -56,13 +83,7 @@ function renderCity() {
       point.classList.toggle('is-active', active);
       point.setAttribute('aria-pressed', String(active));
     });
-    routes.forEach((route, routeIndex) => {
-      if (routeIndex === index) return;
-      route.getAnimations().forEach(animation => animation.cancel());
-      route.classList.remove('is-active');
-    });
-    routes[index].getAnimations().forEach(animation => animation.cancel());
-    routes[index].classList.add('is-active');
+    setRoute(index, hovered === index ? routeBend : 0);
     document.getElementById('hotel-location').textContent = hotel.place;
     document.getElementById('hotel-name').textContent = hotel.title;
     const inCity = cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city);
@@ -87,7 +108,12 @@ function renderCity() {
   const showPreview = () => show(hovered ?? focused ?? committed);
   waypoints.forEach((point) => {
     const index = cityHotels.findIndex(hotel => hotel.city === point.dataset.city);
-    point.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') { hovered = index; showPreview(); } });
+    point.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') { hovered = index; routeBend = 0; showPreview(); } });
+    point.addEventListener('pointermove', event => {
+      if (event.pointerType !== 'mouse' || hovered !== index) return;
+      const bounds = point.getBoundingClientRect();
+      setRoute(index, Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1)));
+    });
     point.addEventListener('pointerleave', () => { if (hovered === index) { hovered = null; showPreview(); } });
     point.addEventListener('focus', () => { focused = index; showPreview(); });
     point.addEventListener('blur', () => { if (focused === index) { focused = null; showPreview(); } });

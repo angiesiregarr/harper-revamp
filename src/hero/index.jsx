@@ -105,28 +105,21 @@ function RusticOrbit() {
         const visibleOpacity = Math.max(opacity, rattanOpacity);
         card.style.opacity = visibleOpacity;
         card.style.zIndex = String(20 - Math.round(shortest * 2));
-        const gray = Math.min(1, Math.max(0, (shortest - .38) / .82));
+        const featured = index === nearest;
+        const gray = featured ? 0 : 1;
         const blur = Math.min(2.7, Math.max(0, shortest - .42) * .85);
-        card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${1 - gray * .82}) blur(${blur}px)`;
+        card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${1 - gray * .82}) blur(${featured ? 0 : blur}px)`;
         const visible = visibleOpacity > .12;
         card.tabIndex = visible ? 0 : -1;
         if (visible) card.removeAttribute('aria-hidden'); else card.setAttribute('aria-hidden', 'true');
-        card.classList.toggle('is-featured', index === nearest);
-        if (index === nearest) card.setAttribute('aria-current', 'true'); else card.removeAttribute('aria-current');
+        card.classList.toggle('is-featured', featured);
+        if (featured) card.setAttribute('aria-current', 'true'); else card.removeAttribute('aria-current');
       });
     };
     const resize = () => {
       const phase = geometry ? phaseAt(distance, geometry) : 0;
-      const { width, height } = orbitRef.current.getBoundingClientRect();
+      const { width } = orbitRef.current.getBoundingClientRect();
       geometry = makeGeometry(width, window.innerHeight);
-      const line = orbitRef.current.querySelector('.rustic-orbit__lines');
-      const samples = 240;
-      const points = Array.from({ length: samples }, (_, index) => {
-        const [x, y] = geometry.sample(index * geometry.count / samples);
-        return `${index ? 'L' : 'M'}${(width / 2 + x).toFixed(2)} ${(height / 2 + y).toFixed(2)}`;
-      });
-      line.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      line.querySelector('path').setAttribute('d', `${points.join(' ')} Z`);
       distance = distanceAt(phase, geometry);
       paint(phase);
     };
@@ -198,9 +191,8 @@ function RusticOrbit() {
         }
         touch.current = null;
       }}>
-      <svg className="rustic-orbit__lines" aria-hidden="true"><path /></svg>
       {rooms.map((room, index) => <button type="button" key={index} ref={element => { cardRefs.current[index] = element; }}
-        className={`rustic-orbit__card${index === active ? ' is-featured' : ''}`}
+        className="rustic-orbit__card"
         onClick={() => controller.current?.select(index)}
         tabIndex={index === active ? 0 : -1}
         aria-hidden={index === active ? undefined : true}
@@ -223,5 +215,5 @@ if (mount) createRoot(mount).render(<RusticOrbit />);
   if (!line) return;
   createRoot(line).render(<TextType text={text} as="span" typingSpeed={68} initialDelay={initialDelay}
     loop={false} typeEffect="fade" mistakes={0} cursorStyle="bar" cursorColor="currentColor"
-    cursorBlinkDuration={0.55} showCursor />);
+    cursorBlinkDuration={0.55} showCursor={id === 'hero-title-line-two'} />);
 });
