@@ -1599,4 +1599,26 @@ html{scroll-padding-top:var(--top-nav-height)}
 .footer-bottom a:hover{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:1050px){.footer-navigation .footer-links{gap:24px;width:min(520px,60%)}.footer-corporate-content{flex-direction:column}.footer-corporate-links,.footer-certifications{max-width:none;width:100%}.footer-certifications{max-width:650px}}
 @media(max-width:700px){.footer-contact.footer-main{flex-direction:column;gap:22px;min-height:0;padding:calc(var(--top-nav-height) + 24px) 24px 48px}.footer-navigation{flex-direction:column;gap:34px;min-height:0;padding:48px 24px 52px}.footer-navigation .footer-brand{width:min(280px,80vw)}.footer-navigation .footer-links{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;width:100%;margin:0}.footer-navigation .footer-links a{font-size:13px}.footer-social{gap:12px}.footer-brand-marquee{height:68px}.footer-corporate{padding:30px 24px}.footer-corporate-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.footer-certifications{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.footer-bottom{padding-inline:24px}}
+
+/* One reversible, scroll-linked handoff per section. Normal-flow surfaces never move. */
+@media (prefers-reduced-motion:no-preference){
+  .hotels.motion-ready .hotel-content{transform:translateY(calc(-14px * var(--handoff-exit,0)))}
+  .offers.motion-ready .offers-layout{opacity:var(--handoff-enter,1);transform:translateY(calc(28px * (1 - var(--handoff-enter,1))))}
+  .offers.motion-ready .offers-intro{transform:translateY(calc(-12px * var(--handoff-exit,0)))}
+  .journal.motion-ready .news-heading{opacity:var(--handoff-enter,1);transform:translateY(calc(20px * (1 - var(--handoff-enter,1))))}
+  .journal.motion-ready .journal-book{opacity:var(--handoff-enter-late,1);transform:translateY(calc(26px * (1 - var(--handoff-enter-late,1)))) scale(calc(.98 + .02 * var(--handoff-enter-late,1)))}
+  .moments.motion-ready .reels-stage{opacity:var(--handoff-enter,1);transform:translateY(calc(20px * (1 - var(--handoff-enter,1)) - 12px * var(--handoff-exit,0)))}
+  .membership.motion-ready .membership-visual{opacity:var(--handoff-enter,1);transform:translateY(calc(20px * (1 - var(--handoff-enter,1))))}
+  .membership.motion-ready .membership-content{opacity:var(--handoff-enter-late,1);transform:translateY(calc(24px * (1 - var(--handoff-enter-late,1))))}
+  .footer.motion-ready .footer-main{opacity:var(--handoff-enter,1);transform:translateY(calc(20px * (1 - var(--handoff-enter,1))))}
+  .footer.motion-ready .footer-navigation{opacity:var(--handoff-enter-late,1);transform:translateY(calc(24px * (1 - var(--handoff-enter-late,1))))}
+}
+@media (max-width:800px) and (prefers-reduced-motion:no-preference){
+  .hotels.motion-ready .hotel-content{transform:translateY(calc(-7px * var(--handoff-exit,0)))}
+  .offers.motion-ready .offers-layout,.journal.motion-ready .journal-book,.moments.motion-ready .reels-stage,.membership.motion-ready .membership-visual,.membership.motion-ready .membership-content,.footer.motion-ready .footer-navigation{transform:translateY(calc(12px * (1 - var(--handoff-enter,1))))}
+}
+.footer-brand-track{animation-play-state:paused}
+.footer-brand-marquee.is-in-view .footer-brand-track{animation-play-state:running}
+.footer-brand-marquee:hover .footer-brand-track,.footer-brand-marquee:focus-within .footer-brand-track{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.footer-brand-track{animation:none!important}}
 @media(prefers-reduced-motion:reduce){.footer-brand-marquee{overflow-x:auto;mask-image:none}.footer-brand-track{animation:none;will-change:auto}.footer-brand-set[aria-hidden="true"]{display:none}.footer-availability,.footer-social a{transition:none}}

@@ -601,50 +601,68 @@ function setupMembershipDevice() {
 
 function setupSectionPortalMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const sections = [...document.querySelectorAll('.hero, .hotels, .offers, .news-section, .journal-cloud-transition, .moments, .membership, .footer')];
-  sections.forEach(section => section.classList.add('portal-ready'));
+  const nav = document.getElementById('site-nav');
+  const city = document.getElementById('hotels');
+  const sections = ['offers', 'journal', 'moments', 'membership', 'footer']
+    .map(id => document.getElementById(id)).filter(Boolean);
+  const cloud = document.querySelector('.journal-cloud-transition');
+  const marquee = document.querySelector('.footer-brand-marquee');
+  city.classList.add('portal-ready');
   const clamp = value => Math.max(0, Math.min(1, value));
+  const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
+  const set = (element, name, value) => element.style.setProperty(name, value.toFixed(4));
   let frame = 0;
   function update() {
     frame = 0;
     if (reduced.matches) {
-      sections.forEach(section => section.style.removeProperty('--portal-progress'));
+      city.style.removeProperty('--portal-progress');
+      [city, ...sections, cloud].filter(Boolean).forEach(section => {
+        section.style.removeProperty('--handoff-enter');
+        section.style.removeProperty('--handoff-enter-late');
+        section.style.removeProperty('--handoff-exit');
+      });
       return;
     }
-    const height = innerHeight;
-    const mobile = innerWidth <= 800;
-    for (const section of sections) {
-      if (section.classList.contains('hero')) continue;
-      const bounds = section.getBoundingClientRect();
-      if (bounds.bottom < -100 || bounds.top > height + 100) continue;
-      const progress = section.classList.contains('hotels')
-        ? clamp((height - bounds.top - document.getElementById('site-nav').getBoundingClientRect().height) / (height * (mobile ? .5 : .55)))
-        : clamp((height - bounds.top) / (height * (mobile ? .62 : .72)));
-      const eased = progress * progress * (3 - 2 * progress);
-      const remaining = 1 - eased;
-      section.style.setProperty('--portal-progress', eased.toFixed(4));
-      if (section.classList.contains('hotels')) {
-        section.style.setProperty('--city-portal-shift', `${(14 * remaining).toFixed(2)}px`);
-        section.style.setProperty('--city-portal-scale', (1 - .055 * remaining).toFixed(4));
-        section.style.setProperty('--city-portal-color', remaining.toFixed(4));
-        section.style.setProperty('--city-portal-opacity', (1 - .58 * remaining).toFixed(4));
-      }
-      section.style.setProperty('--portal-circle', `${(18 + 132 * eased).toFixed(2)}%`);
-      section.style.setProperty('--portal-curtain', `${(mobile ? 0 : 11 * remaining).toFixed(2)}%`);
-      section.style.setProperty('--portal-radius', `${(22 * remaining).toFixed(2)}px`);
-      section.style.setProperty('--portal-lift', `${((mobile ? 24 : 54) * remaining).toFixed(2)}px`);
-      section.style.setProperty('--portal-scale', (1 - (mobile ? .025 : .065) * remaining).toFixed(4));
-      section.style.setProperty('--portal-blur', `${(mobile ? 0 : 5 * remaining).toFixed(2)}px`);
-      section.style.setProperty('--portal-opacity', (1 - .42 * remaining).toFixed(4));
-      section.style.setProperty('--portal-cloud-opacity', (1 - .44 * remaining).toFixed(4));
-      section.style.setProperty('--portal-paper-cut', `${((mobile ? 4 : 6) * remaining).toFixed(2)}%`);
-      section.style.setProperty('--portal-bloom', (0.74 * remaining).toFixed(4));
+    // Measure the visible area below any header surface that actually remains on screen.
+    let top = Math.max(0, nav.getBoundingClientRect().bottom);
+    const booking = document.getElementById('booking-form');
+    if (booking && !booking.closest('dialog:not([open])')) {
+      const style = getComputedStyle(booking);
+      const rect = booking.getBoundingClientRect();
+      if ((style.position === 'fixed' || style.position === 'sticky') && rect.top <= top + 2 && rect.bottom > top) top = rect.bottom;
     }
+    const usable = Math.max(320, innerHeight - top);
+    const mobile = innerWidth <= 800;
+    const span = usable * (mobile ? .67 : .78);
+    const bounds = [city, ...sections].map(section => section.getBoundingClientRect());
+    const cityProgress = ease((innerHeight - bounds[0].top - top) / (usable * (mobile ? .5 : .55)));
+    set(city, '--portal-progress', cityProgress);
+    set(city, '--handoff-exit', ease((innerHeight - bounds[1].top) / span));
+    for (let i = 0; i < sections.length; i++) {
+      const section = sections[i];
+      const enter = ease((innerHeight - bounds[i + 1].top) / span);
+      const late = ease((enter - .18) / .76);
+      const nextTop = bounds[i + 2]?.top;
+      set(section, '--handoff-enter', enter);
+      set(section, '--handoff-enter-late', late);
+      set(section, '--handoff-exit', nextTop === undefined ? 0 : ease((innerHeight - nextTop) / span));
+    }
+    if (cloud) {
+      const paper = ease((innerHeight - cloud.getBoundingClientRect().top) / (usable * .8));
+      set(cloud, '--handoff-enter', paper);
+      set(cloud, '--portal-cloud-opacity', .55 + .45 * paper);
+    }
+    if (marquee) marquee.classList.toggle('is-in-view', marquee.getBoundingClientRect().top < innerHeight && marquee.getBoundingClientRect().bottom > top);
+    [city, ...sections].forEach(section => section.classList.add('motion-ready'));
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(update); }
   addEventListener('scroll', schedule, {passive:true});
   addEventListener('resize', schedule);
+  addEventListener('harper:booking-position', schedule);
   reduced.addEventListener('change', schedule);
+  new ResizeObserver(schedule).observe(nav);
+  document.fonts?.ready.then(schedule);
+  addEventListener('load', schedule, {once:true});
   schedule();
 }
 
