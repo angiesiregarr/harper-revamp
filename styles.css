@@ -1732,3 +1732,22 @@ html{scroll-padding-top:var(--top-nav-height)}
 @media(max-width:800px){.site-nav .brand{width:145px;height:44px}.site-nav.is-compact .brand{width:108px;height:33px}}
 @media(max-width:600px){.site-nav.is-over-hero:not(.is-compact) .brand{width:160px;height:49px}}
 @media(max-width:360px){.site-nav.is-over-hero:not(.is-compact) .brand{width:148px;height:45px}}
+
+/* The hero starts after the entrance clears; its old page-load rise is retired. */
+.js .hero-orbit-stage .hero-heading,.js .hero-orbit-stage .hero-orbit,.js .hero-orbit-stage .hero-booking{animation:none}
+.js.hero-intro-pending .hero-orbit-stage .hero-heading:not(.hero-intro-prepared){visibility:hidden}
+.hero-orbit-stage h1>span{position:relative}
+.hero-title-measure{visibility:hidden}
+.hero-title-typed{position:absolute;inset:0;display:block;text-align:center;white-space:nowrap}
+.hero-type-caret{display:inline-block;width:max(2px,.045em);height:.78em;margin-left:.035em;vertical-align:-.05em;background:currentColor;transition:opacity .15s ease}
+.hero-type-caret.is-fading{opacity:0}
+.hero-orbit-stage .hero-palm{transition:opacity .42s cubic-bezier(.16,1,.3,1),filter .42s cubic-bezier(.16,1,.3,1),scale .42s cubic-bezier(.16,1,.3,1)}
+.hero-orbit-stage .hero-palm-right{transition-timing-function:cubic-bezier(.22,1,.36,1)}
+.js.hero-intro-pending .hero-orbit-stage .hero-palm:not(.hero-intro-revealed){opacity:0;filter:blur(14px);scale:1.035}
+.hero-orbit-stage .hero-booking{transition:opacity .6s cubic-bezier(.22,1,.36,1),translate .6s cubic-bezier(.22,1,.36,1),transform .2s ease,visibility .2s ease}
+.js.hero-intro-pending .hero-orbit-stage .hero-booking:not(.hero-intro-revealed):not(.is-hidden){opacity:0;translate:0 44px}
+.hero-orbit-stage .hero-heading{translate:0 calc(var(--hero-scroll,0px) * -.55)}
+.hero-orbit-stage .hero-orbit{translate:0 calc(var(--hero-scroll,0px) * .33)}
+.hero-orbit-stage .hero-palm-left{translate:0 calc(var(--hero-scroll,0px) * .2)}
+.hero-orbit-stage .hero-palm-right{translate:0 calc(var(--hero-scroll,0px) * -.18)}
+@media(prefers-reduced-motion:reduce){.js.hero-intro-pending .hero-orbit-stage .hero-palm:not(.hero-intro-revealed),.js.hero-intro-pending .hero-orbit-stage .hero-booking:not(.hero-intro-revealed):not(.is-hidden){opacity:1;filter:none;scale:1;translate:0}.hero-orbit-stage .hero-heading,.hero-orbit-stage .hero-orbit,.hero-orbit-stage .hero-palm{translate:none}}

@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import TextType from './TextType';
+import './TextType.css';
 
 // These files are verified Harper room photographs bundled with the site.
 const rooms = [
@@ -18,6 +18,17 @@ const rooms = [
 
 const mod = (value, length) => ((value % length) + length) % length;
 const mix = (a, b, t) => a + (b - a) * t;
+const fanEase = value => {
+  // cubic-bezier(.42, 0, .2, 1), solved by the x coordinate.
+  let low = 0, high = 1;
+  for (let i = 0; i < 12; i++) {
+    const t = (low + high) / 2;
+    const x = 3 * .42 * t * (1 - t) * (1 - t) + 3 * .2 * t * t * (1 - t) + t * t * t;
+    if (x < value) low = t; else high = t;
+  }
+  const t = (low + high) / 2;
+  return 3 * t * t * (1 - t) + t * t * t;
+};
 
 // The near, outer and far points form one closed oval. Hidden top points let
 // cards travel behind the headline without appearing over the lettering.
@@ -25,7 +36,7 @@ function makeGeometry(width, height) {
   const mobile = width < 640, tablet = width < 1050;
   const frontWidth = mobile ? Math.min(width * .76, 390) : tablet ? Math.min(width * .57, 510) : Math.min(width * .36, 600);
   const frontHeight = mobile ? 235 : tablet ? 285 : height < 820 ? 270 : 312;
-  const nearX = width * (mobile ? .44 : tablet ? .39 : .30);
+  const nearX = width * (mobile ? .33 : tablet ? .39 : .30);
   const outerX = width * (mobile ? .52 : tablet ? .47 : .42);
   const upperX = width * (mobile ? .29 : tablet ? .31 : .235);
   const visibleOuter = mobile ? 0 : 1;
@@ -87,29 +98,38 @@ function RusticOrbit() {
   useLayoutEffect(() => {
     let geometry, distance = 0, lastTime = 0, frame, move = null, currentActive = 0;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const paint = phase => {
+    let introState = motion.matches ? 'done' : 'waiting', introStart = 0;
+    const introLength = (rooms.length - 1) * 80 + 650;
+    const paint = (phase, now = performance.now()) => {
       const nearest = mod(Math.round(phase), rooms.length);
       if (nearest !== currentActive) { currentActive = nearest; setActive(nearest); window.dispatchEvent(new Event('harper:hero-change')); }
       cardRefs.current.forEach((card, index) => {
         if (!card) return;
-        const pathPosition = mod(index - phase, rooms.length);
-        const shortest = Math.min(pathPosition, rooms.length - pathPosition);
+        const targetPosition = mod(index - phase, rooms.length);
+        const introProgress = introState === 'done' ? 1 : introState === 'waiting' ? 0
+          : fanEase(Math.min(1, Math.max(0, (now - introStart - index * 80) / 650)));
+        const shortPath = targetPosition > rooms.length / 2 ? targetPosition - rooms.length : targetPosition;
+        const pathPosition = mod(shortPath * introProgress, rooms.length);
+        const shortest = Math.min(targetPosition, rooms.length - targetPosition);
         const [x, y, width, height, opacity] = geometry.sample(pathPosition);
+        const orbitWidth = orbitRef.current.clientWidth;
+        const edgeRoom = Math.max(0, orbitWidth / 2 - width / 2 - (orbitWidth < 640 ? 8 : 12));
+        const safeX = orbitWidth <= 1050 ? Math.max(-edgeRoom, Math.min(edgeRoom, x)) : x;
         card.style.width = `${width}px`;
         card.style.height = `${height}px`;
-        card.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`;
+        card.style.transform = `translate(-50%,-50%) translate(${safeX}px,${y}px)`;
         // Keep the card surface solid while it crosses the left woven arc.
-        const leftEdge = orbitRef.current.clientWidth / 2 + x - width / 2;
-        const rattanOpacity = orbitRef.current.clientWidth < 640 && x < 0
+        const leftEdge = orbitWidth / 2 + safeX - width / 2;
+        const rattanOpacity = orbitWidth < 640 && safeX < 0
           ? Math.max(0, Math.min(1, (98 - leftEdge) / 30)) : 0;
         const visibleOpacity = Math.max(opacity, rattanOpacity);
-        card.style.opacity = visibleOpacity;
+        card.style.opacity = String(visibleOpacity * introProgress);
         card.style.zIndex = String(20 - Math.round(shortest * 2));
         const featured = index === nearest;
         const gray = featured ? 0 : 1;
         const blur = Math.min(2.7, Math.max(0, shortest - .42) * .85);
         card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${1 - gray * .82}) blur(${featured ? 0 : blur}px)`;
-        const visible = visibleOpacity > .12;
+        const visible = visibleOpacity > .12 && introProgress > .5;
         card.tabIndex = visible ? 0 : -1;
         if (visible) card.removeAttribute('aria-hidden'); else card.setAttribute('aria-hidden', 'true');
         card.classList.toggle('is-featured', featured);
@@ -128,9 +148,17 @@ function RusticOrbit() {
       move = { from: distance, to: distanceAt(target, geometry), start: performance.now(), duration: motion.matches ? 0 : 850 };
       if (motion.matches) { distance = move.to; move = null; paint(target); }
     };
+    const finishIntro = () => {
+      if (introState === 'done') return;
+      introState = 'done';
+      paint(phaseAt(distance, geometry));
+      window.dispatchEvent(new Event('harper:hero-orbit-complete'));
+    };
     controller.current = {
-      step(delta) { moveTo(Math.round(phaseAt(distance, geometry)) + delta); },
+      finishIntro,
+      step(delta) { finishIntro(); moveTo(Math.round(phaseAt(distance, geometry)) + delta); },
       select(index) {
+        finishIntro();
         const phase = phaseAt(distance, geometry), current = Math.round(phase);
         let difference = mod(index - mod(current, rooms.length), rooms.length);
         if (difference > rooms.length / 2) difference -= rooms.length;
@@ -143,28 +171,42 @@ function RusticOrbit() {
       const elapsed = lastTime ? Math.min((now - lastTime) / 1000, .05) : 0;
       lastTime = now;
       let changed = false;
-      if (move) {
+      if (introState === 'running') {
+        paint(phaseAt(distance, geometry), now);
+        changed = true;
+        if (now - introStart >= introLength) finishIntro();
+      } else if (move) {
         const ratio = move.duration ? Math.min(1, (now - move.start) / move.duration) : 1;
         const eased = ratio * ratio * (3 - 2 * ratio);
         distance = mix(move.from, move.to, eased);
         changed = true;
         if (ratio === 1) move = null;
-      } else if (!motion.matches && !document.hidden && !document.body.classList.contains('handoff-in-flight') && !Object.values(paused.current).some(Boolean)) {
+      } else if (introState === 'done' && !motion.matches && !document.hidden && !document.body.classList.contains('handoff-in-flight') && !Object.values(paused.current).some(Boolean)) {
         distance += 28 * elapsed; changed = true; // CSS pixels of arc length per second.
       }
       if (changed) paint(phaseAt(distance, geometry));
       frame = requestAnimationFrame(tick);
     };
     resize(); frame = requestAnimationFrame(tick);
+    const startIntro = () => {
+      if (introState !== 'waiting') return;
+      introState = 'running';
+      introStart = performance.now();
+    };
+    const onMotionChange = () => { if (motion.matches) finishIntro(); };
+    window.addEventListener('harper:hero-orbit-start', startIntro);
+    motion.addEventListener('change', onMotionChange);
+    window.__harperOrbitReady = true;
+    window.dispatchEvent(new Event('harper:hero-orbit-ready'));
     window.addEventListener('resize', resize);
-    return () => { cancelAnimationFrame(frame); visibility.disconnect(); window.removeEventListener('resize', resize); controller.current = null; };
+    return () => { cancelAnimationFrame(frame); visibility.disconnect(); window.removeEventListener('resize', resize); window.removeEventListener('harper:hero-orbit-start', startIntro); motion.removeEventListener('change', onMotionChange); controller.current = null; };
   }, []);
 
   return (
     <div ref={orbitRef} className="rustic-orbit" role="region" aria-roledescription="carousel" aria-label="Harper hotel room carousel" tabIndex={0}
       onMouseEnter={() => { paused.current.hover = true; }}
       onMouseLeave={() => { paused.current.hover = false; }}
-      onFocusCapture={() => { paused.current.focus = true; }}
+      onFocusCapture={() => { paused.current.focus = true; controller.current?.finishIntro(); }}
       onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) paused.current.focus = false; }}
       onClickCapture={event => {
         if (!suppressClick.current) return;
@@ -209,11 +251,120 @@ function RusticOrbit() {
 const mount = document.getElementById('hero-orbit');
 if (mount) createRoot(mount).render(<RusticOrbit />);
 
-// The title stays in its existing two-line layout; only its lettering is typed.
-[['hero-title-line-one', 'Come Home', 180], ['hero-title-line-two', 'to Harmony', 900]].forEach(([id, text, initialDelay]) => {
-  const line = document.getElementById(id);
-  if (!line) return;
-  createRoot(line).render(<TextType text={text} as="span" typingSpeed={68} initialDelay={initialDelay}
-    loop={false} typeEffect="fade" mistakes={0} cursorStyle="bar" cursorColor="currentColor"
-    cursorBlinkDuration={0.55} showCursor={id === 'hero-title-line-two'} />);
-});
+function setupHeroIntro() {
+  const hero = document.querySelector('.hero-orbit-stage');
+  if (!hero || !mount) return;
+  const heading = hero.querySelector('.hero-heading');
+  const booking = hero.querySelector('.hero-booking');
+  const orbit = hero.querySelector('.hero-orbit');
+  const palms = [hero.querySelector('.hero-palm-left'), hero.querySelector('.hero-palm-right')];
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const lines = [document.getElementById('hero-title-line-one'), document.getElementById('hero-title-line-two')];
+  const segments = lines.map(line => {
+    const value = line.textContent;
+    const chars = typeof Intl.Segmenter === 'function'
+      ? Array.from(new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(value), item => item.segment)
+      : Array.from(value);
+    line.textContent = '';
+    const measure = document.createElement('span');
+    measure.className = 'hero-title-measure';
+    measure.setAttribute('aria-hidden', 'true');
+    measure.textContent = value;
+    const visible = document.createElement('span');
+    visible.className = 'hero-title-typed';
+    visible.setAttribute('aria-hidden', 'true');
+    line.append(measure, visible);
+    return { chars, visible };
+  });
+  hero.querySelector('h1').setAttribute('aria-label', 'Come Home to Harmony');
+  heading.classList.add('hero-intro-prepared');
+  let orbitReady = Boolean(window.__harperOrbitReady), started = false, orbitStarted = false, completed = false, startTime = 0;
+  let orbitObserver, titleFrame;
+  const timers = [];
+  const schedule = (time, action) => timers.push(setTimeout(action, Math.max(0, startTime + time - performance.now())));
+  const fillTitle = () => segments.forEach(({ chars, visible }) => { visible.textContent = chars.join(''); });
+  const finish = () => {
+    if (completed) return;
+    completed = true;
+    document.documentElement.classList.remove('hero-intro-pending');
+    hero.classList.add('hero-intro-complete');
+  };
+  const revealBooking = () => {
+    if (booking.classList.contains('hero-intro-revealed')) return;
+    booking.classList.add('hero-intro-revealed');
+    setTimeout(finish, motion.matches ? 0 : Math.max(600, startTime + 4280 - performance.now()));
+  };
+  const onOrbitComplete = () => { if (started) schedule(3680, revealBooking); };
+  window.addEventListener('harper:hero-orbit-complete', onOrbitComplete, { once: true });
+  const startOrbit = () => {
+    if (orbitStarted) return;
+    orbitStarted = true;
+    orbitObserver?.disconnect();
+    window.dispatchEvent(new Event('harper:hero-orbit-start'));
+  };
+  const waitForOrbit = () => {
+    const bounds = orbit.getBoundingClientRect();
+    const visible = Math.max(0, Math.min(bounds.bottom, innerHeight) - Math.max(bounds.top, 0));
+    if (visible >= bounds.height * .5) return startOrbit();
+    orbitObserver = new IntersectionObserver(([entry]) => {
+      if (entry.intersectionRatio >= .5) startOrbit();
+    }, { threshold: .5 });
+    orbitObserver.observe(orbit);
+  };
+  const typeTitle = () => {
+    const firstLength = segments[0].chars.length;
+    const total = firstLength + segments[1].chars.length;
+    const caret = document.createElement('span');
+    caret.className = 'hero-type-caret';
+    caret.setAttribute('aria-hidden', 'true');
+    const begin = performance.now();
+    let lastCount = -1;
+    const draw = now => {
+      const count = Math.min(total, Math.floor((now - begin) / 1050 * total));
+      if (count !== lastCount) {
+        lastCount = count;
+        segments[0].visible.textContent = segments[0].chars.slice(0, Math.min(count, firstLength)).join('');
+        segments[1].visible.textContent = segments[1].chars.slice(0, Math.max(0, count - firstLength)).join('');
+        if (count > firstLength && count < total) segments[1].visible.append(caret);
+      }
+      if (count < total) titleFrame = requestAnimationFrame(draw);
+      else { segments[1].visible.append(caret); caret.classList.add('is-fading'); setTimeout(() => caret.remove(), 150); }
+    };
+    titleFrame = requestAnimationFrame(draw);
+  };
+  const start = () => {
+    if (started || !orbitReady || document.documentElement.classList.contains('entrance-pending')) return;
+    started = true;
+    startTime = performance.now();
+    if (motion.matches) {
+      fillTitle();
+      palms.forEach(palm => palm.classList.add('hero-intro-revealed'));
+      window.dispatchEvent(new Event('harper:hero-orbit-start'));
+      revealBooking();
+      return;
+    }
+    schedule(100, typeTitle);
+    schedule(1250, () => palms[0].classList.add('hero-intro-revealed'));
+    schedule(1770, () => palms[1].classList.add('hero-intro-revealed'));
+    schedule(2290, waitForOrbit);
+  };
+  const checkStart = () => requestAnimationFrame(start);
+  const handoff = new MutationObserver(checkStart);
+  handoff.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  window.addEventListener('harper:hero-orbit-ready', () => { orbitReady = true; checkStart(); }, { once: true });
+  checkStart();
+  hero.addEventListener('focusin', event => {
+    if (!started || completed) return;
+    if (orbit.contains(event.target)) startOrbit();
+    if (booking.contains(event.target)) revealBooking();
+  });
+  booking.addEventListener('pointerdown', () => { if (started && !completed) revealBooking(); }, { passive: true });
+  addEventListener('pagehide', () => {
+    cancelAnimationFrame(titleFrame);
+    timers.forEach(clearTimeout);
+    orbitObserver?.disconnect();
+    handoff.disconnect();
+  }, { once: true });
+}
+
+setupHeroIntro();
