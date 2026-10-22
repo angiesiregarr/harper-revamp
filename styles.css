@@ -1769,6 +1769,11 @@ html{scroll-padding-top:var(--top-nav-height)}
 .hero-field-chevron{width:18px;height:18px;stroke-width:2;font-size:inherit}
 .news-section .news-heading #journal-title{color:#e86f0d}
 .city-waypoint.is-active .city-label{font-size:clamp(16px,1.35vw,22px)}
+.footer-corporate{background:linear-gradient(180deg,#674016,#593310);border-top:1px solid #f7bd7659}
+.footer-corporate-heading>a{color:#fff5e7}
+.footer-corporate-heading>span{color:#f5d2a6}
+.footer-corporate-links{color:#fff0de}
+.footer-certifications figcaption{color:#f0d8bb}
 @media(max-width:800px){
   .booking-sheet{width:100%;min-height:min(650px,91svh);padding:0}
   .booking-sheet .booking-bar{padding:22px!important}

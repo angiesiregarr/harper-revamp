@@ -13,11 +13,7 @@ const groups = [
   ['.news-heading > div:first-child', ':scope > .journal-eyebrow, :scope > h2, :scope > .journal-intro'],
   ['.membership-content', ':scope > .section-kicker, :scope > h2, :scope > .membership-description, :scope > .membership-benefits, :scope > .membership-stores'],
   ['.footer-contact', ':scope > div, :scope > .footer-availability'],
-  ['.footer-navigation', ':scope > .footer-identity, :scope > .footer-links'],
-  ['.footer-corporate', ':scope > .footer-corporate-heading, :scope > .footer-corporate-content'],
-  ['.footer-corporate-links', ':scope > div'],
-  ['.footer-certifications', ':scope > figure'],
-  ['.footer-bottom', ':scope > *']
+  ['.footer-navigation', ':scope > .footer-identity, :scope > .footer-links']
 ];
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');

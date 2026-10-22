@@ -10,6 +10,7 @@
   const excluded = '#hero-title,.hero-orbit,.reels-orbit,.membership-device,' +
     '.site-nav,.hero-booking,.journal-cover,.journal-spine,.journal-page-count,' +
     '.journal-page-button,.journal-open-button,.news-read,.visually-hidden,.scroll-blur-word,' +
+    '.footer-corporate,.footer-bottom,' +
     '[aria-hidden="true"],[inert],script,style,svg,option,textarea';
   const blocks = new Set();
   const visible = new Set();

@@ -110,7 +110,7 @@
   }
   function frame(now) {
     const dt = Math.min(250,Math.max(0,now-last)); last=now;
-    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 4000){setState('spreading');spreadAt=now;}}
+    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 2000){setState('spreading');spreadAt=now;}}
     if (state === 'spreading' && now-spreadAt > Math.max(1250,900+(cards.length-1)*55)){setState('spinning');}
     if (stepAt) {
       const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
