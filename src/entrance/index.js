@@ -50,7 +50,6 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
     brand.style.removeProperty('opacity');
     root.classList.remove('entrance-pending');
     overlay.remove();
-    try { sessionStorage.setItem('harper-entrance-seen', '1'); } catch {}
     delete window.__harperEntrance;
   }
 
