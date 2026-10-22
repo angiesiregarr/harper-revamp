@@ -1695,6 +1695,18 @@ html{scroll-padding-top:var(--top-nav-height)}
 @media(max-width:850px){.hotels{min-height:max(var(--city-available),100svh)}.hotels>.city-map{top:32px;width:min(86vw,600px)}}
 @media(prefers-reduced-motion:reduce){.city-waypoint .city-point,.city-waypoint .city-label{transition:none}}
 
+/* Country outlines echo the reference map while staying quiet behind the destinations. */
+.hotels{--city-map-alpha:.43}
+.hotels>.city-map{top:clamp(20px,4svh,50px);width:min(108vw,1600px);max-width:none;opacity:var(--city-map-alpha);filter:none;mask-image:none}
+.city-heading::before{content:"";position:absolute;z-index:-1;inset:-48px 15% -38px;background:radial-gradient(ellipse at center,#f8f7f3 24%,#f8f7f3e8 47%,transparent 78%);pointer-events:none}
+@media(prefers-reduced-motion:no-preference){
+  .hotels.portal-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--portal-progress,1))}
+  body.hero-city-handoff-enabled .hotels.portal-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--handoff-map,1))}
+  .hotels.motion-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--portal-progress,1) * var(--map-exit-opacity,1))}
+  body.hero-city-handoff-enabled .hotels.motion-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--handoff-map,1) * var(--map-exit-opacity,1))}
+}
+@media(max-width:850px){.hotels{--city-map-alpha:.28}.hotels>.city-map{top:clamp(40px,8svh,76px);width:min(140vw,950px)}.city-heading::before{inset:-24px -8% -18px}}
+
 /* Keep the original compact Journal link treatment clear of word-reveal spans. */
 .news-section .news-read{display:inline-flex;align-items:center;gap:9px;width:max-content;max-width:100%;white-space:nowrap;font:700 12px/1.2 var(--sans);letter-spacing:.045em;text-transform:uppercase}
 .news-section .news-read>span{flex:none;font:400 18px/1 Arial,sans-serif}
