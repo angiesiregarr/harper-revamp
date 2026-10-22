@@ -1700,15 +1700,17 @@ html{scroll-padding-top:var(--top-nav-height)}
 .news-section .news-read>span{flex:none;font:400 18px/1 Arial,sans-serif}
 
 /* Entrance overlay over the existing, normally laid-out homepage. */
-.harper-entrance{display:none;position:fixed;inset:0;z-index:200;overflow:hidden;pointer-events:auto}
+.harper-entrance{display:none;position:fixed;inset:0;z-index:200;overflow:hidden;pointer-events:auto;perspective:1600px;perspective-origin:50% 50%}
 .entrance-pending .harper-entrance{display:block}
 .entrance-pending .site-nav .brand{opacity:0}
-.harper-entrance__door{position:absolute;inset:0;background:linear-gradient(#0c0d0dd9,#0c0d0dd9),url('./assets/entrance/stone-texture.webp') center/cover no-repeat;will-change:transform}
-.harper-entrance__door--left{clip-path:inset(0 49.95% 0 0)}
-.harper-entrance__door--right{clip-path:inset(0 0 0 49.95%)}
-.harper-entrance__door::after{content:"";position:absolute;top:0;bottom:0;width:18px;pointer-events:none}
-.harper-entrance__door--left::after{left:calc(50% - 18px);background:linear-gradient(90deg,transparent,#05050555)}
-.harper-entrance__door--right::after{left:50%;background:linear-gradient(90deg,#05050555,transparent)}
+.harper-entrance__door{position:absolute;inset:0;background:linear-gradient(#0c0d0dd9,#0c0d0dd9),url('./assets/entrance/stone-texture.webp') center/cover no-repeat;backface-visibility:hidden;transform-style:preserve-3d;will-change:transform}
+.harper-entrance__door--left{clip-path:inset(0 49.95% 0 0);transform-origin:0 50%}
+.harper-entrance__door--right{clip-path:inset(0 0 0 49.95%);transform-origin:100% 50%}
+.harper-entrance__door::before,.harper-entrance__door::after{content:"";position:absolute;top:0;bottom:0;pointer-events:none}
+.harper-entrance__door::before{inset:0;background:linear-gradient(90deg,#ffffff0c 0%,transparent 19%,#0000000b 43%,#00000039 50%,#0000000b 57%,transparent 81%,#ffffff0c 100%)}
+.harper-entrance__door::after{width:34px}
+.harper-entrance__door--left::after{left:calc(50% - 34px);background:linear-gradient(90deg,transparent,#0000001c 55%,#ffffff16 82%,#05050580 100%)}
+.harper-entrance__door--right::after{left:50%;background:linear-gradient(90deg,#05050580 0%,#ffffff16 18%,#0000001c 45%,transparent)}
 .harper-entrance__logo{position:absolute;z-index:2;left:50%;top:50%;pointer-events:none;will-change:transform,width}
 .harper-entrance__back{position:absolute;top:9.43%;bottom:9.43%;left:0;right:0;overflow:hidden;background:#808285;opacity:0;box-shadow:0 16px 42px #05050566}
 .harper-entrance__shine{position:absolute;top:-15%;bottom:-15%;left:-28%;width:28%;background:linear-gradient(90deg,transparent,#fffffff0 49%,transparent);opacity:0;filter:blur(11px);transform:translateX(-130%) skewX(-15deg)}

@@ -69,7 +69,7 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
     const targetX = header.left + header.width / 2 - innerWidth / 2;
     const targetY = header.top + header.height / 2 - innerHeight / 2;
 
-    gsap.set([leftDoor, rightDoor], { xPercent: 0 });
+    gsap.set([leftDoor, rightDoor], { xPercent: 0, rotationY: 0 });
     gsap.set(brand, { opacity: 0 });
     gsap.set(logo, { width, height, xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 1 });
     gsap.set(back, { opacity: 0, backgroundColor: '#808285' });
@@ -88,6 +88,8 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
       .to(aston, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' }, 1.08)
       .to(leftDoor, { xPercent: -50, duration: 1.44, ease: 'power2.inOut' }, 1.64)
       .to(rightDoor, { xPercent: 50, duration: 1.44, ease: 'power2.inOut' }, 1.64)
+      .to(leftDoor, { rotationY: -4, duration: 1.44, ease: 'power2.inOut' }, 1.64)
+      .to(rightDoor, { rotationY: 4, duration: 1.44, ease: 'power2.inOut' }, 1.64)
       .to(logo, { width: expandedWidth, duration: .57, ease: 'power2.inOut' }, 1.65)
       .to(shine, { opacity: .25, duration: .12 }, 1.68)
       .to(shine, { x: expandedWidth * 1.45, duration: .44, ease: 'power2.inOut' }, 1.70)
@@ -95,8 +97,10 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
       .to(logo, { width, x: targetX, y: targetY, scale, duration: .90, ease: 'power2.inOut' }, 2.22)
       .to(finalLogo, { opacity: 1, duration: .10, ease: 'power1.inOut' }, 3.02)
       .to([back, wordmarks], { opacity: 0, duration: .10, ease: 'power1.inOut' }, 3.02)
-      .to(brand, { opacity: 1, duration: .20, ease: 'power1.inOut' }, 3.12)
-      .to(logo, { opacity: 0, duration: .20, ease: 'power1.inOut' }, 3.12)
+      // Swap the two copies on the same frame after the flying logo has landed.
+      // Crossfading them leaves a doubled wordmark and orange divider in the nav.
+      .set(brand, { opacity: 1 }, 3.12)
+      .set(logo, { opacity: 0 }, 3.12)
       .call(() => {}, null, 3.80);
   }
 
