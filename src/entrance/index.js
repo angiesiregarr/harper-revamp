@@ -76,7 +76,7 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
     gsap.set(logo, { width, height, xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 1 });
     gsap.set(back, { opacity: 0, backgroundColor: '#808285' });
     gsap.set(frame, { opacity: 0 });
-    gsap.set(frameStroke, { strokeDashoffset: 2496 });
+    gsap.set(frameStroke, { strokeDashoffset: 2496, strokeWidth: 3 });
     gsap.set(wordmarks, { width });
     gsap.set(letters, { opacity: 0, y: 9 });
     gsap.set(aston, { opacity: 0, y: 9, clipPath: 'inset(0 100% 0 0)' });
@@ -98,6 +98,7 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
       .to(shine, { x: expandedWidth * 1.45, duration: .44, ease: 'power2.inOut' }, 1.70)
       .to(shine, { opacity: 0, duration: .16 }, 2.07)
       .to(logo, { x: targetX, y: targetY, scale, duration: .90, ease: 'power2.inOut' }, 2.22)
+      .to(frameStroke, { strokeWidth: 1.5, duration: .55, ease: 'power2.inOut' }, 2.50)
       .to(seam, { backgroundColor: '#f8f8f5', boxShadow: 'none', duration: .20, ease: 'power1.inOut' }, 2.94)
       .to(brand, { opacity: 1, duration: .20, ease: 'power1.inOut' }, 3.12)
       .to(logo, { opacity: 0, duration: .20, ease: 'power1.inOut' }, 3.12)
