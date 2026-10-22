@@ -58,25 +58,3 @@ media.add({
     ScrollTrigger.refresh();
   };
 });
-
-// The one textured orange surface grows a shallow curved leading edge as the
-// Offers section enters. It follows scroll directly and does not pin the page.
-media.add('(min-width: 961px) and (prefers-reduced-motion: no-preference)', () => {
-  const offers = document.getElementById('offers');
-  const tween = gsap.fromTo(offers, { '--swipe-height': '40px' }, {
-    '--swipe-height': '140px',
-    ease: 'none',
-    scrollTrigger: {
-      trigger: offers,
-      start: 'top bottom',
-      end: 'top 78%',
-      scrub: true,
-      invalidateOnRefresh: true
-    }
-  });
-  return () => {
-    tween.scrollTrigger?.kill();
-    tween.kill();
-    offers.style.removeProperty('--swipe-height');
-  };
-});

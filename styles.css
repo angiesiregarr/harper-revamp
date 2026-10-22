@@ -1695,7 +1695,7 @@ html{scroll-padding-top:var(--top-nav-height)}
 @media(max-width:850px){.hotels{min-height:max(var(--city-available),100svh)}.hotels>.city-map{top:32px;width:min(86vw,600px)}}
 @media(prefers-reduced-motion:reduce){.city-waypoint .city-point,.city-waypoint .city-label{transition:none}}
 
-/* Refinement: a complete map, one textured curved sheet, and lighter pins. */
+/* The Offers texture rises as one rectangular sheet with rounded top corners. */
 @media(min-width:851px){.city-waypoint,.city-waypoint.is-active{text-shadow:none}}
 .offers{isolation:isolate;overflow:visible}
 .offers::before{
@@ -1704,13 +1704,21 @@ html{scroll-padding-top:var(--top-nav-height)}
   z-index:0;
   left:0;
   right:0;
-  top:calc(0px - var(--swipe-height,140px));
+  top:calc(0px - var(--swipe-overlap,120px));
   bottom:0;
-  border-radius:50% 50% 0 0 / var(--swipe-height,140px) var(--swipe-height,140px) 0 0;
+  border-radius:var(--swipe-radius,120px) var(--swipe-radius,120px) 0 0;
   background:#f08b1d url('./assets/gradient-1.webp') center top / cover no-repeat;
   pointer-events:none;
 }
 .offers-layout{position:relative;z-index:1}
+@media(min-width:961px) and (prefers-reduced-motion:no-preference){
+  body.hero-city-handoff-enabled .hotels.motion-ready .hotel-content.reveal,
+  .hotels.motion-ready .hotel-content{opacity:calc(1 - var(--swipe-city-exit,0));transition:none}
+  body.hero-city-handoff-enabled .hotels.motion-ready .city-heading,
+  .hotels.motion-ready .city-heading{opacity:calc(1 - var(--swipe-city-exit,0))}
+  .offers.motion-ready .offers-intro.scroll-reveal{opacity:var(--swipe-heading,1)}
+  .offers.motion-ready .offer-list{opacity:var(--swipe-cards,1)}
+}
 @media(max-width:960px),(prefers-reduced-motion:reduce){
   .offers{overflow:clip}
   .offers::before{display:none}
@@ -1747,8 +1755,8 @@ html{scroll-padding-top:var(--top-nav-height)}
 @media(prefers-reduced-motion:no-preference){
   .hotels.portal-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--portal-progress,1))}
   body.hero-city-handoff-enabled .hotels.portal-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--handoff-map,1))}
-  .hotels.motion-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--portal-progress,1) * var(--map-exit-opacity,1))}
-  body.hero-city-handoff-enabled .hotels.motion-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--handoff-map,1) * var(--map-exit-opacity,1))}
+  .hotels.motion-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--portal-progress,1) * var(--map-exit-opacity,1) * (1 - var(--swipe-city-exit,0)))}
+  body.hero-city-handoff-enabled .hotels.motion-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--handoff-map,1) * var(--map-exit-opacity,1) * (1 - var(--swipe-city-exit,0)))}
 }
 @media(max-width:850px){.hotels{--city-map-alpha:.53}.hotels>.city-map{top:clamp(58px,9svh,86px);width:min(96vw,580px)}.city-heading::before{inset:-24px -8% -18px}}
 @media(min-width:851px){

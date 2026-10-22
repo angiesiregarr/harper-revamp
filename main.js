@@ -672,6 +672,9 @@ function setupSectionPortalMotion() {
     frame = 0;
     if (reduced.matches) {
       city.style.removeProperty('--portal-progress');
+      city.style.removeProperty('--swipe-city-exit');
+      city.querySelector('.hotel-content').inert = false;
+      ['--swipe-heading', '--swipe-cards', '--swipe-overlap', '--swipe-radius'].forEach(name => sections[0].style.removeProperty(name));
       [city, ...sections, cloud].filter(Boolean).forEach(section => {
         section.style.removeProperty('--handoff-enter');
         section.style.removeProperty('--handoff-enter-late');
@@ -697,6 +700,25 @@ function setupSectionPortalMotion() {
     const cityExit = ease((offersArrival - .73) / .27);
     set(city, '--handoff-exit', cityExit);
     set(city, '--map-exit-opacity', 1 - .18 * cityExit);
+    // The leading edge starts just below the viewport and reaches the sticky
+    // navigation over one viewport of native scroll. Every part of this handoff
+    // reads the same progress, so scrolling up reverses it without a tween lag.
+    if (innerWidth > 960) {
+      const offers = sections[0];
+      const overlap = Math.min(120, Math.max(80, innerWidth * .08));
+      const swipe = clamp((innerHeight + overlap - bounds[1].top) / Math.max(1, innerHeight - top));
+      const hotelExit = ease((swipe - .18) / .31);
+      set(city, '--swipe-city-exit', hotelExit);
+      city.querySelector('.hotel-content').inert = hotelExit >= .99;
+      set(offers, '--swipe-heading', ease((swipe - .52) / .26));
+      set(offers, '--swipe-cards', ease((swipe - .68) / .27));
+      offers.style.setProperty('--swipe-overlap', `${overlap.toFixed(1)}px`);
+      offers.style.setProperty('--swipe-radius', `${(overlap * (1 - ease((swipe - .45) / .55))).toFixed(1)}px`);
+    } else {
+      city.style.removeProperty('--swipe-city-exit');
+      city.querySelector('.hotel-content').inert = false;
+      ['--swipe-heading', '--swipe-cards', '--swipe-overlap', '--swipe-radius'].forEach(name => sections[0].style.removeProperty(name));
+    }
     for (let i = 0; i < sections.length; i++) {
       const section = sections[i];
       const enter = ease((innerHeight - bounds[i + 1].top) / span);
