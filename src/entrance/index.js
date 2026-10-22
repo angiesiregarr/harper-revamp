@@ -12,6 +12,15 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
   const wordmarks = overlay.querySelector('.harper-entrance__wordmarks');
   const harper = overlay.querySelector('.harper-entrance__harper');
   const aston = overlay.querySelector('.harper-entrance__aston');
+  // Crop repeated views of the approved wordmark in the transparent spaces
+  // between glyphs. The finished letters are still the original image.
+  const letterEdges = [0, 80, 158, 233, 306, 380, 475];
+  const letters = letterEdges.slice(0, -1).map((start, index) => {
+    const letter = index ? harper.cloneNode() : harper;
+    letter.style.clipPath = `inset(0 ${(1 - letterEdges[index + 1] / 475) * 100}% 0 ${(start / 475) * 100}%)`;
+    if (index) wordmarks.insertBefore(letter, aston);
+    return letter;
+  });
   const seam = overlay.querySelector('.harper-entrance__seam');
   const shine = overlay.querySelector('.harper-entrance__shine');
   const leftDoor = overlay.querySelector('.harper-entrance__door--left');
@@ -55,7 +64,7 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
 
   function buildTimeline() {
     const header = brand.getBoundingClientRect();
-    const width = Math.min(460, Math.max(250, innerWidth * (innerWidth < 700 ? .77 : .46)));
+    const width = Math.min(520, Math.max(270, innerWidth * (innerWidth < 700 ? .85 : .48)));
     const height = width * 256 / 843;
     const expandedWidth = height * header.width / header.height;
     const scale = header.height / height;
@@ -65,11 +74,12 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
     gsap.set([leftDoor, rightDoor], { xPercent: 0 });
     gsap.set(brand, { opacity: 0 });
     gsap.set(logo, { width, height, xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 1 });
-    gsap.set(back, { opacity: 0, backgroundColor: '#303235' });
+    gsap.set(back, { opacity: 0, backgroundColor: '#808285' });
     gsap.set(frame, { opacity: 0 });
     gsap.set(frameStroke, { strokeDashoffset: 2496 });
     gsap.set(wordmarks, { width });
-    gsap.set([harper, aston], { opacity: 0, y: 11, clipPath: 'inset(0 100% 0 0)' });
+    gsap.set(letters, { opacity: 0, y: 9 });
+    gsap.set(aston, { opacity: 0, y: 9, clipPath: 'inset(0 100% 0 0)' });
     gsap.set(seam, { left: '50%', height: innerHeight, xPercent: -50, yPercent: -50, scaleY: 0, opacity: 1 });
     gsap.set(shine, { opacity: 0, x: 0 });
 
@@ -79,7 +89,7 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
       .to(frame, { opacity: 1, duration: .15 }, .73)
       .to(frameStroke, { strokeDashoffset: 0, duration: .82, ease: 'power2.inOut' }, .73)
       .to(seam, { left: '69.35%', height: height * 1.08, scaleY: 1, duration: .82, ease: 'power2.inOut', boxShadow: '0 0 5px #f08b1d99' }, .73)
-      .to(harper, { opacity: 1, y: 0, clipPath: 'inset(0 0% 0 0)', duration: .60, ease: 'power2.out' }, .85)
+      .to(letters, { opacity: 1, y: 0, duration: .33, stagger: .07, ease: 'back.out(1.2)' }, .84)
       .to(aston, { opacity: 1, y: 0, clipPath: 'inset(0 0% 0 0)', duration: .45, ease: 'power2.out' }, 1.08)
       .to(leftDoor, { xPercent: -50, duration: 1.44, ease: 'power2.inOut' }, 1.64)
       .to(rightDoor, { xPercent: 50, duration: 1.44, ease: 'power2.inOut' }, 1.64)
@@ -88,7 +98,6 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
       .to(shine, { x: expandedWidth * 1.45, duration: .44, ease: 'power2.inOut' }, 1.70)
       .to(shine, { opacity: 0, duration: .16 }, 2.07)
       .to(logo, { x: targetX, y: targetY, scale, duration: .90, ease: 'power2.inOut' }, 2.22)
-      .to(back, { backgroundColor: '#808285', duration: .30, ease: 'power2.inOut' }, 2.86)
       .to(seam, { backgroundColor: '#f8f8f5', boxShadow: 'none', duration: .20, ease: 'power1.inOut' }, 2.94)
       .to(brand, { opacity: 1, duration: .20, ease: 'power1.inOut' }, 3.12)
       .to(logo, { opacity: 0, duration: .20, ease: 'power1.inOut' }, 3.12)

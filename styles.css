@@ -1699,7 +1699,7 @@ html{scroll-padding-top:var(--top-nav-height)}
 .news-section .news-read{display:inline-flex;align-items:center;gap:9px;width:max-content;max-width:100%;white-space:nowrap;font:700 12px/1.2 var(--sans);letter-spacing:.045em;text-transform:uppercase}
 .news-section .news-read>span{flex:none;font:400 18px/1 Arial,sans-serif}
 
-/* One first-visit entrance over the existing, normally laid-out homepage. */
+/* Entrance overlay over the existing, normally laid-out homepage. */
 .harper-entrance{display:none;position:fixed;inset:0;z-index:200;overflow:hidden;pointer-events:auto}
 .entrance-pending .harper-entrance{display:block}
 .entrance-pending .site-nav .brand{opacity:0}
@@ -1710,10 +1710,10 @@ html{scroll-padding-top:var(--top-nav-height)}
 .harper-entrance__door--left::after{left:calc(50% - 18px);background:linear-gradient(90deg,transparent,#05050555)}
 .harper-entrance__door--right::after{left:50%;background:linear-gradient(90deg,#05050555,transparent)}
 .harper-entrance__logo{position:absolute;z-index:2;left:50%;top:50%;pointer-events:none;will-change:transform,width}
-.harper-entrance__back{position:absolute;inset:0;overflow:hidden;background:#303235;opacity:0;box-shadow:0 12px 35px #05050544}
+.harper-entrance__back{position:absolute;inset:0;overflow:hidden;background:#808285;opacity:0;box-shadow:0 16px 42px #05050566}
 .harper-entrance__shine{position:absolute;top:-15%;bottom:-15%;left:-28%;width:28%;background:linear-gradient(90deg,transparent,#fffffff0 49%,transparent);opacity:0;filter:blur(11px);transform:translateX(-130%) skewX(-15deg)}
 .harper-entrance__frame{position:absolute;inset:0;width:100%;height:100%;overflow:visible;fill:none;opacity:0}
-.harper-entrance__frame rect{fill:none;stroke:#f8f8f5;stroke-width:2;vector-effect:non-scaling-stroke;stroke-dasharray:2496;stroke-dashoffset:2496}
+.harper-entrance__frame rect{fill:none;stroke:#f8f8f5;stroke-width:3;vector-effect:non-scaling-stroke;stroke-dasharray:2496;stroke-dashoffset:2496}
 .harper-entrance__wordmarks{position:absolute;left:50%;top:0;height:100%;transform:translateX(-50%)}
 .harper-entrance__wordmarks img{position:absolute;display:block;height:auto;opacity:0;clip-path:inset(0 100% 0 0);will-change:clip-path,transform}
 .harper-entrance__harper{left:7.8%;top:30.9%;width:56.3%}
