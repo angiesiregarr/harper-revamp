@@ -85,16 +85,17 @@
     if (!cards.length) return;
     const scrollDriven = section.classList.contains('motion-ready') && !reduced.matches;
     const sectionProgress = parseFloat(section.style.getPropertyValue('--handoff-enter')) || 0;
-    const spread = reduced.matches ? 1 : scrollDriven ? ease((sectionProgress - .12) / .82) : state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
+    const timedSpread = state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
+    const spread = reduced.matches ? 1 : timedSpread * (scrollDriven ? ease((sectionProgress - .12) / .82) : 1);
     currentSpread = spread;
-    const centerProgress = reduced.matches ? 1 : scrollDriven ? ease((spread - .18) / .77) : state === 'spreading' ? ease((now-spreadAt-100)/1050) : state === 'spinning' ? 1 : 0;
+    const centerProgress = reduced.matches ? 1 : ease((spread - .18) / .77);
     social.inert = state === 'idle' || (spread < .9 && !social.contains(document.activeElement));
     center.style.setProperty('--reels-title-y', `${(geometry.titleShift*(1-centerProgress)).toFixed(1)}px`);
     center.style.setProperty('--reels-social-y', `${(geometry.socialShift*(1-centerProgress)).toFixed(1)}px`);
     const n = cards.length;
     cards.forEach((card,i) => {
       const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
-      const stagger = reduced.matches ? 1 : scrollDriven ? ease((spread - i * .045) / Math.max(.65, 1 - i * .045)) : state === 'spreading' ? ease((now-spreadAt-i*55)/900) : spread;
+      const stagger = reduced.matches ? 1 : ease((spread - i * .045) / Math.max(.65, 1 - i * .045));
       const radius = i === 0 ? spread : stagger;
       const x = Math.cos(phase)*geometry.x*radius;
       const y = Math.sin(phase)*geometry.y*radius;
@@ -109,7 +110,7 @@
   }
   function frame(now) {
     const dt = Math.min(250,Math.max(0,now-last)); last=now;
-    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 750){setState('spreading');spreadAt=now;}}
+    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 4000){setState('spreading');spreadAt=now;}}
     if (state === 'spreading' && now-spreadAt > Math.max(1250,900+(cards.length-1)*55)){setState('spinning');}
     if (stepAt) {
       const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
@@ -124,15 +125,14 @@
   }
   function start() {
     if (state !== 'idle') return;
-    if (reduced.matches || section.classList.contains('motion-ready')) setState('spinning');
-    else setState('holding');
+    setState(reduced.matches ? 'spinning' : 'holding');
   }
   function initialize(data) {
     items=(data.items || []).filter(valid);
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
     renderCards();
-    const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)start();},{threshold:.01});observer.observe(stage);
+    const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio >= .25;if(visible)start();},{threshold:[0,.25]});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();});
     orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
     orbit.addEventListener('pointerout',e=>{if(e.target.closest('.reels-card') && !e.relatedTarget?.closest?.('.reels-card'))hover=false;});

@@ -292,9 +292,9 @@ function setupHeroIntro() {
   const revealBooking = () => {
     if (booking.classList.contains('hero-intro-revealed')) return;
     booking.classList.add('hero-intro-revealed');
-    setTimeout(finish, motion.matches ? 0 : Math.max(600, startTime + 4280 - performance.now()));
+    setTimeout(finish, motion.matches ? 0 : Math.max(600, startTime + 1700 - performance.now()));
   };
-  const onOrbitComplete = () => { if (started) schedule(3680, revealBooking); };
+  const onOrbitComplete = () => { if (started) setTimeout(revealBooking, 120); };
   window.addEventListener('harper:hero-orbit-complete', onOrbitComplete, { once: true });
   const startOrbit = () => {
     if (orbitStarted) return;
@@ -344,9 +344,9 @@ function setupHeroIntro() {
       return;
     }
     schedule(100, typeTitle);
-    schedule(1250, () => palms[0].classList.add('hero-intro-revealed'));
-    schedule(1770, () => palms[1].classList.add('hero-intro-revealed'));
-    schedule(2290, waitForOrbit);
+    schedule(380, () => palms[0].classList.add('hero-intro-revealed'));
+    schedule(650, () => palms[1].classList.add('hero-intro-revealed'));
+    schedule(550, waitForOrbit);
   };
   const checkStart = () => requestAnimationFrame(start);
   const handoff = new MutationObserver(checkStart);

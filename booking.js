@@ -129,9 +129,8 @@
     }
     form.requestSubmit();
   });
-  document.addEventListener('pointerdown',event=>{if(!popup.contains(event.target) && !fields.some(button=>button.contains(event.target)))closeField();});
-  document.addEventListener('keydown',event=>{if(event.key==='Escape' && !popup.hidden){event.preventDefault();event.stopPropagation();closeField(true);}},true);
-  sheet.addEventListener('cancel',()=>closeField());
+  document.addEventListener('pointerdown',event=>{if(sheet.open && sheet.contains(event.target) && event.target.closest('.booking-close'))return;if(!popup.contains(event.target) && !fields.some(button=>button.contains(event.target)))closeField();});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape' && sheet.open){event.preventDefault();event.stopPropagation();sheet.close();}},true);
   sheet.addEventListener('close',()=>{closeField();opener?.focus({preventScroll:true});});
   form.querySelector('.booking-close').addEventListener('click',()=>sheet.close());
   results.querySelector('.booking-close').addEventListener('click',()=>results.close());

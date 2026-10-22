@@ -64,29 +64,31 @@ function renderCity() {
   }, {rootMargin: '600px'});
   imagePreloader.observe(document.getElementById('hotels'));
   const waypoints = [...waypointHost.querySelectorAll('.city-waypoint')];
-  let committed = 0;
+  let committed = null;
   let hovered = null;
   let focused = null;
   const show = (index) => {
-    const hotel = cityHotels[index];
+    const hotel = index == null ? null : cityHotels[index];
+    const layoutIndex = index ?? 0;
     panels.forEach((panel, i) => {
-      let distance = (i - index + panels.length) % panels.length;
+      let distance = (i - layoutIndex + panels.length) % panels.length;
       if (distance > panels.length / 2) distance -= panels.length;
       panel.dataset.slot = Math.abs(distance) <= 2 ? String(distance) : 'away';
-      panel.classList.toggle('is-active', i === index);
-      panel.setAttribute('aria-pressed', String(i === index));
+      panel.classList.toggle('is-active', i === index && hotel !== null);
+      panel.setAttribute('aria-pressed', String(i === index && hotel !== null));
       panel.tabIndex = Math.abs(distance) <= 2 ? 0 : -1;
       panel.setAttribute('aria-hidden', String(Math.abs(distance) > 2));
     });
     waypoints.forEach((point) => {
-      const active = point.dataset.city === hotel.city;
+      const active = hotel !== null && point.dataset.city === hotel.city;
       point.classList.toggle('is-active', active);
       point.setAttribute('aria-pressed', String(active));
     });
-    setRoute(index, hovered === index ? routeBend : 0);
-    document.getElementById('hotel-location').textContent = hotel.place;
-    document.getElementById('hotel-name').textContent = hotel.title;
-    const inCity = cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city);
+    route.classList.toggle('is-active', hotel !== null);
+    if (hotel) setRoute(index, hovered === index ? routeBend : 0);
+    document.getElementById('hotel-location').textContent = hotel?.place || '';
+    document.getElementById('hotel-name').textContent = hotel?.title || 'Choose a city to explore';
+    const inCity = hotel ? cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city) : [];
     const selector = document.getElementById('city-properties');
     selector.hidden = inCity.length < 2;
     selector.innerHTML = inCity.length < 2 ? '' : `<span>Hotels in ${hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span>${inCity.map(({item, i}) => `<button type="button" data-hotel="${i}" aria-pressed="${i === index}">${item.title}</button>`).join('')}`;
@@ -104,7 +106,8 @@ function renderCity() {
     }
   };
   const currentCity = () => new URLSearchParams(window.location.search).get('city')?.toLowerCase();
-  select(Math.max(0, cityHotels.findIndex(hotel => hotel.city === currentCity())));
+  const selectedFromUrl = () => { const index = cityHotels.findIndex(hotel => hotel.city === currentCity()); return index < 0 ? null : index; };
+  select(selectedFromUrl());
   const showPreview = () => show(hovered ?? focused ?? committed);
   waypoints.forEach((point) => {
     const index = cityHotels.findIndex(hotel => hotel.city === point.dataset.city);
@@ -124,22 +127,22 @@ function renderCity() {
     const property = event.target.closest('[data-hotel]');
     const arrow = event.target.closest('[data-step]');
     if (property) select(Number(property.dataset.hotel), true);
-    if (arrow) select((committed + Number(arrow.dataset.step) + cityHotels.length) % cityHotels.length, true);
+    if (arrow) select(((committed ?? (Number(arrow.dataset.step) > 0 ? -1 : 0)) + Number(arrow.dataset.step) + cityHotels.length) % cityHotels.length, true);
   });
   view.addEventListener('keydown', event => {
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
     event.preventDefault();
-    select((committed + (event.key === 'ArrowRight' ? 1 : -1) + cityHotels.length) % cityHotels.length, true);
+    select(((committed ?? (event.key === 'ArrowRight' ? -1 : 0)) + (event.key === 'ArrowRight' ? 1 : -1) + cityHotels.length) % cityHotels.length, true);
   });
   let touchX = null;
   view.addEventListener('touchstart', event => { touchX = event.touches[0].clientX; }, {passive:true});
   view.addEventListener('touchend', event => {
     if (touchX === null) return;
     const delta = event.changedTouches[0].clientX - touchX;
-    if (Math.abs(delta) > 45) select((committed + (delta < 0 ? 1 : -1) + cityHotels.length) % cityHotels.length, true);
+    if (Math.abs(delta) > 45) select(((committed ?? (delta < 0 ? -1 : 0)) + (delta < 0 ? 1 : -1) + cityHotels.length) % cityHotels.length, true);
     touchX = null;
   }, {passive:true});
-  window.addEventListener('popstate', () => select(Math.max(0, cityHotels.findIndex(hotel => hotel.city === currentCity()))));
+  window.addEventListener('popstate', () => select(selectedFromUrl()));
 }
 
 function setupMenu() {

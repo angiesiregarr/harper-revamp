@@ -1751,3 +1751,31 @@ html{scroll-padding-top:var(--top-nav-height)}
 .hero-orbit-stage .hero-palm-left{translate:0 calc(var(--hero-scroll,0px) * .2)}
 .hero-orbit-stage .hero-palm-right{translate:0 calc(var(--hero-scroll,0px) * -.18)}
 @media(prefers-reduced-motion:reduce){.js.hero-intro-pending .hero-orbit-stage .hero-palm:not(.hero-intro-revealed),.js.hero-intro-pending .hero-orbit-stage .hero-booking:not(.hero-intro-revealed):not(.is-hidden){opacity:1;filter:none;scale:1;translate:0}.hero-orbit-stage .hero-heading,.hero-orbit-stage .hero-orbit,.hero-orbit-stage .hero-palm{translate:none}}
+
+/* Keep the booking dialog spacious while switching fields or dismissing a picker. */
+.booking-sheet{min-height:min(530px,82svh);width:min(94vw,1050px);padding:30px 32px}
+.booking-sheet .booking-sheet-heading{margin-bottom:26px}
+.booking-sheet .booking-fields{grid-template-columns:minmax(170px,1.4fr) repeat(3,minmax(135px,1fr)) 72px;align-items:stretch}
+.booking-sheet .booking-field{padding:10px 18px;min-height:78px}
+.booking-sheet .booking-field:first-child{padding-left:6px}
+.booking-sheet .booking-search{width:62px;height:62px;min-height:62px;padding:0;margin-left:10px;border-radius:9px;background:#e9822a;color:#fff;box-shadow:0 4px 12px #9e4e1c20}
+.booking-sheet .booking-search:hover{background:#bd5923}
+.booking-sheet .booking-search svg{display:block;flex:none}
+.booking-sheet .booking-popover{width:100%!important;max-height:min(42svh,350px)!important;margin-top:20px;padding:22px 24px;border-radius:8px}
+.booking-sheet .booking-popover label{display:block;margin-bottom:9px}
+.booking-sheet .destination-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 14px}
+.booking-sheet .destination-options button{padding:9px 12px}
+.booking-sheet .booking-close{flex:none;float:none;cursor:pointer}
+.hero-field-chevron{width:18px;height:18px;stroke-width:2;font-size:inherit}
+.news-section .news-heading #journal-title{color:#e86f0d}
+.city-waypoint.is-active .city-label{font-size:clamp(16px,1.35vw,22px)}
+@media(max-width:800px){
+  .booking-sheet{width:100%;min-height:min(650px,91svh);padding:0}
+  .booking-sheet .booking-bar{padding:22px!important}
+  .booking-sheet .booking-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .booking-sheet .booking-field{padding:12px!important;min-height:70px}
+  .booking-sheet .booking-search{grid-column:1/-1;width:100%;height:54px;min-height:54px;margin:0}
+  .booking-sheet .booking-popover{width:100%!important;max-height:min(37svh,310px)!important;margin-top:16px;padding:16px}
+  .booking-sheet .destination-options{grid-template-columns:1fr}
+  .city-waypoint.is-active .city-label{font-size:17px}
+}
