@@ -61,9 +61,13 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
   }
 
   function buildTimeline() {
+    const header = brand.getBoundingClientRect();
     const width = Math.min(520, Math.max(270, innerWidth * (innerWidth < 700 ? .85 : .48)));
     const height = width * 106 / 350;
     const expandedWidth = width * 1.16;
+    const scale = header.height / height;
+    const targetX = header.left + header.width / 2 - innerWidth / 2;
+    const targetY = header.top + header.height / 2 - innerHeight / 2;
     gsap.set([leftDoor, rightDoor], { xPercent: 0, rotationY: 0 });
     gsap.set(brand, { opacity: 0 });
     gsap.set(logo, { width, height, xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 1 });
@@ -81,20 +85,21 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
       .to(seam, { left: '69.3%', width: '2.86%', height, scaleY: 1, duration: .82, ease: 'power2.inOut', boxShadow: '0 0 5px #f08b1d99' }, .73)
       .to(letters, { opacity: 1, y: 0, duration: .33, stagger: .07, ease: 'back.out(1.2)' }, .84)
       .to(aston, { opacity: 1, y: 0, duration: .45, ease: 'power2.out' }, 1.08)
-      .to(leftDoor, { xPercent: -50, duration: 1.44, ease: 'power2.inOut' }, 1.64)
-      .to(rightDoor, { xPercent: 50, duration: 1.44, ease: 'power2.inOut' }, 1.64)
-      .to(leftDoor, { rotationY: -4, duration: 1.44, ease: 'power2.inOut' }, 1.64)
-      .to(rightDoor, { rotationY: 4, duration: 1.44, ease: 'power2.inOut' }, 1.64)
+      .to(leftDoor, { xPercent: -115, duration: 1.44, ease: 'power2.inOut' }, 1.64)
+      .to(rightDoor, { xPercent: 115, duration: 1.44, ease: 'power2.inOut' }, 1.64)
+      .to(leftDoor, { rotationY: -7, duration: 1.15, ease: 'power2.inOut' }, 1.64)
+      .to(rightDoor, { rotationY: 7, duration: 1.15, ease: 'power2.inOut' }, 1.64)
       .to(logo, { width: expandedWidth, duration: .57, ease: 'power2.inOut' }, 1.65)
+      .to(logo, { x: targetX, y: targetY, scale, duration: 1.42, ease: 'power2.inOut' }, 1.70)
       .to(shine, { opacity: .25, duration: .12 }, 1.68)
       .to(shine, { x: expandedWidth * 1.45, duration: .44, ease: 'power2.inOut' }, 1.70)
       .to(shine, { opacity: 0, duration: .16 }, 2.07)
-      .to(finalLogo, { opacity: 1, duration: .10, ease: 'power1.inOut' }, 2.25)
-      .to([back, wordmarks], { opacity: 0, duration: .10, ease: 'power1.inOut' }, 2.25)
-      // End the center reveal before showing the stationary navbar artwork.
-      // The logo never flies across the hero or overlaps another copy.
-      .to(logo, { opacity: 0, duration: .32, ease: 'power1.inOut' }, 2.65)
+      .to(logo, { width, duration: .90, ease: 'power2.inOut' }, 2.22)
+      .to(finalLogo, { opacity: 1, duration: .10, ease: 'power1.inOut' }, 3.02)
+      .to([back, wordmarks], { opacity: 0, duration: .10, ease: 'power1.inOut' }, 3.02)
+      // Exchange the artwork on the landing frame with no overlapping copies.
       .set(brand, { opacity: 1 }, 3.12)
+      .set(logo, { opacity: 0 }, 3.12)
       .call(() => {}, null, 3.80);
   }
 
@@ -136,7 +141,7 @@ if (root.classList.contains('entrance-pending') && overlay && brand) {
     imageReady(harper.src), imageReady(finalLogo.src)
   ]).then(async () => {
     if (complete || reduceMotion.matches || scrollY > 2) return finish();
-    // Let the page's first layout frame settle before starting the overlay.
+    // Let the navbar settle before measuring the mark's exact landing spot.
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     if (complete || reduceMotion.matches || scrollY > 2) return finish();
     timeline = buildTimeline();

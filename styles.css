@@ -1703,14 +1703,17 @@ html{scroll-padding-top:var(--top-nav-height)}
 .harper-entrance{display:none;position:fixed;inset:0;z-index:200;overflow:hidden;pointer-events:auto;perspective:1600px;perspective-origin:50% 50%}
 .entrance-pending .harper-entrance{display:block}
 .entrance-pending .site-nav .brand{opacity:0}
-.harper-entrance__door{position:absolute;inset:0;background:linear-gradient(#0c0d0dd9,#0c0d0dd9),url('./assets/entrance/stone-texture.webp') center/cover no-repeat;backface-visibility:hidden;transform-style:preserve-3d;will-change:transform}
-.harper-entrance__door--left{clip-path:inset(0 49.95% 0 0);transform-origin:0 50%}
-.harper-entrance__door--right{clip-path:inset(0 0 0 49.95%);transform-origin:100% 50%}
-.harper-entrance__door::before,.harper-entrance__door::after{content:"";position:absolute;top:0;bottom:0;pointer-events:none}
-.harper-entrance__door::before{inset:0;background:linear-gradient(90deg,#ffffff0c 0%,transparent 19%,#0000000b 43%,#00000039 50%,#0000000b 57%,transparent 81%,#ffffff0c 100%)}
-.harper-entrance__door::after{width:34px}
-.harper-entrance__door--left::after{left:calc(50% - 34px);background:linear-gradient(90deg,transparent,#0000001c 55%,#ffffff16 82%,#05050580 100%)}
-.harper-entrance__door--right::after{left:50%;background:linear-gradient(90deg,#05050580 0%,#ffffff16 18%,#0000001c 45%,transparent)}
+.harper-entrance__door{position:absolute;top:0;bottom:0;width:50%;background:linear-gradient(#0c0d0dd9,#0c0d0dd9),url('./assets/entrance/stone-texture.webp') center/auto 100% no-repeat;backface-visibility:hidden;transform-style:preserve-3d;will-change:transform}
+.harper-entrance__door--left{left:0;transform-origin:0 50%;box-shadow:inset 0 7px 8px #ffffff1a,inset 0 -10px 17px #050505a1,inset -18px 0 24px #05050580,9px 0 22px #05050575}
+.harper-entrance__door--right{right:0;transform-origin:100% 50%;box-shadow:inset 0 7px 8px #ffffff1a,inset 0 -10px 17px #050505a1,inset 18px 0 24px #05050580,-9px 0 22px #05050575}
+.harper-entrance__door::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#ffffff0b,transparent 17%,#00000008 72%,#00000029)}
+.harper-entrance__door--right::before{transform:scaleX(-1)}
+.harper-entrance__door::after{content:"";position:absolute;top:0;bottom:0;width:16px;pointer-events:none}
+.harper-entrance__door--left::after{right:0;background:linear-gradient(90deg,transparent,#ffffff19 27%,#3435369c 65%,#0a0b0bd9);box-shadow:4px 0 10px #05050566}
+.harper-entrance__door--right::after{left:0;background:linear-gradient(90deg,#0a0b0bd9,#3435369c 35%,#ffffff19 73%,transparent);box-shadow:-4px 0 10px #05050566}
+.harper-entrance__door-edge{position:absolute;top:0;bottom:0;width:15px;pointer-events:none;background:linear-gradient(90deg,#1c1d1e,#56585a 35%,#202122 100%);box-shadow:inset 1px 0 #ffffff30,3px 0 9px #0008}
+.harper-entrance__door--left .harper-entrance__door-edge{right:0;transform:translateX(50%) translateZ(-7px) rotateY(88deg)}
+.harper-entrance__door--right .harper-entrance__door-edge{left:0;transform:translateX(-50%) translateZ(-7px) rotateY(-88deg)}
 .harper-entrance__logo{position:absolute;z-index:2;left:50%;top:50%;pointer-events:none;will-change:transform,width}
 .harper-entrance__back{position:absolute;top:9.43%;bottom:9.43%;left:0;right:0;overflow:hidden;background:#808285;opacity:0;box-shadow:0 16px 42px #05050566}
 .harper-entrance__shine{position:absolute;top:-15%;bottom:-15%;left:-28%;width:28%;background:linear-gradient(90deg,transparent,#fffffff0 49%,transparent);opacity:0;filter:blur(11px);transform:translateX(-130%) skewX(-15deg)}
