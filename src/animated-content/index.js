@@ -55,7 +55,7 @@ function mount() {
         start: 'top 80%',
         end: 'top 0%',
         animation: timeline,
-        scrub: 0.55,
+        scrub: 1,
         invalidateOnRefresh: true
       });
       owned.push({ trigger, timeline, targets });
