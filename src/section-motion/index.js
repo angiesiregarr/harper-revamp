@@ -52,12 +52,17 @@ media.add('(min-width: 961px) and (prefers-reduced-motion: no-preference)', () =
     });
     pins.push({ section, timeline, trigger });
   }
-  const refresh = () => ScrollTrigger.refresh();
+  let disposed = false;
+  const refresh = () => {
+    if (!disposed) ScrollTrigger.refresh();
+  };
   addEventListener('load', refresh, { once: true });
   document.fonts?.ready.then(refresh);
   requestAnimationFrame(refresh);
 
   return () => {
+    disposed = true;
+    removeEventListener('load', refresh);
     pins.forEach(({ section, timeline, trigger }) => {
       trigger.kill(true);
       timeline.kill();
@@ -71,5 +76,3 @@ media.add('(min-width: 961px) and (prefers-reduced-motion: no-preference)', () =
     ScrollTrigger.refresh();
   };
 });
-
-addEventListener('pagehide', () => media.revert(), { once: true });
