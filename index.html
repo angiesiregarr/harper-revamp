@@ -8,9 +8,13 @@
     <title>Harper Hotels — Come Home to Harmony</title>
     <link rel="preload" href="./assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/lato-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="./styles.css?v=a969ea872fba" />
+    <link rel="preload" href="./assets/entrance/stone-texture.webp" as="image" type="image/webp" />
+    <link rel="preload" href="./assets/entrance/harper-wordmark.png" as="image" type="image/png" />
+    <link rel="preload" href="./assets/entrance/by-aston-wordmark.png" as="image" type="image/png" />
+    <link rel="stylesheet" href="./styles.css?v=ed5a521edf00" />
     <link rel="stylesheet" href="./offers-pixel.css?v=2619944de854" />
-    <script>document.documentElement.classList.add('js');</script>
+    <script>document.documentElement.classList.add('js');try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&!location.hash&&(!sessionStorage.getItem('harper-entrance-seen')||new URLSearchParams(location.search).get('entrance')==='replay'))document.documentElement.classList.add('entrance-pending')}catch{document.documentElement.classList.add('entrance-pending')}setTimeout(()=>document.documentElement.classList.remove('entrance-pending'),6500)</script>
+    <script src="./entrance.js?v=5a8c49ec5893" defer></script>
     <script src="./reels.js?v=bfb1ad943ea5" defer></script>
     <script src="./main.js?v=e00a2bf367d9" defer></script>
     <link rel="stylesheet" href="./hero-carousel.css?v=7a18a2113b70" />
@@ -21,6 +25,19 @@
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <div class="harper-entrance" aria-hidden="true">
+      <div class="harper-entrance__door harper-entrance__door--left"></div>
+      <div class="harper-entrance__door harper-entrance__door--right"></div>
+      <div class="harper-entrance__logo">
+        <div class="harper-entrance__back"><span class="harper-entrance__shine"></span></div>
+        <svg class="harper-entrance__frame" viewBox="0 0 1000 260" preserveAspectRatio="none"><rect x="3" y="3" width="994" height="254" rx="0" /></svg>
+        <div class="harper-entrance__wordmarks">
+          <img class="harper-entrance__harper" src="./assets/entrance/harper-wordmark.png" alt="" />
+          <img class="harper-entrance__aston" src="./assets/entrance/by-aston-wordmark.png" alt="" />
+          <span class="harper-entrance__seam"></span>
+        </div>
+      </div>
+    </div>
       <div class="site-nav" id="site-nav">
         <a class="brand" href="#main" aria-label="Harper Hotels, back to top"><img src="./assets/harper-logo-white.png" alt="Harper by Aston" /></a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-links" aria-label="Open navigation menu"><span></span><span></span><span></span></button>
