@@ -1,78 +1,82 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ScrollSmoother } from 'gsap/ScrollSmoother';
+gsap.registerPlugin(ScrollTrigger);
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
-
-// Keep the opening scene and all interactive controls in their existing DOM.
-// The smoother only changes how the document follows the native scroll position;
-// each short pin supplies room for the section's existing scroll-linked reveal.
-const sections = ['hotels', 'journal', 'moments', 'membership'];
+// Native scrolling keeps wheel and trackpad input immediate. Each pin only
+// holds its scene for the pixels needed by its scroll-linked detail.
 const media = gsap.matchMedia();
 
-media.add('(min-width: 961px) and (prefers-reduced-motion: no-preference)', () => {
+media.add({
+  desktop: '(min-width: 961px) and (prefers-reduced-motion: no-preference)',
+  tall: '(min-width: 961px) and (min-height: 821px) and (prefers-reduced-motion: no-preference)'
+}, ({ conditions }) => {
+  if (!conditions.desktop) return;
   const nav = document.getElementById('site-nav');
-  const main = document.getElementById('main');
-  const footer = document.getElementById('footer');
-  const wrapper = document.createElement('div');
-  const content = document.createElement('div');
-  wrapper.id = 'smooth-wrapper';
-  content.id = 'smooth-content';
-  main.before(wrapper);
-  wrapper.append(content);
-  content.append(main, footer);
-  document.documentElement.classList.add('has-scroll-smoother');
-
-  const smoother = ScrollSmoother.create({
-    wrapper,
-    content,
-    smooth: 1.15,
-    effects: false,
-    normalizeScroll: true,
-    smoothTouch: 0
-  });
-  const pins = [];
-  for (const id of sections) {
+  const scenes = [['hotels', .18], ...(conditions.tall ? [['journal', .13]] : []), ['moments', .16], ['membership', .13]];
+  const pins = scenes.map(([id, distance]) => {
     const section = document.getElementById(id);
     section.classList.add('motion-pinned');
-    const timeline = gsap.timeline({ paused: true }).fromTo(section,
+    const timeline = gsap.fromTo(section,
       { '--pin-progress': 0 },
-      { '--pin-progress': 1, duration: 1, ease: 'none' }
+      { '--pin-progress': 1, duration: 1, ease: 'none', paused: true }
     );
     const trigger = ScrollTrigger.create({
       trigger: section,
       pin: section,
       pinSpacing: true,
       start: () => `top top+=${nav.getBoundingClientRect().height}`,
-      end: () => `+=${Math.round(innerHeight * (id === 'moments' ? .62 : id === 'journal' ? .42 : .48))}`,
+      end: () => `+=${Math.round(Math.min(innerHeight * distance, 170))}`,
       animation: timeline,
-      scrub: 1,
+      scrub: true,
       anticipatePin: 1,
       invalidateOnRefresh: true
     });
-    pins.push({ section, timeline, trigger });
-  }
+    return { section, timeline, trigger };
+  });
   let disposed = false;
   const refresh = () => {
     if (!disposed) ScrollTrigger.refresh();
   };
+  const pendingImages = [...document.images].filter(image => !image.complete);
+  pendingImages.forEach(image => image.addEventListener('load', refresh, { once: true }));
   addEventListener('load', refresh, { once: true });
+  addEventListener('resize', refresh);
   document.fonts?.ready.then(refresh);
   requestAnimationFrame(refresh);
 
   return () => {
     disposed = true;
     removeEventListener('load', refresh);
+    removeEventListener('resize', refresh);
+    pendingImages.forEach(image => image.removeEventListener('load', refresh));
     pins.forEach(({ section, timeline, trigger }) => {
       trigger.kill(true);
       timeline.kill();
       section.classList.remove('motion-pinned');
       section.style.removeProperty('--pin-progress');
     });
-    smoother.kill();
-    wrapper.before(main, footer);
-    wrapper.remove();
-    document.documentElement.classList.remove('has-scroll-smoother');
     ScrollTrigger.refresh();
+  };
+});
+
+// The one textured orange surface grows a shallow curved leading edge as the
+// Offers section enters. It follows scroll directly and does not pin the page.
+media.add('(min-width: 961px) and (prefers-reduced-motion: no-preference)', () => {
+  const offers = document.getElementById('offers');
+  const tween = gsap.fromTo(offers, { '--swipe-height': '40px' }, {
+    '--swipe-height': '140px',
+    ease: 'none',
+    scrollTrigger: {
+      trigger: offers,
+      start: 'top bottom',
+      end: 'top 78%',
+      scrub: true,
+      invalidateOnRefresh: true
+    }
+  });
+  return () => {
+    tween.scrollTrigger?.kill();
+    tween.kill();
+    offers.style.removeProperty('--swipe-height');
   };
 });

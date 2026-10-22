@@ -28,8 +28,9 @@ function renderCity() {
     const span = endX - x;
     return [x,y,x + span * .2,y + (240-y) * .46,endX - span * .28,240 - (240-y) * .3,endX,240];
   });
-  routeHost.innerHTML = '<path class="city-route is-active" pathLength="1" />';
+  routeHost.innerHTML = '<defs><mask id="city-route-label-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse"><rect width="1600" height="240" fill="white"/><rect class="city-route-label-gap" fill="black" width="0" height="0"/></mask></defs><path class="city-route is-active" pathLength="1" mask="url(#city-route-label-mask)" />';
   const route = routeHost.querySelector('.city-route');
+  const routeGap = routeHost.querySelector('.city-route-label-gap');
   const reducedRouteMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let routeCurrent = null, routeTarget = null, routeFrame = 0, routeBend = 0;
   const routePath = values => `M ${values[0].toFixed(1)} ${values[1].toFixed(1)} C ${values[2].toFixed(1)} ${values[3].toFixed(1)}, ${values[4].toFixed(1)} ${values[5].toFixed(1)}, ${values[6].toFixed(1)} ${values[7].toFixed(1)}`;
@@ -67,7 +68,25 @@ function renderCity() {
   let committed = null;
   let hovered = null;
   let focused = null;
+  let visibleIndex = null;
+  const updateRouteMask = () => {
+    const label = visibleIndex == null ? null : waypoints[visibleIndex]?.querySelector('.city-label');
+    if (!label) { routeGap.setAttribute('width', '0'); return; }
+    const box = label.getBoundingClientRect();
+    const svg = routeHost.getBoundingClientRect();
+    if (!svg.width || !svg.height) return;
+    const gap = 7;
+    routeGap.setAttribute('x', ((box.left - svg.left - gap) / svg.width * 1600).toFixed(1));
+    routeGap.setAttribute('y', ((box.top - svg.top - gap / 2) / svg.height * 240).toFixed(1));
+    routeGap.setAttribute('width', ((box.width + gap * 2) / svg.width * 1600).toFixed(1));
+    routeGap.setAttribute('height', ((box.height + gap) / svg.height * 240).toFixed(1));
+  };
+  new ResizeObserver(updateRouteMask).observe(routeHost);
+  waypoints.forEach(point => new ResizeObserver(updateRouteMask).observe(point.querySelector('.city-label')));
+  addEventListener('resize', updateRouteMask);
+  document.fonts?.ready.then(updateRouteMask);
   const show = (index) => {
+    visibleIndex = index;
     const hotel = index == null ? null : cityHotels[index];
     const layoutIndex = index ?? 0;
     panels.forEach((panel, i) => {
@@ -84,6 +103,7 @@ function renderCity() {
       point.classList.toggle('is-active', active);
       point.setAttribute('aria-pressed', String(active));
     });
+    requestAnimationFrame(updateRouteMask);
     route.classList.toggle('is-active', hotel !== null);
     if (hotel) setRoute(index, hovered === index ? routeBend : 0);
     document.getElementById('hotel-location').textContent = hotel?.place || '';

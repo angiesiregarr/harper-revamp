@@ -1695,7 +1695,52 @@ html{scroll-padding-top:var(--top-nav-height)}
 @media(max-width:850px){.hotels{min-height:max(var(--city-available),100svh)}.hotels>.city-map{top:32px;width:min(86vw,600px)}}
 @media(prefers-reduced-motion:reduce){.city-waypoint .city-point,.city-waypoint .city-label{transition:none}}
 
-/* Country outlines echo the reference map while staying quiet behind the destinations. */
+/* Refinement: a complete map, one textured curved sheet, and lighter pins. */
+@media(min-width:851px){.city-waypoint,.city-waypoint.is-active{text-shadow:none}}
+.offers{isolation:isolate;overflow:visible}
+.offers::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:0;
+  right:0;
+  top:calc(0px - var(--swipe-height,140px));
+  bottom:0;
+  border-radius:50% 50% 0 0 / var(--swipe-height,140px) var(--swipe-height,140px) 0 0;
+  background:#f08b1d url('./assets/gradient-1.webp') center top / cover no-repeat;
+  pointer-events:none;
+}
+.offers-layout{position:relative;z-index:1}
+@media(max-width:960px),(prefers-reduced-motion:reduce){
+  .offers{overflow:clip}
+  .offers::before{display:none}
+}
+/* The paper clouds travel as part of the Reels section, including while pinned. */
+.harper-reels{margin-top:clamp(80px,9vw,120px);overflow:visible}
+.harper-reels>.journal-cloud-transition{
+  position:absolute;
+  z-index:0;
+  left:0;
+  right:0;
+  top:calc(-1 * clamp(110px,12vw,160px));
+  height:clamp(200px,22vw,310px);
+  margin:0;
+  pointer-events:none;
+}
+.harper-reels>.journal-cloud-transition::before{
+  animation:reels-cloud-sway 7s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes reels-cloud-sway{to{transform:translate3d(-24px,0,0)}}
+@media(max-width:650px){
+  .harper-reels{margin-top:75px}
+  .harper-reels>.journal-cloud-transition{top:-105px;height:200px}
+}
+@media(prefers-reduced-motion:reduce){
+  .harper-reels>.journal-cloud-transition::before{animation:none;will-change:auto}
+}
+
+/* Filled country silhouettes stay quiet behind the destinations. */
 .hotels{--city-map-alpha:.72}
 .hotels>.city-map{top:clamp(38px,6svh,64px);width:min(86vw,1050px);height:auto;max-width:none;opacity:var(--city-map-alpha);filter:none;mask-image:none}
 .city-heading::before{content:"";position:absolute;z-index:-1;inset:-48px 15% -38px;background:radial-gradient(ellipse at center,#f8f7f3 24%,#f8f7f3e8 47%,transparent 78%);pointer-events:none}
@@ -1706,10 +1751,18 @@ html{scroll-padding-top:var(--top-nav-height)}
   body.hero-city-handoff-enabled .hotels.motion-ready>.city-map{opacity:calc(var(--city-map-alpha) * var(--handoff-map,1) * var(--map-exit-opacity,1))}
 }
 @media(max-width:850px){.hotels{--city-map-alpha:.53}.hotels>.city-map{top:clamp(58px,9svh,86px);width:min(96vw,580px)}.city-heading::before{inset:-24px -8% -18px}}
+@media(min-width:851px){
+  .hotels>.city-map{
+    top:clamp(20px,3.2svh,32px);
+    width:min(86vw,1050px);
+    max-width:calc(100% - 44px);
+    height:auto;
+    object-fit:contain;
+  }
+}
 
-/* ScrollSmoother follows the document; the navigation stays anchored above it. */
-.has-scroll-smoother .site-nav{position:fixed;inset:0 0 auto;width:100%}
-.has-scroll-smoother #smooth-content{padding-top:var(--top-nav-height)}
+/* The document scrolls natively; short pins add only a small visual hold. */
+@media(min-width:961px){html{scroll-behavior:auto}}
 @media(prefers-reduced-motion:no-preference){
   .hotels.motion-pinned .hotel-content{translate:0 calc(-16px * var(--pin-progress,0))}
   .journal.motion-pinned .journal-book{translate:0 calc(-12px * var(--pin-progress,0))}

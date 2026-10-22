@@ -5,8 +5,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 // DOM adapter for React Bits AnimatedContent. The site keeps its existing DOM
 // because the Journal, city gallery, Reels, and phone own their click/drag state.
-// The same scroll timeline plays in either direction. A short scrub catch-up
-// keeps a single mouse-wheel step from skipping every visible in-between frame.
+// The same scroll timeline plays directly in either direction.
 const groups = [
   ['.offers-intro', ':scope > .section-kicker, :scope > h2, :scope > p:not(.section-kicker), :scope > .scroll-cue'],
   ['.offer-card', ':scope > .offer-body'],
@@ -55,7 +54,7 @@ function mount() {
         start: 'top 80%',
         end: 'top 0%',
         animation: timeline,
-        scrub: 1,
+        scrub: true,
         invalidateOnRefresh: true
       });
       owned.push({ trigger, timeline, targets });
