@@ -9,17 +9,50 @@
     {
       "url": "https://www.instagram.com/reel/DettYzjhQdQ/",
       "thumbnail": "./assets/reels/DettYzjhQdQ.jpg",
-      "alt": "60s to Tokyo mixed berry and basil drink \u2014 original favehotels Reel cover"
+      "alt": "60s to Tokyo mixed berry and basil drink \u2014 original favehotels Reel cover",
+      "video": "./assets/reels/DettYzjhQdQ.mp4"
     },
     {
       "url": "https://www.instagram.com/reel/DeeKFpoSKX7/",
       "thumbnail": "./assets/reels/DeeKFpoSKX7.jpg",
-      "alt": "Archipelago Black Box Battle Young Barista 2026 \u2014 original favehotels Reel cover"
+      "alt": "Archipelago Black Box Battle Young Barista 2026 \u2014 original favehotels Reel cover",
+      "video": "./assets/reels/DeeKFpoSKX7.mp4"
     },
     {
       "url": "https://www.instagram.com/reel/DebyfNCyBvp/",
       "thumbnail": "./assets/reels/DebyfNCyBvp.jpg",
-      "alt": "Archipelago Black Box Battle Young Pastry 2026 \u2014 original favehotels Reel cover"
+      "alt": "Archipelago Black Box Battle Young Pastry 2026 \u2014 original favehotels Reel cover",
+      "video": "./assets/reels/DebyfNCyBvp.mp4"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DelaylrBZLG/",
+      "thumbnail": "./assets/reels/DelaylrBZLG.jpg",
+      "video": "./assets/reels/DelaylrBZLG.mp4",
+      "alt": "favebanyumanik: \"Almost time to check in !"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DeOcStuot0j/",
+      "thumbnail": "./assets/reels/DeOcStuot0j.jpg",
+      "video": "./assets/reels/DeOcStuot0j.mp4",
+      "alt": "fave_hotellampung: Enjoy 20% off your room stay and 30% off Food & Beverage, up to IDR 500,000."
+    },
+    {
+      "url": "https://www.instagram.com/reel/DdyJr6Lx2TW/",
+      "thumbnail": "./assets/reels/DdyJr6Lx2TW.jpg",
+      "video": "./assets/reels/DdyJr6Lx2TW.mp4",
+      "alt": "fave_hotellampung: \ud83d\udccdFave+ Hotel Lampung"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DdsaG2uo6e8/",
+      "thumbnail": "./assets/reels/DdsaG2uo6e8.jpg",
+      "video": "./assets/reels/DdsaG2uo6e8.mp4",
+      "alt": "fave_hotellampung: \ud83d\udd25 BBQ NIGHT IS ON! \ud83d\udd25"
+    },
+    {
+      "url": "https://www.instagram.com/reel/DcP9f-BRhef/",
+      "thumbnail": "./assets/reels/DcP9f-BRhef.jpg",
+      "video": "./assets/reels/DcP9f-BRhef.mp4",
+      "alt": "fave_hotellampung: Hotel tercanggih di Bandar Lampung 2026 \ud83d\ude07"
     }
   ]
 }

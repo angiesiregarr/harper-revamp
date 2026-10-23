@@ -16,6 +16,14 @@
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
   let cards = [], items = [], state = 'idle';
+  let playbackPaused = false, playbackButton = null;
+  function syncPlayback() {
+    const playing = visible && !document.hidden && !playbackPaused;
+    for (const video of orbit.querySelectorAll('video')) {
+      if (playing) video.play().catch(() => { /* The poster and Instagram link remain available. */ });
+      else video.pause();
+    }
+  }
   let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0, currentSpread = 0;
   let holdElapsed = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
   let geometry = {x:0,y:0,w:0,h:0,titleShift:0,socialShift:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
@@ -66,8 +74,17 @@
       link.className = 'reels-card'; link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
       link.setAttribute('aria-label', item.preview ? `Browse Harper Reels on Instagram. Preview photo: ${item.alt}` : `Watch Reel on Instagram. Cover: ${item.alt}`);
       if (item.cover || item.thumbnail) {
-        const img = document.createElement('img'); img.src = item.cover || item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
-        link.append(img);
+        if (/^\.\/assets\/reels\/[\w-]+\.mp4$/.test(item.video || '')) {
+          const video = document.createElement('video');
+          video.muted = true; video.defaultMuted = true; video.autoplay = true; video.loop = true; video.playsInline = true;
+          video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
+          video.poster = item.cover || item.thumbnail; video.preload = 'metadata';
+          video.setAttribute('aria-hidden', 'true'); video.src = item.video;
+          link.classList.add('has-video'); link.append(video);
+        } else {
+          const img = document.createElement('img'); img.src = item.cover || item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
+          link.append(img);
+        }
         const badge = document.createElement('span');
         badge.className = 'reels-card-badge';
         badge.setAttribute('aria-hidden', 'true');
@@ -141,6 +158,17 @@
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
     renderCards();
+    if (orbit.querySelector('video')) {
+      playbackButton = document.createElement('button');
+      playbackButton.type = 'button'; playbackButton.className = 'reels-playback';
+      playbackButton.textContent = 'Pause videos'; playbackButton.setAttribute('aria-pressed', 'false');
+      playbackButton.addEventListener('click', () => {
+        playbackPaused = !playbackPaused;
+        playbackButton.textContent = playbackPaused ? 'Play videos' : 'Pause videos';
+        playbackButton.setAttribute('aria-pressed', String(playbackPaused)); syncPlayback();
+      });
+      stage.append(playbackButton);
+    }
     mobileControls = document.createElement('div');
     mobileControls.className = 'mobile-pager mobile-reels-controls';
     mobileControls.innerHTML = '<button type="button" data-reel-step="-1" aria-label="Previous moment">←</button><span aria-live="polite"></span><button type="button" data-reel-step="1" aria-label="Next moment">→</button>';
@@ -173,8 +201,8 @@
       if (!phone.matches && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
     });
     updateMobile();
-    const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio >= .25;if(visible)start();},{threshold:[0,.25]});observer.observe(stage);
-    document.addEventListener('visibilitychange',()=>{last=performance.now();});
+    const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio >= .25;if(visible)start();syncPlayback();},{threshold:[0,.25]});observer.observe(stage);
+    document.addEventListener('visibilitychange',()=>{last=performance.now();syncPlayback();});
     orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
     orbit.addEventListener('pointerout',e=>{if(e.target.closest('.reels-card') && !e.relatedTarget?.closest?.('.reels-card'))hover=false;});
     stage.addEventListener('focusin',()=>{focused=true;});stage.addEventListener('focusout',()=>{focused=stage.contains(document.activeElement);});
