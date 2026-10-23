@@ -803,7 +803,7 @@ function setupHeroCityHandoff() {
     document.body.style.setProperty('--handoff-hero-title', (1 - .9 * phase(.06, .36, progress)).toFixed(4));
     document.body.style.setProperty('--handoff-hero-rise', `${(-20 * phase(.06, .36, progress)).toFixed(2)}px`);
     document.body.style.setProperty('--handoff-orbit', (1 - .86 * phase(.28, .76, progress)).toFixed(4));
-    city.style.setProperty('--handoff-heading', phase(.54, .79, progress).toFixed(4));
+    city.style.setProperty('--handoff-heading', (mobile ? phase(.20, .40, progress) : phase(.54, .79, progress)).toFixed(4));
     city.style.setProperty('--handoff-map', phase(.48, .86, progress).toFixed(4));
     city.style.setProperty('--handoff-neighbors', phase(.68, .93, progress).toFixed(4));
     city.style.setProperty('--handoff-caption', phase(.78, .98, progress).toFixed(4));
@@ -812,7 +812,7 @@ function setupHeroCityHandoff() {
     city.style.setProperty('--handoff-real-card', (mobile ? phase(.64, .9, progress) : phase(.94, 1, progress)).toFixed(4));
     city.style.setProperty('--handoff-mobile-scale', (1 - .07 * (1 - phase(.6, .93, progress))).toFixed(4));
     city.querySelectorAll('.city-waypoint').forEach((waypoint, index) => {
-      waypoint.style.setProperty('--handoff-label', phase(.62 + index * .012, .84 + index * .012, progress).toFixed(4));
+      waypoint.style.setProperty('--handoff-label', (mobile ? phase(.28 + index * .008, .48 + index * .008, progress) : phase(.62 + index * .012, .84 + index * .012, progress)).toFixed(4));
     });
     if (!inFlight || mobile) { layer.style.display = 'none'; return; }
     const travel = phase(.06, .94, progress);
