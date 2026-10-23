@@ -16,14 +16,15 @@
     <script>document.documentElement.classList.add('js','hero-intro-pending');try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&(!location.hash||new URLSearchParams(location.search).get('entrance')==='replay'))document.documentElement.classList.add('entrance-pending')}catch{document.documentElement.classList.add('entrance-pending')}setTimeout(()=>document.documentElement.classList.remove('entrance-pending'),6500)</script>
     <script src="./entrance.js?v=7815b5f6d0bd" defer></script>
     <script src="./reels.js?v=12c2c4445bf9" defer></script>
-    <script src="./main.js?v=a5d6676899b7" defer></script>
+    <script src="./main.js?v=95cd356c5805" defer></script>
     <link rel="stylesheet" href="./hero-carousel.css?v=7a18a2113b70" />
-    <script src="./hero-carousel.js?v=53458c3373e9" defer></script>
+    <script src="./hero-carousel.js?v=869f5fc52a6a" defer></script>
     <script src="./offers-pixel.js?v=390e9c7feeec" defer></script>
     <script src="./scroll-blur.js?v=80516a4420b1" defer></script>
     <script src="./animated-content.js?v=e0dda09228a5" defer></script>
     <script src="./section-motion.js?v=ae7760302961" defer></script>
     <link rel="stylesheet" href="./mobile-layout.css?v=e2281b5f8414" />
+    <link rel="stylesheet" href="./hero-contour.css?v=4f66227624de" />
     <script src="./mobile-layout.js?v=b6e73b2132f3" defer></script>
   </head>
   <body>
@@ -53,16 +54,14 @@
         <a class="nav-book" href="#booking-form" data-booking-open>Book Now <span aria-hidden="true">↗</span></a>
       </div>
     <main id="main">
-      <section class="hero hero-orbit-stage" aria-labelledby="hero-title">
-        <div class="hero-rattan hero-rattan-left" aria-hidden="true"></div>
-        <div class="hero-rattan hero-rattan-top" aria-hidden="true"></div>
-        <div class="hero-rattan hero-rattan-bottom" aria-hidden="true"></div>
-        <div class="hero-rattan-line hero-rattan-left" aria-hidden="true"></div>
-        <div class="hero-rattan-line hero-rattan-top" aria-hidden="true"></div>
-        <div class="hero-rattan-line hero-rattan-bottom" aria-hidden="true"></div>
-        <img class="hero-palm hero-palm-left" src="./assets/palm-shadow.svg" alt="" aria-hidden="true" />
-        <img class="hero-palm hero-palm-right" src="./assets/palm-shadow.svg" alt="" aria-hidden="true" />
-        <div class="hero-city-fade" aria-hidden="true"></div>
+      <section class="hero hero-orbit-stage hero-contour" aria-labelledby="hero-title">
+        <div class="hero-atmosphere" aria-hidden="true">
+          <div class="hero-clouds"></div>
+          <img class="hero-contours hero-contours-top" src="./assets/hero-contours.svg" alt="" />
+          <img class="hero-contours hero-contours-bottom" src="./assets/hero-contours.svg" alt="" />
+          <img class="hero-palm hero-palm-left" src="./assets/palm-shadow.svg" alt="" />
+          <div class="hero-paper"></div>
+        </div>
         <div class="hero-heading"><h1 id="hero-title"><span id="hero-title-line-one">Come Home</span><span id="hero-title-line-two">to Harmony</span></h1></div>
         <div class="hero-orbit" id="hero-orbit" aria-label="Explore Harper hotel rooms"></div>
         <div class="hero-booking" role="search" aria-label="Find a Harper stay">

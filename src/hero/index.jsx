@@ -18,40 +18,28 @@ const rooms = [
 
 const mod = (value, length) => ((value % length) + length) % length;
 const mix = (a, b, t) => a + (b - a) * t;
-const fanEase = value => {
-  // cubic-bezier(.42, 0, .2, 1), solved by the x coordinate.
-  let low = 0, high = 1;
-  for (let i = 0; i < 12; i++) {
-    const t = (low + high) / 2;
-    const x = 3 * .42 * t * (1 - t) * (1 - t) + 3 * .2 * t * t * (1 - t) + t * t * t;
-    if (x < value) low = t; else high = t;
-  }
-  const t = (low + high) / 2;
-  return 3 * t * t * (1 - t) + t * t * t;
-};
-
 // The near, outer and far points form one closed oval. Hidden top points let
 // cards travel behind the headline without appearing over the lettering.
 function makeGeometry(width, height) {
   const mobile = width < 640, tablet = width < 1050;
-  const frontWidth = mobile ? Math.min(width * .76, 390) : tablet ? Math.min(width * .57, 510) : Math.min(width * .36, 600);
-  const frontHeight = mobile ? 235 : tablet ? 285 : height < 820 ? 270 : 312;
-  const nearX = width * (mobile ? .33 : tablet ? .39 : .30);
-  const outerX = width * (mobile ? .52 : tablet ? .47 : .42);
+  const frontWidth = mobile ? Math.min(width * .78, 390) : tablet ? Math.min(width * .57, 510) : Math.min(width * .35, 620);
+  const frontHeight = mobile ? 222 : tablet ? 285 : Math.min(height * .36, 356);
+  const nearX = width * (mobile ? .46 : tablet ? .39 : .29);
+  const outerX = width * (mobile ? .70 : tablet ? .47 : .355);
   const upperX = width * (mobile ? .29 : tablet ? .31 : .235);
   const visibleOuter = mobile ? 0 : 1;
-  const visibleUpper = mobile || tablet ? 0 : 1;
+  const visibleUpper = 0;
   const points = [
     [0, 0, frontWidth, frontHeight, 1],
-    [nearX, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, 1],
-    [outerX, -65, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
+    [nearX, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 158 : tablet ? 185 : 260, 1],
+    [outerX, -50, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
     [upperX, mobile ? -100 : -108, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
     [width * .12, mobile ? -119 : -137, 100, 86, 0],
     [0, mobile ? -125 : -145, 100, 86, 0],
     [-width * .12, mobile ? -119 : -137, 100, 86, 0],
     [-upperX, mobile ? -100 : -108, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
-    [-outerX * .93, -65, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
-    [-nearX * 1.04, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, 1],
+    [-outerX, -50, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
+    [-nearX, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 158 : tablet ? 185 : 260, 1],
   ];
   const sample = phase => {
     const t = mod(phase, points.length), i = Math.floor(t), u = t - i;
@@ -99,30 +87,23 @@ function RusticOrbit() {
     let geometry, distance = 0, lastTime = 0, frame, move = null, currentActive = 0;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let introState = motion.matches ? 'done' : 'waiting', introStart = 0;
-    const introLength = (rooms.length - 1) * 80 + 650;
+    const introLength = 650;
     const paint = (phase, now = performance.now()) => {
       const nearest = mod(Math.round(phase), rooms.length);
       if (nearest !== currentActive) { currentActive = nearest; setActive(nearest); window.dispatchEvent(new Event('harper:hero-change')); }
       cardRefs.current.forEach((card, index) => {
         if (!card) return;
         const targetPosition = mod(index - phase, rooms.length);
-        const introProgress = introState === 'done' ? 1 : introState === 'waiting' ? 0
-          : fanEase(Math.min(1, Math.max(0, (now - introStart - index * 80) / 650)));
-        const shortPath = targetPosition > rooms.length / 2 ? targetPosition - rooms.length : targetPosition;
-        const pathPosition = mod(shortPath * introProgress, rooms.length);
+        const progress = introState === 'done' ? 1 : introState === 'waiting' ? 0
+          : Math.min(1, Math.max(0, (now - introStart) / introLength));
+        const introProgress = 1 - Math.pow(1 - progress, 3);
         const shortest = Math.min(targetPosition, rooms.length - targetPosition);
-        const [x, y, width, height, opacity] = geometry.sample(pathPosition);
-        const orbitWidth = orbitRef.current.clientWidth;
-        const edgeRoom = Math.max(0, orbitWidth / 2 - width / 2 - (orbitWidth < 640 ? 8 : 12));
-        const safeX = orbitWidth <= 1050 ? Math.max(-edgeRoom, Math.min(edgeRoom, x)) : x;
+        const [x, y, width, height, opacity] = geometry.sample(targetPosition);
+        const safeX = x;
         card.style.width = `${width}px`;
         card.style.height = `${height}px`;
-        card.style.transform = `translate(-50%,-50%) translate(${safeX}px,${y}px)`;
-        // Keep the card surface solid while it crosses the left woven arc.
-        const leftEdge = orbitWidth / 2 + safeX - width / 2;
-        const rattanOpacity = orbitWidth < 640 && safeX < 0
-          ? Math.max(0, Math.min(1, (98 - leftEdge) / 30)) : 0;
-        const visibleOpacity = Math.max(opacity, rattanOpacity);
+        card.style.transform = `translate(-50%,-50%) translate(${safeX}px,${y + (1 - introProgress) * 16}px)`;
+        const visibleOpacity = opacity;
         card.style.opacity = String(visibleOpacity * introProgress);
         card.style.zIndex = String(20 - Math.round(shortest * 2));
         const featured = index === nearest;
@@ -141,6 +122,7 @@ function RusticOrbit() {
       const { width } = orbitRef.current.getBoundingClientRect();
       geometry = makeGeometry(width, window.innerHeight);
       distance = distanceAt(phase, geometry);
+      orbitRef.current.style.setProperty('--featured-width', `${geometry.sample(0)[2]}px`);
       paint(phase);
     };
     const moveTo = target => {
@@ -182,7 +164,7 @@ function RusticOrbit() {
         changed = true;
         if (ratio === 1) move = null;
       } else if (introState === 'done' && !motion.matches && !document.hidden && !document.body.classList.contains('handoff-in-flight') && !Object.values(paused.current).some(Boolean)) {
-        distance += 28 * elapsed; changed = true; // CSS pixels of arc length per second.
+        distance += 18 * elapsed; changed = true; // CSS pixels of arc length per second.
       }
       if (changed) paint(phaseAt(distance, geometry));
       frame = requestAnimationFrame(tick);
@@ -233,6 +215,11 @@ function RusticOrbit() {
         }
         touch.current = null;
       }}>
+      <svg className="rustic-orbit__path" viewBox="0 0 1672 350" preserveAspectRatio="none" aria-hidden="true">
+        <ellipse cx="836" cy="175" rx="680" ry="158" />
+        <circle cx="302" cy="77" r="4" /><circle cx="1370" cy="77" r="4" />
+        <circle cx="474" cy="309" r="4" /><circle cx="1198" cy="309" r="4" />
+      </svg>
       {rooms.map((room, index) => <button type="button" key={index} ref={element => { cardRefs.current[index] = element; }}
         className="rustic-orbit__card"
         onClick={() => controller.current?.select(index)}
@@ -243,7 +230,13 @@ function RusticOrbit() {
         <img src={room.src} alt={room.alt} style={{ objectPosition: room.position }} draggable="false" loading="eager" />
         {index === active && <span className="rustic-orbit__caption" aria-hidden="true"><span className="rustic-orbit__hotel"><svg className="rustic-orbit__pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M19 9c0 5-7 12-7 12S5 14 5 9a7 7 0 0 1 14 0Z"/><circle cx="12" cy="9" r="2.3"/></svg><span><small>{room.place}, Indonesia</small><strong>{room.hotel}</strong></span></span></span>}
       </button>)}
-      <span className="visually-hidden" aria-live="polite">Featured room: {rooms[active].hotel}, {rooms[active].place}. Use left and right arrow keys or select a surrounding room.</span>
+      <button className="hero-orbit-arrow hero-orbit-prev" type="button" aria-label="Previous room" onClick={() => controller.current?.step(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7" /></svg></button>
+      <button className="hero-orbit-arrow hero-orbit-next" type="button" aria-label="Next room" onClick={() => controller.current?.step(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7" /></svg></button>
+      <div className="hero-orbit-pagination" role="group" aria-label="Choose a room">
+        <span className="hero-orbit-count" aria-live="off">{String(active + 1).padStart(2, '0')} / {String(rooms.length).padStart(2, '0')}</span>
+        <div className="hero-orbit-dots">{rooms.map((room, index) => <button type="button" key={index} aria-label={`Go to room ${index + 1}: ${room.hotel}`} aria-current={index === active ? 'true' : undefined} onClick={() => controller.current?.select(index)}><span /></button>)}</div>
+      </div>
+      <span className="visually-hidden" aria-live="off">Featured room: {rooms[active].hotel}, {rooms[active].place}. Use left and right arrow keys or select a surrounding room.</span>
     </div>
   );
 }
@@ -252,119 +245,23 @@ const mount = document.getElementById('hero-orbit');
 if (mount) createRoot(mount).render(<RusticOrbit />);
 
 function setupHeroIntro() {
-  const hero = document.querySelector('.hero-orbit-stage');
+  const hero = document.querySelector('.hero-contour');
   if (!hero || !mount) return;
-  const heading = hero.querySelector('.hero-heading');
-  const booking = hero.querySelector('.hero-booking');
-  const orbit = hero.querySelector('.hero-orbit');
-  const palms = [hero.querySelector('.hero-palm-left'), hero.querySelector('.hero-palm-right')];
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  const lines = [document.getElementById('hero-title-line-one'), document.getElementById('hero-title-line-two')];
-  const segments = lines.map(line => {
-    const value = line.textContent;
-    const chars = typeof Intl.Segmenter === 'function'
-      ? Array.from(new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(value), item => item.segment)
-      : Array.from(value);
-    line.textContent = '';
-    const measure = document.createElement('span');
-    measure.className = 'hero-title-measure';
-    measure.setAttribute('aria-hidden', 'true');
-    measure.textContent = value;
-    const visible = document.createElement('span');
-    visible.className = 'hero-title-typed';
-    visible.setAttribute('aria-hidden', 'true');
-    line.append(measure, visible);
-    return { chars, visible };
-  });
-  hero.querySelector('h1').setAttribute('aria-label', 'Come Home to Harmony');
-  heading.classList.add('hero-intro-prepared');
-  let orbitReady = Boolean(window.__harperOrbitReady), started = false, orbitStarted = false, completed = false, startTime = 0;
-  let orbitObserver, titleFrame;
-  const timers = [];
-  const schedule = (time, action) => timers.push(setTimeout(action, Math.max(0, startTime + time - performance.now())));
-  const fillTitle = () => segments.forEach(({ chars, visible }) => { visible.textContent = chars.join(''); });
-  const finish = () => {
-    if (completed) return;
-    completed = true;
-    document.documentElement.classList.remove('hero-intro-pending');
-    hero.classList.add('hero-intro-complete');
-  };
-  const revealBooking = () => {
-    if (booking.classList.contains('hero-intro-revealed')) return;
-    booking.classList.add('hero-intro-revealed');
-    setTimeout(finish, motion.matches ? 0 : Math.max(600, startTime + 1700 - performance.now()));
-  };
-  const onOrbitComplete = () => { if (started) setTimeout(revealBooking, 120); };
-  window.addEventListener('harper:hero-orbit-complete', onOrbitComplete, { once: true });
-  const startOrbit = () => {
-    if (orbitStarted) return;
-    orbitStarted = true;
-    orbitObserver?.disconnect();
-    window.dispatchEvent(new Event('harper:hero-orbit-start'));
-  };
-  const waitForOrbit = () => {
-    const bounds = orbit.getBoundingClientRect();
-    const visible = Math.max(0, Math.min(bounds.bottom, innerHeight) - Math.max(bounds.top, 0));
-    if (visible >= bounds.height * .5) return startOrbit();
-    orbitObserver = new IntersectionObserver(([entry]) => {
-      if (entry.intersectionRatio >= .5) startOrbit();
-    }, { threshold: .5 });
-    orbitObserver.observe(orbit);
-  };
-  const typeTitle = () => {
-    const firstLength = segments[0].chars.length;
-    const total = firstLength + segments[1].chars.length;
-    const caret = document.createElement('span');
-    caret.className = 'hero-type-caret';
-    caret.setAttribute('aria-hidden', 'true');
-    const begin = performance.now();
-    let lastCount = -1;
-    const draw = now => {
-      const count = Math.min(total, Math.floor((now - begin) / 1050 * total));
-      if (count !== lastCount) {
-        lastCount = count;
-        segments[0].visible.textContent = segments[0].chars.slice(0, Math.min(count, firstLength)).join('');
-        segments[1].visible.textContent = segments[1].chars.slice(0, Math.max(0, count - firstLength)).join('');
-        if (count > firstLength && count < total) segments[1].visible.append(caret);
-      }
-      if (count < total) titleFrame = requestAnimationFrame(draw);
-      else { segments[1].visible.append(caret); caret.classList.add('is-fading'); setTimeout(() => caret.remove(), 150); }
-    };
-    titleFrame = requestAnimationFrame(draw);
-  };
-  const start = () => {
-    if (started || !orbitReady || document.documentElement.classList.contains('entrance-pending')) return;
+  let started = false, ready = Boolean(window.__harperOrbitReady), timer;
+  const reveal = () => {
+    if (started || !ready || document.documentElement.classList.contains('entrance-pending')) return;
     started = true;
-    startTime = performance.now();
-    if (motion.matches) {
-      fillTitle();
-      palms.forEach(palm => palm.classList.add('hero-intro-revealed'));
-      window.dispatchEvent(new Event('harper:hero-orbit-start'));
-      revealBooking();
-      return;
-    }
-    schedule(100, typeTitle);
-    schedule(380, () => palms[0].classList.add('hero-intro-revealed'));
-    schedule(650, () => palms[1].classList.add('hero-intro-revealed'));
-    schedule(550, waitForOrbit);
+    document.documentElement.classList.remove('hero-intro-pending');
+    hero.classList.add('hero-intro-revealed');
+    window.dispatchEvent(new Event('harper:hero-orbit-start'));
+    timer = setTimeout(() => hero.classList.add('hero-intro-complete'), motion.matches ? 0 : 750);
   };
-  const checkStart = () => requestAnimationFrame(start);
-  const handoff = new MutationObserver(checkStart);
-  handoff.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-  window.addEventListener('harper:hero-orbit-ready', () => { orbitReady = true; checkStart(); }, { once: true });
-  checkStart();
-  hero.addEventListener('focusin', event => {
-    if (!started || completed) return;
-    if (orbit.contains(event.target)) startOrbit();
-    if (booking.contains(event.target)) revealBooking();
-  });
-  booking.addEventListener('pointerdown', () => { if (started && !completed) revealBooking(); }, { passive: true });
-  addEventListener('pagehide', () => {
-    cancelAnimationFrame(titleFrame);
-    timers.forEach(clearTimeout);
-    orbitObserver?.disconnect();
-    handoff.disconnect();
-  }, { once: true });
+  const observer = new MutationObserver(reveal);
+  observer.observe(document.documentElement, {attributes:true,attributeFilter:['class']});
+  const onReady = () => { ready = true; reveal(); };
+  window.addEventListener('harper:hero-orbit-ready', onReady, {once:true});
+  reveal();
+  addEventListener('pagehide', () => { observer.disconnect(); clearTimeout(timer); window.removeEventListener('harper:hero-orbit-ready', onReady); }, {once:true});
 }
-
 setupHeroIntro();
