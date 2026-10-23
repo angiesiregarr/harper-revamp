@@ -1,4 +1,4 @@
-/* Harper Reels. User-supplied permalinks; local editorial covers are not Reel stills. */
+/* Reels gallery. Verified Instagram clips and original covers: data/reels-sources.json. */
 (() => {
   const section = document.getElementById('moments');
   if (!section) return;
@@ -64,7 +64,7 @@
     cards = items.map((item,i) => {
       const link = document.createElement('a');
       link.className = 'reels-card'; link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-      link.setAttribute('aria-label', item.preview ? `Browse Harper Reels on Instagram. Preview photo: ${item.alt}` : `Watch Harper Reel on Instagram. Preview photo: ${item.alt}`);
+      link.setAttribute('aria-label', item.preview ? `Browse Harper Reels on Instagram. Preview photo: ${item.alt}` : `Watch Reel on Instagram. Cover: ${item.alt}`);
       if (item.cover || item.thumbnail) {
         const img = document.createElement('img'); img.src = item.cover || item.thumbnail; img.alt = item.alt; img.loading = i < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
         link.append(img);
