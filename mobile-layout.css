@@ -145,3 +145,26 @@
   .mobile-city-controls input:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
 }
 @media(max-width:700px){.hotels .city-waypoint:not(.is-active) .city-label{color:#62666a;transform:none}}
+/* A tactile cover and orange edge block around the existing one-story phone view. */
+@media(max-width:700px){
+ .mobile-journal-book{position:relative;isolation:isolate;padding:12px 20px 14px 18px;margin:0 0 9px 9px;background:#d6c8b4;border:1px solid #b9ad99;border-radius:3px 10px 10px 3px;perspective:1100px;box-shadow:3px 3px 0 #eee7d9,5px 5px 0 #c7bba8,7px 7px 0 #f1eadc}
+ .mobile-journal-book::before{content:'HARPER JOURNAL';position:absolute;z-index:5;left:-10px;top:-1px;bottom:-1px;width:20px;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;transform:rotate(180deg);background:linear-gradient(90deg,#262521,#56534c,#302f2a);border-radius:0 4px 4px 0;color:#e8dfcb;font:700 8px var(--sans);letter-spacing:.16em;pointer-events:none}
+ .mobile-journal-cover{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:22px;padding:34px 28px 30px 30px;text-align:left;color:#fff9ed;border:1px solid #a8aaa7;border-radius:3px 9px 9px 3px!important;background:repeating-linear-gradient(120deg,transparent 0 17px,#fff9ed20 17px 18px),linear-gradient(110deg,#686b6d,#929493);transform-origin:left center;backface-visibility:hidden;box-shadow:inset 5px 0 10px #0002;cursor:pointer}
+ .mobile-journal-cover[hidden]{display:none}
+ .mobile-journal-cover::before{content:'';position:absolute;inset:12px 12px 12px 18px;border:1px solid #fff9ed70;pointer-events:none}
+ .mobile-journal-cover img{width:165px;max-width:90%;height:auto;position:relative}
+ .mobile-cover-title{font:400 clamp(46px,14vw,65px)/.98 var(--serif);letter-spacing:-.05em;position:relative}
+ .mobile-cover-description{font:400 12px/1.5 var(--sans);position:relative}
+ .mobile-cover-open{font:700 11px/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;position:relative;display:flex;align-items:center;gap:12px;min-height:44px}
+ .mobile-journal-cover:focus-visible{outline:3px solid var(--orange);outline-offset:4px}
+ .mobile-journal-edge{position:absolute;z-index:6;top:0;bottom:0;right:8px;width:7px;background:linear-gradient(90deg,#c96c14,var(--orange) 45%,#ffa94f 70%,#ca6a14);box-shadow:1px 0 2px #52341b40;border-radius:2px;pointer-events:none}
+ .mobile-journal-story{border-color:#d7cbb970}
+ .mobile-story-copy{padding:14px 12px}
+ .mobile-story-meta{font-size:9px;gap:5px}
+ .mobile-journal-controls{column-gap:5px;grid-template-columns:1fr auto 1fr}
+ .mobile-journal-controls button{padding-inline:6px;font-size:10px}
+ .mobile-journal-content{position:relative;min-width:0}
+ .mobile-journal-book.is-open .mobile-journal-content{animation:mobile-story-in .24s ease-out}
+ .journal .journal-page-forward{display:none}
+}
+@media(prefers-reduced-motion:reduce){.mobile-journal-book.is-open .mobile-journal-content{animation:none}}

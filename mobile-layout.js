@@ -42,7 +42,41 @@
   const controls = document.createElement('div');
   controls.className = 'mobile-pager mobile-journal-controls';
   controls.innerHTML = '<button type="button" data-story-step="-1">← Previous</button><span aria-live="polite"></span><button type="button" data-story-step="1">Next story →</button>';
-  region.append(slides, controls);
+  const frame = document.createElement('div');
+  frame.className = 'mobile-journal-book';
+  const content = document.createElement('div');
+  content.className = 'mobile-journal-content';
+  content.inert = true;
+  content.setAttribute('aria-hidden','true');
+  content.append(slides, controls);
+  const cover = document.createElement('button');
+  cover.type = 'button';
+  cover.className = 'mobile-journal-cover';
+  cover.setAttribute('aria-label','Open the Harper Journal');
+  cover.innerHTML = '<img src="./assets/harper-logo-white.png" alt="Harper by Aston" /><span class="mobile-cover-title">The<br>Journal</span><span class="mobile-cover-description">Something new at Harper.<br>Stories worth staying for.</span><span class="mobile-cover-open">Tap to open <span aria-hidden="true">↗</span></span>';
+  const edge = document.createElement('span');
+  edge.className = 'mobile-journal-edge';
+  edge.setAttribute('aria-hidden','true');
+  frame.append(content,cover,edge);
+  region.append(frame);
+  let opening = false, coverMotion = null;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  cover.addEventListener('click', async () => {
+    if (opening || cover.hidden) return;
+    opening = true;
+    if (!reduced.matches) {
+      coverMotion = cover.animate([{transform:'rotateY(0deg)',opacity:1},{transform:'rotateY(-105deg)',opacity:0}],{duration:520,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
+      try { await coverMotion.finished; } catch {}
+    }
+    cover.hidden = true;
+    coverMotion?.cancel();
+    content.inert = false;
+    content.removeAttribute('aria-hidden');
+    frame.classList.add('is-open');
+    controls.querySelector('[data-story-step="1"]').focus({preventScroll:true});
+    opening = false;
+  });
+  reduced.addEventListener('change', () => { if (reduced.matches) coverMotion?.finish(); });
   book.before(region);
   let current = 0, touch = null, suppressClickUntil = 0;
   function show(index) {

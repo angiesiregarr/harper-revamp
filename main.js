@@ -231,6 +231,13 @@ function setupNews() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = matchMedia('(max-width: 700px)');
   const spreads = [];
+  const forward = document.createElement('button');
+  forward.type = 'button';
+  forward.className = 'journal-page-forward';
+  forward.setAttribute('aria-label', 'Next journal spread');
+  forward.innerHTML = '<span aria-hidden="true">›</span>';
+  book.append(forward);
+  let lastPointer = null;
   let current = 0, opening = false, coverAnimation = null, pageAnimation = null;
   book.classList.add('journal-simple');
   // All stories share the same editorial row; each leaf holds up to two.
@@ -281,9 +288,29 @@ function setupNews() {
     previous.disabled = current === 0 || !book.classList.contains('is-open');
     next.disabled = current === spreads.length - 1 || !book.classList.contains('is-open');
     if (animate && !reduced.matches) pageAnimation = spreads[current].animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'cubic-bezier(.22,1,.36,1)'});
+    forward.hidden = current === spreads.length - 1 || !book.classList.contains('is-open');
+    updateCursor();
     measure();
   }
   function hideCursor() { cursor?.classList.remove('is-visible'); section.classList.remove('has-journal-cursor'); }
+  function canAdvance(target) {
+    return book.classList.contains('is-open') && !mobile.matches && current < spreads.length - 1 &&
+      (target.closest('.journal-page-forward') || (book.contains(target) && !target.closest('a,button,input,select,textarea')));
+  }
+  function updateCursor() {
+    if (!cursor || !lastPointer || mobile.matches || reduced.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) { hideCursor(); return; }
+    const {x,y} = lastPointer;
+    const target = document.elementFromPoint(x,y);
+    if (!target || !(book.classList.contains('is-closed') && target.closest('.journal-cover')) && !canAdvance(target) && !(target.closest('#journal-next') && !next.disabled)) { hideCursor(); return; }
+    cursor.style.transform = `translate3d(${x}px,${y}px,0)`;
+    cursor.querySelector('.journal-drag-label').style.transform = `translate(${x > innerWidth - 145 ? -127 : 30}px,8px)`;
+    cursor.classList.add('is-visible');
+    section.classList.add('has-journal-cursor');
+  }
+  book.addEventListener('click', event => {
+    if (!canAdvance(event.target) || window.getSelection()?.toString()) return;
+    show(current + 1, true);
+  });
   async function open(immediate = false) {
     if (opening || book.classList.contains('is-open')) return;
     opening = true;
@@ -317,15 +344,12 @@ function setupNews() {
   if (cursor) {
     document.body.append(cursor);
     cursor.querySelector('.journal-drag-label').textContent = 'Click me';
-    const fine = matchMedia('(hover: hover) and (pointer: fine)');
     section.addEventListener('pointermove', event => {
-      if (!fine.matches || reduced.matches || !book.classList.contains('is-closed') || !event.target.closest('.journal-cover')) { hideCursor(); return; }
-      cursor.style.transform = `translate3d(${event.clientX}px,${event.clientY}px,0)`;
-      cursor.querySelector('.journal-drag-label').style.transform = `translate(${event.clientX > innerWidth - 145 ? -127 : 30}px,8px)`;
-      cursor.classList.add('is-visible');
-      section.classList.add('has-journal-cursor');
+      lastPointer = {x:event.clientX,y:event.clientY};
+      updateCursor();
     }, {passive:true});
-    section.addEventListener('pointerleave', hideCursor);
+    section.addEventListener('pointerleave', () => { lastPointer = null; hideCursor(); });
+    addEventListener('scroll', hideCursor, {passive:true});
   }
   addEventListener('resize', measure);
   new ResizeObserver(measure).observe(nav);
