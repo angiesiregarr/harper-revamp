@@ -1888,3 +1888,33 @@ html{scroll-padding-top:var(--top-nav-height)}
 .reels-playback{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);z-index:201;border:1px solid #fff8ed99;border-radius:20px;background:#45474bcc;color:#fff8ed;padding:9px 16px;font:700 11px var(--sans);cursor:pointer}
 .reels-playback:focus-visible{outline:3px solid var(--orange);outline-offset:4px}
 @media(max-width:700px){.reels-playback{position:relative;inset:auto;transform:none;order:3;align-self:center;margin-top:12px}}
+
+/* Linen and timber: a quieter rustic material study for the Hero. */
+.hero.hero-orbit-stage{background:#faf4ea url('./assets/hero-linen.svg') repeat;background-size:80px 80px}
+.hero-orbit-stage .hero-rattan{aspect-ratio:auto;width:250px;height:440px;border-radius:8px;background:#dbc49e url('./assets/hero-timber.svg') repeat;background-size:96px 240px;opacity:.42;filter:none;mask-image:linear-gradient(90deg,#000 35%,#0009 75%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 35%,#0009 75%,transparent);clip-path:polygon(0 0,100% 0,100% 30%,83% 30%,83% 64%,65% 64%,65% 100%,0 100%)}
+.hero-orbit-stage .hero-rattan-left{left:-90px;top:20%;transform:rotate(-7deg)}
+.hero-orbit-stage .hero-rattan-top{width:300px;height:180px;right:-80px;top:-55px;transform:rotate(8deg);mask-image:linear-gradient(180deg,#000,transparent);-webkit-mask-image:linear-gradient(180deg,#000,transparent)}
+.hero-orbit-stage .hero-rattan-bottom{width:330px;height:170px;right:-70px;bottom:-45px;transform:rotate(-6deg);mask-image:linear-gradient(0deg,#000,transparent);-webkit-mask-image:linear-gradient(0deg,#000,transparent)}
+.hero-orbit-stage .hero-rattan-line{display:none}
+.hotels .city-constellation{margin-top:clamp(30px,3.8vw,48px)}
+.prism-footer{align-items:center}
+.prism-footer .prism-arrow{display:grid;place-items:center;align-self:center;justify-self:center;padding:0;margin:0;line-height:1;transform:none}
+.prism-arrow>span{display:block;line-height:1;translate:0 -1px}
+
+/* One short cover flip; the opened book uses equal, click-paged news rows. */
+.journal-simple .journal-cover,.journal-simple.is-closed .journal-elastic,.journal-simple.is-closed .journal-bookmark{animation:none!important}
+.journal-simple.is-opening .journal-page>*{animation:none!important;opacity:1!important}
+.journal-simple.is-closed .journal-cover{cursor:pointer}
+.journal-simple .journal-page{display:flex;flex-direction:column;min-height:0}
+.journal-simple .journal-page-rule{flex:none;margin:0 0 12px;padding:8px 0;font-size:9px;letter-spacing:.07em}
+.journal-simple .journal-story-list{display:grid;grid-template-rows:repeat(2,minmax(0,1fr));gap:16px;flex:1;min-height:0}
+.news-section .journal-simple .journal-story-list .news-card.journal-supporting-story{display:grid!important;grid-template-columns:36% minmax(0,1fr);gap:18px;width:100%;height:100%;margin:0;padding:8px 0!important;align-self:start;min-height:0}
+.news-section .journal-simple .journal-supporting-story .news-photo{height:100%;max-height:160px;aspect-ratio:auto}
+.news-section .journal-simple .journal-supporting-story .news-photo img{width:100%;height:100%;object-fit:cover}
+.news-section .journal-simple .journal-supporting-story .news-copy{padding:0}
+.news-section .journal-simple .journal-supporting-story h3{font-size:clamp(15px,1.2vw,18px);line-height:1.22;height:auto;min-height:0}
+.news-section .journal-simple .journal-supporting-story .news-excerpt{font-size:12px;line-height:1.4}
+.journal-simple .journal-folio{margin-top:12px;flex:none}
+@media(min-width:701px) and (max-width:1100px){.journal-simple{height:600px}.journal-simple .journal-spread,.journal-simple .journal-spread.is-current{position:absolute;inset:0 0 0 30px;display:grid;grid-template-columns:1fr 1fr;height:100%}.journal-simple .journal-page{padding:22px}.news-section .journal-simple .journal-story-list .news-card.journal-supporting-story{grid-template-columns:1fr;gap:8px}.news-section .journal-simple .journal-supporting-story .news-photo{height:85px}.journal-simple .news-excerpt{display:none!important}.journal-simple .journal-page-right{border-top:0}}
+@media(prefers-reduced-motion:reduce){.journal-simple .journal-cover{transition:none!important}}
+.journal-simple .journal-page-right{padding-right:clamp(42px,4.5vw,64px)}

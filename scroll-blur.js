@@ -10,7 +10,7 @@
   const excluded = '#hero-title,.hero-orbit,.reels-orbit,.membership-device,.prism-caption,' +
     '.site-nav,.hero-booking,.journal-cover,.journal-spine,.journal-page-count,' +
     '.journal-page-button,.journal-open-button,.news-read,.offer-action,.visually-hidden,.scroll-blur-word,' +
-    '.footer-corporate,.footer-bottom,.mobile-journal,.mobile-pager,.mobile-city-selection,' +
+    '.footer-corporate,.footer-bottom,.journal-simple,.mobile-journal,.mobile-pager,.mobile-city-selection,' +
     '[aria-hidden="true"],[inert],script,style,svg,option,textarea';
   const blocks = new Set();
   const visible = new Set();

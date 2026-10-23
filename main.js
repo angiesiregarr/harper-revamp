@@ -11,13 +11,14 @@ const cityHotels = [
   { city: 'makassar', place: 'Makassar, Indonesia', title: 'Harper Perintis - Makassar', src: './assets/harper-room-04.jpg', alt: 'Twin guest room at Harper Perintis in Makassar' },
   { city: 'kupang', place: 'Kupang, Indonesia', title: 'Harper Kupang', src: './assets/harper-room-08.jpg', alt: 'Guest room at Harper Kupang' },
   { city: 'batam', label: 'Batam', place: 'Batam, Indonesia', title: 'Harper Premier Nagoya Batam', src: './assets/city-batam-illustrative.webp', alt: 'Illustrative guest room representing a stay in Batam' },
+  { city: 'bekasi', label: 'Bekasi', place: 'Cikarang, Bekasi, Indonesia', title: 'Harper Cikarang', src: './assets/city-cikarang-illustrative.webp', alt: 'Illustrative guest room representing Harper Cikarang in the Bekasi region' },
   { city: 'punta-cana', label: 'Punta Cana', place: 'Punta Cana, Dominican Republic', title: 'Reserva Real by Harper', src: './assets/city-punta-cana-illustrative.webp', alt: 'Illustrative Caribbean suite representing a stay in Punta Cana' },
 ];
 
 function renderCity() {
   const view = document.getElementById('city-view');
   const waypointHost = document.getElementById('city-waypoints');
-  const positions = [[8,16],[24,61],[49,23],[43,70],[65,71],[75,35],[8,76],[29,9],[83,13],[91,75],[59,6],[79,59]];
+  const positions = [[8,16],[24,61],[49,23],[43,70],[65,71],[75,35],[8,76],[29,9],[83,13],[91,75],[59,6],[18,39],[79,59]];
   waypointHost.innerHTML = cityHotels.map((hotel,index) => `<button class="city-waypoint" type="button" data-city="${hotel.city}" style="--x:${positions[index][0]}%;--y:${positions[index][1]}%" aria-label="Preview ${hotel.title} in ${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}"><span class="city-point" aria-hidden="true"></span><span class="city-label">${hotel.label || hotel.city[0].toUpperCase() + hotel.city.slice(1)}</span></button>`).join('');
   const routeHost = document.querySelector('.city-routes');
   const routePoints = cityHotels.map((hotel,index) => {
@@ -69,23 +70,28 @@ function renderCity() {
   let cityPage = 0;
   const cityPager = document.createElement('div');
   cityPager.className = 'mobile-city-controls';
-  cityPager.innerHTML = '<div class="mobile-pager"><button type="button" data-city-page="-1" aria-label="Previous city page">←</button><span class="mobile-city-count" aria-live="polite"></span><button type="button" data-city-page="1" aria-label="Next city page">→</button></div><p class="mobile-city-selection" aria-live="polite"></p>';
+  cityPager.innerHTML = '<label class="mobile-city-slider-label" for="city-page-slider">Browse cities</label><input id="city-page-slider" type="range" min="1" max="4" value="1" step="1" aria-label="City page"><span class="mobile-city-count" aria-live="polite"></span>';
   waypointHost.after(cityPager);
   function showCityPage(index = visibleIndex, followSelection = false) {
     if (followSelection && index !== null) cityPage = Math.floor(index / 4);
     waypoints.forEach((point, i) => point.classList.toggle('is-mobile-hidden', Math.floor(i / 4) !== cityPage));
     const total = Math.ceil(waypoints.length / 4);
     cityPager.querySelector('.mobile-city-count').textContent = `${String(cityPage + 1).padStart(2,'0')} / ${String(total).padStart(2,'0')} city pages`;
-    cityPager.querySelector('[data-city-page="-1"]').disabled = cityPage === 0;
-    cityPager.querySelector('[data-city-page="1"]').disabled = cityPage === total - 1;
-    cityPager.querySelector('.mobile-city-selection').textContent = index === null ? 'Choose a city' : `Selected: ${cityHotels[index].label || cityHotels[index].place.split(',')[0]}`;
+    const slider = cityPager.querySelector('input');
+    slider.max = String(total);
+    slider.value = String(cityPage + 1);
+    slider.setAttribute('aria-valuetext', `City page ${cityPage + 1} of ${total}`);
   }
-  cityPager.addEventListener('click', event => {
-    const button = event.target.closest('[data-city-page]');
-    if (!button) return;
-    cityPage = Math.max(0, Math.min(Math.ceil(waypoints.length / 4) - 1, cityPage + Number(button.dataset.cityPage)));
-    showCityPage();
-  });
+  cityPager.querySelector('input').addEventListener('input', event => { cityPage = Number(event.target.value) - 1; showCityPage(); });
+  let citySwipe = null, citySuppressClickUntil = 0;
+  waypointHost.addEventListener('touchstart', event => { citySwipe = [event.touches[0].clientX,event.touches[0].clientY]; }, {passive:true});
+  waypointHost.addEventListener('touchend', event => {
+    if (!mobileCities.matches || !citySwipe) return;
+    const dx = event.changedTouches[0].clientX - citySwipe[0], dy = event.changedTouches[0].clientY - citySwipe[1];
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) { citySuppressClickUntil = performance.now() + 400; cityPage = Math.max(0, Math.min(Math.ceil(waypoints.length / 4) - 1, cityPage + (dx < 0 ? 1 : -1))); showCityPage(); }
+    citySwipe = null;
+  }, {passive:true});
+  waypointHost.addEventListener('click', event => { if (performance.now() < citySuppressClickUntil) { event.preventDefault(); event.stopPropagation(); } }, true);
   let committed = null;
   let hovered = null;
   let focused = null;
@@ -154,9 +160,9 @@ function renderCity() {
   const showPreview = () => show(hovered ?? focused ?? committed);
   waypoints.forEach((point) => {
     const index = cityHotels.findIndex(hotel => hotel.city === point.dataset.city);
-    point.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') { hovered = index; routeBend = 0; showPreview(); } });
+    point.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse' && !mobileCities.matches) { hovered = index; routeBend = 0; showPreview(); } });
     point.addEventListener('pointermove', event => {
-      if (event.pointerType !== 'mouse' || hovered !== index) return;
+      if (mobileCities.matches || event.pointerType !== 'mouse' || hovered !== index) return;
       const bounds = point.getBoundingClientRect();
       setRoute(index, Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1)));
     });
@@ -214,274 +220,120 @@ function setupNews() {
   const section = document.getElementById('journal');
   const book = document.getElementById('journal-book');
   if (!section || !book) return;
-  const spreads = [...book.querySelectorAll('[data-journal-spread]')];
-  const sheet = book.querySelector('.journal-turn-sheet');
-  const frontFace = sheet.querySelector('.journal-turn-front');
-  const backFace = sheet.querySelector('.journal-turn-back');
+  const stories = [...book.querySelectorAll('[data-journal-spread] .news-card')];
+  const oldSpreads = [...book.querySelectorAll('[data-journal-spread]')];
   const cover = book.querySelector('.journal-cover');
   const openButton = document.getElementById('journal-open');
-  const prevButton = document.getElementById('journal-prev');
-  const nextButton = document.getElementById('journal-next');
-  const pageCount = document.getElementById('journal-page-count');
+  const previous = document.getElementById('journal-prev');
+  const next = document.getElementById('journal-next');
+  const count = document.getElementById('journal-page-count');
   const cursor = section.querySelector('.journal-drag-hint');
   const nav = document.getElementById('site-nav');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const mobile = matchMedia('(max-width: 620px)');
-  let current = 0;
-  let turning = false;
-  let drag = null;
-  let coverAnimation = null;
-  let hideCursor = () => {};
-  const headerBottom = () => nav?.getBoundingClientRect().bottom || 0;
-  const measureHeader = () => section.style.setProperty('--journal-header-clearance', `${Math.max(0, headerBottom()).toFixed(1)}px`);
-  const placeBookmark = () => {
-    const page = spreads[current]?.querySelector('.journal-page-right');
-    if (!page) return;
-    const pageRect = page.getBoundingClientRect();
-    const bookRect = book.getBoundingClientRect();
-    book.style.setProperty('--journal-ribbon-x', `${pageRect.left - bookRect.left + pageRect.width * .43}px`);
-    book.style.setProperty('--journal-ribbon-y', `${pageRect.top - bookRect.top}px`);
-  };
-  const showPage = index => {
+  const mobile = matchMedia('(max-width: 700px)');
+  const spreads = [];
+  let current = 0, opening = false, coverAnimation = null, pageAnimation = null;
+  book.classList.add('journal-simple');
+  // All stories share the same editorial row; each leaf holds up to two.
+  for (let offset = 0; offset < stories.length; offset += 4) {
+    const spread = document.createElement('div');
+    spread.className = 'journal-spread';
+    spread.dataset.journalSpread = String(spreads.length);
+    for (let leaf = 0; leaf < 2; leaf++) {
+      const page = document.createElement('div');
+      page.className = `journal-page journal-page-${leaf ? 'right' : 'left'}`;
+      const rule = document.createElement('div');
+      rule.className = 'journal-page-rule';
+      rule.innerHTML = '<span>NOTES FROM HARPER</span><span>THE JOURNAL</span>';
+      const list = document.createElement('div');
+      list.className = 'journal-story-list';
+      stories.slice(offset + leaf * 2, offset + leaf * 2 + 2).forEach(story => {
+        story.className = 'news-card journal-supporting-story';
+        list.append(story);
+      });
+      const folio = document.createElement('p');
+      folio.className = 'journal-folio';
+      folio.innerHTML = `STORIES TO TAKE WITH YOU <span>${String(spreads.length * 2 + leaf + 1).padStart(2,'0')}</span>`;
+      page.append(rule, list, folio);
+      spread.append(page);
+    }
+    spreads.push(spread);
+    book.insertBefore(spread, cover);
+  }
+  oldSpreads.forEach(spread => spread.remove());
+  book.querySelectorAll('.journal-turn-sheet,.journal-turn-zone').forEach(node => node.remove());
+  function measure() {
+    section.style.setProperty('--journal-header-clearance', `${nav.getBoundingClientRect().height}px`);
+    const page = spreads[current].querySelector('.journal-page-right').getBoundingClientRect();
+    const bounds = book.getBoundingClientRect();
+    book.style.setProperty('--journal-ribbon-x', `${page.left - bounds.left + page.width * .43}px`);
+    book.style.setProperty('--journal-ribbon-y', `${page.top - bounds.top}px`);
+  }
+  function show(index, animate = false) {
+    if (index < 0 || index >= spreads.length) return;
+    pageAnimation?.cancel();
     current = index;
     spreads.forEach((spread, i) => {
-      spread.classList.toggle('is-current', i === index);
-      spread.toggleAttribute('inert', i !== index);
-      spread.setAttribute('aria-hidden', String(i !== index));
+      spread.classList.toggle('is-current', i === current);
+      spread.inert = i !== current || !book.classList.contains('is-open');
+      spread.setAttribute('aria-hidden', String(spread.inert));
     });
-    pageCount.textContent = `${String(index + 1).padStart(2, '0')} / ${String(spreads.length).padStart(2, '0')}`;
-    prevButton.disabled = index === 0;
-    nextButton.disabled = index === spreads.length - 1;
-    placeBookmark();
-  };
-  const open = (immediate = false) => {
-    if (book.classList.contains('is-open') || book.classList.contains('is-opening')) return;
+    count.textContent = `${String(current + 1).padStart(2,'0')} / ${String(spreads.length).padStart(2,'0')}`;
+    previous.disabled = current === 0 || !book.classList.contains('is-open');
+    next.disabled = current === spreads.length - 1 || !book.classList.contains('is-open');
+    if (animate && !reduced.matches) pageAnimation = spreads[current].animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'cubic-bezier(.22,1,.36,1)'});
+    measure();
+  }
+  function hideCursor() { cursor?.classList.remove('is-visible'); section.classList.remove('has-journal-cursor'); }
+  async function open(immediate = false) {
+    if (opening || book.classList.contains('is-open')) return;
+    opening = true;
     hideCursor();
-    coverAnimation?.cancel();
-    book.classList.remove('is-closed', 'is-opening');
+    if (!immediate && !reduced.matches && !mobile.matches) {
+      book.classList.replace('is-closed','is-opening');
+      coverAnimation = cover.animate([{transform:'rotateY(0deg)',opacity:1},{transform:'rotateY(-155deg)',opacity:0}],{duration:720,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
+      try { await coverAnimation.finished; } catch {}
+      coverAnimation.cancel();
+    }
+    book.classList.remove('is-closed','is-opening');
+    book.classList.add('is-open');
+    section.classList.add('journal-is-open');
     book.tabIndex = 0;
     cover.tabIndex = -1;
-    spreads[current].removeAttribute('inert');
-    spreads[current].setAttribute('aria-hidden','false');
-    if (immediate || reduced.matches || mobile.matches) {
-      cover.style.transform = '';
-      cover.style.opacity = '';
-      book.classList.add('is-open');
-      section.classList.add('journal-is-open');
-      showPage(current);
-      return;
-    }
-    book.classList.add('is-opening');
-    coverAnimation = cover.animate([
-      {transform:'rotateY(0deg)',opacity:1},
-      {transform:'rotateY(-165deg)',opacity:0}
-    ],{duration:1600,easing:'cubic-bezier(.2,.7,.2,1)',fill:'forwards'});
-    coverAnimation.finished.catch(() => {}).then(() => {
-      if (!book.classList.contains('is-opening')) return;
-      coverAnimation?.cancel();
-      cover.style.transform = '';
-      cover.style.opacity = '';
-      book.classList.remove('is-opening');
-      book.classList.add('is-open');
-      section.classList.add('journal-is-open');
-      showPage(current);
-    });
-  };
-  showPage(0);
-  measureHeader();
-  if (reduced.matches || mobile.matches) {
-    open(true);
-  } else {
-    book.classList.add('is-closed');
-    book.tabIndex = -1;
-    spreads[0].setAttribute('inert','');
-    spreads[0].setAttribute('aria-hidden','true');
-    nextButton.disabled = true;
+    opening = false;
+    show(current);
   }
-  const update = () => {
-    measureHeader();
-    placeBookmark();
-  };
-  addEventListener('scroll', () => requestAnimationFrame(update), {passive:true});
-  addEventListener('harper:booking-position', update);
-  addEventListener('resize', update);
-  reduced.addEventListener('change', () => { if (reduced.matches) open(true); });
-  mobile.addEventListener('change', () => { if (mobile.matches) open(true); });
-  openButton.addEventListener('click', () => open(false));
-  cover.addEventListener('click', () => open(false));
-  const turnTransform = (direction, progress) => `rotateY(${(direction > 0 ? -1 : 1)*180*progress}deg)`;
-  const turnShadow = progress => `${(sheet.dataset.direction === 'next' ? -1 : 1)*Math.round(8+22*Math.sin(Math.PI*progress))}px 9px ${Math.round(18+24*Math.sin(Math.PI*progress))}px rgba(57,40,27,${(.12+.18*Math.sin(Math.PI*progress)).toFixed(3)})`;
-  const clearSheet = () => {
-    sheet.classList.remove('is-turning');
-    frontFace.replaceChildren(); backFace.replaceChildren();
-    book.querySelectorAll('.is-under-page,.is-lifting-page').forEach(el => el.classList.remove('is-under-page','is-lifting-page'));
-    turning = false;
-  };
-  const turn = async (direction, fromDrag = false) => {
-    if (!book.classList.contains('is-open') || turning || current + direction < 0 || current + direction >= spreads.length) return;
-    if (reduced.matches || mobile.matches) { showPage(current + direction); return; }
-    turning = true;
-    const source = spreads[current].querySelector(direction > 0 ? '.journal-page-right' : '.journal-page-left');
-    const destination = spreads[current + direction].querySelector(direction > 0 ? '.journal-page-left' : '.journal-page-right');
-    const bookBox = book.getBoundingClientRect();
-    const spreadBox = spreads[current].getBoundingClientRect();
-    const pageWidth = spreadBox.width / 2;
-    const gutter = spreadBox.left + pageWidth;
-    const clonePage = page => {
-      const clone = page.cloneNode(true);
-      clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-      clone.querySelectorAll('a').forEach(el => { el.removeAttribute('href'); el.tabIndex = -1; });
-      return clone;
-    };
-    frontFace.replaceChildren(clonePage(source));
-    backFace.replaceChildren(clonePage(destination));
-    sheet.style.left = `${(direction > 0 ? gutter : spreadBox.left) - bookBox.left}px`;
-    sheet.style.top = `${spreadBox.top - bookBox.top}px`;
-    sheet.style.width = `${pageWidth}px`;
-    sheet.style.height = `${spreadBox.height}px`;
-    sheet.style.transformOrigin = direction > 0 ? 'left center' : 'right center';
-    sheet.dataset.direction = direction > 0 ? 'next' : 'prev';
-    sheet.style.transform = turnTransform(direction,0);
-    sheet.style.boxShadow = turnShadow(0);
-    sheet.classList.add('is-turning');
-    const from = current;
-    spreads[current + direction].classList.add('is-under-page');
-    source.classList.add('is-lifting-page');
-    if (fromDrag) return {from, direction, width:pageWidth};
-    try { await sheet.animate([{transform:turnTransform(direction,0),boxShadow:turnShadow(0)},{transform:turnTransform(direction,1),boxShadow:turnShadow(1)}],{duration:1300,easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
-    showPage(from + direction);
-    clearSheet();
-  };
-  prevButton.addEventListener('click', () => turn(-1));
-  nextButton.addEventListener('click', () => turn(1));
+  book.classList.add('is-closed');
+  book.tabIndex = -1;
+  show(0);
+  if (mobile.matches || reduced.matches) open(true);
+  openButton.addEventListener('click', () => open());
+  cover.addEventListener('click', () => open());
+  previous.addEventListener('click', () => show(current - 1, true));
+  next.addEventListener('click', () => show(current + 1, true));
   book.addEventListener('keydown', event => {
-    if (event.target.closest('a,button')) return;
-    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-      event.preventDefault();
-      turn(event.key === 'ArrowRight' ? 1 : -1);
-    }
+    if (!book.classList.contains('is-open') || event.target.closest('a,button')) return;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); show(current + (event.key === 'ArrowRight' ? 1 : -1), true); }
   });
-  book.querySelectorAll('.journal-turn-zone').forEach(zone => {
-    const direction = zone.classList.contains('journal-turn-zone-next') ? 1 : -1;
-    zone.addEventListener('pointermove', event => {
-      if (!drag || drag.pointerId !== event.pointerId) return;
-      const travel = direction > 0 ? drag.x - event.clientX : event.clientX - drag.x;
-      const vertical = Math.abs(event.clientY - drag.y);
-      if (vertical > Math.abs(travel) * 1.2 && vertical > 18) return;
-      drag.progress = Math.max(0, Math.min(1, travel / drag.width));
-      sheet.style.transform = turnTransform(direction,drag.progress);
-      sheet.style.boxShadow = turnShadow(drag.progress);
-    });
-    zone.addEventListener('pointerdown', async event => {
-      if (!book.classList.contains('is-open') || turning || (direction > 0 && current === spreads.length - 1) || (direction < 0 && current === 0)) return;
-      event.preventDefault();
-      zone.setPointerCapture(event.pointerId);
-      const state = await turn(direction, true);
-      if (!state) return;
-      drag = {pointerId:event.pointerId,x:event.clientX,y:event.clientY,time:performance.now(),progress:0,...state};
-      book.classList.add('is-dragging');
-    });
-    const finish = async event => {
-      if (!drag || drag.pointerId !== event.pointerId) return;
-      const state = drag;
-      drag = null;
-      book.classList.remove('is-dragging');
-      const distance = direction > 0 ? state.x - event.clientX : event.clientX - state.x;
-      const speed = distance / Math.max(1, performance.now() - state.time);
-      const complete = event.type !== 'pointercancel' && (state.progress >= .26 || (distance > 35 && speed > .55));
-      const endProgress = complete ? 1 : 0;
-      try { await sheet.animate([{transform:sheet.style.transform,boxShadow:sheet.style.boxShadow},{transform:turnTransform(direction,endProgress),boxShadow:turnShadow(endProgress)}],{duration:Math.max(360,1300*Math.abs(endProgress-state.progress)),easing:'cubic-bezier(.2,.7,.2,1)'}).finished; } catch {}
-      if (complete) showPage(state.from + direction);
-      clearSheet();
-    };
-    zone.addEventListener('pointerup', finish);
-    zone.addEventListener('pointercancel', finish);
-  });
-  let touchStart = null;
-  book.addEventListener('touchstart', event => {
-    if (event.touches.length !== 1 || event.target.closest('button')) return;
-    const touch = event.touches[0];
-    touchStart = {x: touch.clientX, y: touch.clientY};
-  }, {passive:true});
-  book.addEventListener('touchend', event => {
-    if (!touchStart || !event.changedTouches.length) return;
-    const touch = event.changedTouches[0];
-    const dx = touch.clientX - touchStart.x;
-    const dy = touch.clientY - touchStart.y;
-    touchStart = null;
-    if (Math.abs(dx) < 62 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
-    event.preventDefault();
-    turn(dx < 0 ? 1 : -1);
-  }, {passive:false});
   if (cursor) {
     document.body.append(cursor);
-    const label = cursor.querySelector('.journal-drag-label');
-    const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
-    const point = {x:0,y:0,vx:0,vy:0};
-    const caption = {x:0,y:0,vx:0,vy:0};
-    let targetX = 0, targetY = 0, labelX = 0, labelY = 0;
-    let active = false, pressed = false, frame = 0, previous = 0;
-    const spring = (body, x, y, stiffness, damping, mass, dt) => {
-      body.vx += ((x - body.x) * stiffness - body.vx * damping) / mass * dt;
-      body.vy += ((y - body.y) * stiffness - body.vy * damping) / mass * dt;
-      body.x += body.vx * dt;
-      body.y += body.vy * dt;
-    };
-    const draw = time => {
-      frame = 0;
-      if (!active) return;
-      const dt = Math.min((time - (previous || time)) / 1000, .032);
-      previous = time;
-      if (reduced.matches) {
-        point.x = targetX; point.y = targetY;
-        caption.x = labelX; caption.y = labelY;
-      } else {
-        spring(point, targetX, targetY, 450, 34, .60, dt);
-        spring(caption, labelX, labelY, 220, 26, .70, dt);
-      }
-      cursor.style.transform = `translate3d(${point.x}px,${point.y}px,0) scale(${pressed ? .88 : 1})`;
-      label.style.transform = `translate3d(${caption.x - point.x}px,${caption.y - point.y}px,0)`;
-      frame = requestAnimationFrame(draw);
-    };
-    const move = event => {
-      if (!finePointer.matches || event.pointerType === 'touch') return;
-      const overCover = book.classList.contains('is-closed') && event.target.closest('.journal-cover');
-      const overEdge = book.classList.contains('is-open') && event.target.closest('.journal-turn-zone');
-      if (!overCover && !overEdge) { hide(); return; }
-      label.textContent = overCover ? 'Click me' : 'Drag me';
-      targetX = event.clientX; targetY = event.clientY;
-      labelX = targetX + (targetX > innerWidth - 145 ? -127 : 30);
-      labelY = targetY + (targetY > innerHeight - 48 ? -38 : 8);
-      if (!active) {
-        active = true;
-        point.x = targetX; point.y = targetY;
-        caption.x = labelX; caption.y = labelY;
-        cursor.classList.add('is-visible');
-        section.classList.add('has-journal-cursor');
-        previous = 0;
-        frame = requestAnimationFrame(draw);
-      }
-    };
-    const hide = () => {
-      active = false; pressed = false;
-      cursor.classList.remove('is-visible');
-      section.classList.remove('has-journal-cursor');
-      if (frame) cancelAnimationFrame(frame);
-      frame = 0;
-    };
-    hideCursor = hide;
-    section.addEventListener('pointerenter', move);
-    section.addEventListener('pointermove', move, {passive:true});
-    section.addEventListener('pointerleave', hide);
-    section.addEventListener('pointerdown', () => { pressed = true; });
-    addEventListener('pointerup', () => { pressed = false; });
-    addEventListener('pointercancel', () => { pressed = false; });
-    finePointer.addEventListener('change', () => { if (!finePointer.matches) hide(); });
+    cursor.querySelector('.journal-drag-label').textContent = 'Click me';
+    const fine = matchMedia('(hover: hover) and (pointer: fine)');
+    section.addEventListener('pointermove', event => {
+      if (!fine.matches || reduced.matches || !book.classList.contains('is-closed') || !event.target.closest('.journal-cover')) { hideCursor(); return; }
+      cursor.style.transform = `translate3d(${event.clientX}px,${event.clientY}px,0)`;
+      cursor.querySelector('.journal-drag-label').style.transform = `translate(${event.clientX > innerWidth - 145 ? -127 : 30}px,8px)`;
+      cursor.classList.add('is-visible');
+      section.classList.add('has-journal-cursor');
+    }, {passive:true});
+    section.addEventListener('pointerleave', hideCursor);
   }
-  update();
-  setTimeout(update, 120);
+  addEventListener('resize', measure);
+  new ResizeObserver(measure).observe(nav);
+  mobile.addEventListener('change', () => { if (mobile.matches) open(true); hideCursor(); measure(); });
+  reduced.addEventListener('change', () => { if (reduced.matches) { coverAnimation?.finish(); pageAnimation?.finish(); open(true); hideCursor(); } });
+  document.fonts?.ready.then(measure);
 }
-
 function setupSectionAnchors() {
   const nav = document.getElementById('site-nav');
   document.querySelectorAll('a[href="#journal"], a[href="#membership"]').forEach(link => link.addEventListener('click', event => {
@@ -903,7 +755,7 @@ function setupHeroCityHandoff() {
     const rect = element.getBoundingClientRect();
     return { x: rect.left, y: rect.top + scrollY, width: rect.width, height: rect.height };
   };
-  let layer, fromImage, toImage, sourceCaption, geometry, frame = 0, ready = false;
+  let layer, fromImage, toImage, sourceCaption, geometry, frame = 0, ready = false, cityInteracted = false;
   const overlay = () => {
     layer = document.createElement('div');
     layer.className = 'hero-city-handoff';
@@ -941,7 +793,9 @@ function setupHeroCityHandoff() {
       layer.style.display = 'none';
       return;
     }
-    const progress = clamp((scrollY - geometry.start) / (geometry.end - geometry.start));
+    const scrollProgress = clamp((scrollY - geometry.start) / (geometry.end - geometry.start));
+    if (scrollProgress < .1) cityInteracted = false;
+    const progress = cityInteracted && scrollProgress > .4 ? 1 : scrollProgress;
     const mobile = innerWidth <= 800;
     const inFlight = progress >= .06 && progress < 1;
     document.body.classList.toggle('handoff-in-flight', inFlight);
@@ -996,6 +850,8 @@ function setupHeroCityHandoff() {
     window.addEventListener('orientationchange', refresh);
     window.addEventListener('harper:hero-change', refresh);
     window.addEventListener('harper:city-change', () => { refresh(); setTimeout(refresh, 650); });
+    city.addEventListener('pointerdown', () => { cityInteracted = true; schedule(); }, {passive:true});
+    city.addEventListener('focusin', () => { cityInteracted = true; schedule(); });
     window.addEventListener('harper:booking-position', refresh);
     window.addEventListener('scroll', schedule, { passive: true });
     reduced.addEventListener('change', () => { refresh(); schedule(); });
