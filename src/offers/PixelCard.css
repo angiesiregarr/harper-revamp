@@ -92,15 +92,17 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgb(255 245 219 / 16%), rgb(142 59 6 / 14%)), rgb(177 78 8 / 30%);
+  background: rgb(255 255 255 / 9%);
   backdrop-filter: blur(2px) saturate(.95);
   -webkit-backdrop-filter: blur(2px) saturate(.95);
   pointer-events: none;
 }
 .offers .pixel-card.offer-card:hover::before,
 .offers .pixel-card.offer-card:focus-within::before {
-  background: linear-gradient(180deg, rgb(255 249 230 / 23%), rgb(164 70 7 / 15%)), rgb(185 85 9 / 35%);
+  background: #fff;
 }
+.offers .pixel-card.offer-card:is(:hover, :focus-within) { color: #111; text-shadow: none; }
+.offers .pixel-card.offer-card:is(:hover, :focus-within) .scroll-blur-word { color: inherit; }
 .offers .pixel-card .offer-image > span,
 .offers .pixel-card .offer-body a { text-shadow: none; }
 .offers .offer-card-content { display: block; width: 100%; }
@@ -112,7 +114,7 @@
   height: auto;
 }
 .offers .pixel-card .offer-body a {
-  border: 1px solid #9e540e;
+  border: 0;
   border-image: none;
   border-radius: 0;
   background: #f08b1d;
