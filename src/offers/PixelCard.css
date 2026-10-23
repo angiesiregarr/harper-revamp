@@ -69,24 +69,39 @@
 
 /* Fit the supplied effect to the existing editorial Offers cards. */
 .offers .pixel-card.offer-card {
+  --pixel-card-edge: rgb(255 246 225 / 55%);
+  --pixel-card-edge-active: rgb(255 248 231 / 78%);
+  --pixel-card-highlight: rgb(255 249 233 / 30%);
+  --pixel-card-shadow: 0 16px 34px -18px rgb(89 39 3 / 43%), 0 4px 12px rgb(108 48 7 / 15%);
   display: block;
   align-self: start;
   width: 100%;
   height: auto;
   box-sizing: border-box;
   padding: 11px;
-  background: rgb(255 255 255 / 14%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgb(255 255 255 / 68%);
+  background: transparent;
+  border: 1px solid rgb(255 248 229 / 70%);
   color: #fff;
   text-shadow: 0 1px 4px rgb(96 49 7 / 65%);
   cursor: default;
-  transition: background-color .35s ease, color .35s ease, transform .35s ease, box-shadow .35s ease;
+  transition: background .32s ease, transform .32s ease, box-shadow .32s ease;
 }
-.offers .pixel-card.offer-card:hover,
-.offers .pixel-card.offer-card:focus-within { background: #fff; color: #3b3b3b; text-shadow: none; }
-.offers .pixel-card .offer-image span,
+.offers .pixel-card.offer-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgb(255 245 219 / 16%), rgb(142 59 6 / 14%)), rgb(177 78 8 / 30%);
+  backdrop-filter: blur(2px) saturate(.95);
+  -webkit-backdrop-filter: blur(2px) saturate(.95);
+  pointer-events: none;
+}
+.offers .pixel-card.offer-card:hover::before,
+.offers .pixel-card.offer-card:focus-within::before {
+  background: linear-gradient(180deg, rgb(255 249 230 / 23%), rgb(164 70 7 / 15%)), rgb(185 85 9 / 35%);
+}
+.offers .pixel-card .offer-image > span,
 .offers .pixel-card .offer-body a { text-shadow: none; }
 .offers .offer-card-content { display: block; width: 100%; }
 .offers .pixel-card .offer-body p:not(.card-kicker) {
@@ -94,7 +109,7 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  height: 2.96em;
+  height: auto;
 }
 .offers .pixel-card .offer-body a {
   border: 1px solid #9e540e;
@@ -102,24 +117,13 @@
   border-radius: 0;
   background: #f08b1d;
   color: #281b10;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity .25s ease, transform .3s ease, background .25s, color .25s;
+  transition: background .25s ease, color .25s ease;
 }
 .offers .pixel-card .offer-body a:hover,
 .offers .pixel-card .offer-body a:focus-visible { background: #d9780d; color: #281b10; }
-.offers .pixel-card:hover .offer-body a,
-.offers .pixel-card:focus-within .offer-body a,
-.offers .pixel-card:focus-visible .offer-body a {
-  opacity: 1;
-  transform: none;
-}
 .offers .pixel-card:focus-visible {
   outline: 3px solid #4c2c13;
   outline-offset: 3px;
-}
-@media (hover: none), (pointer: coarse) {
-  .offers .pixel-card .offer-body a { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .offers .pixel-card .offer-body a { transition: none; }
