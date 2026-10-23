@@ -9,21 +9,19 @@
   const empty = document.getElementById('reels-empty');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const phone = matchMedia('(max-width: 700px)');
-  let mobileScrollFrame = 0, mobileTouch = null;
   const icons = {
     instagram: '<rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="18" cy="6.3" r="1" fill="currentColor" stroke="none"/>',
     facebook: '<path d="M14.4 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.5 1.6-1.5h1.7V3.3a22 22 0 0 0-2.5-.1c-2.5 0-4.2 1.5-4.2 4.3v2.3H8.3V13H11v8z" fill="currentColor" stroke="none"/>',
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
   let cards = [], items = [], state = 'idle';
-  let playbackPaused = false, manualPreview = false, player = null, featuredIndex = 0, focusIndex = -1, stepIndex = -1;
-  let updateMobile = () => {};
+  let playbackPaused = false, manualPreview = false, player = null, featuredIndex = 0;
   function syncPlayback() {
     const playing = visible && !document.hidden && !player?.open && (manualPreview || (!reduced.matches && !playbackPaused));
     cards.forEach((card,index) => {
       const video = card.querySelector('video');
       if (!video) return;
-      if (playing && index === featuredIndex) video.play().catch(() => {});
+      if (playing && index === featuredIndex && card.dataset.inView === 'true') video.play().catch(() => {});
       else video.pause();
     });
   }
@@ -36,13 +34,14 @@
 
   }
   function alignTo(index) {
-    if (phone.matches || currentSpread < .95) return;
-    stepIndex = index;
-    const target = Math.PI/2-index*2*Math.PI/cards.length;
-    stepFrom=angle;stepTo=angle+Math.atan2(Math.sin(target-angle),Math.cos(target-angle));stepAt=performance.now();velocity=0;
+    const target = -index / cards.length;
+    stepFrom = phase;
+    stepTo = phase + wrap(target - phase);
+    stepAt = performance.now();
+    if (reduced.matches) { phase = stepTo; stepAt = 0; render(); }
   }
   function openVideo(item) {
-    stepAt=0;velocity=0;
+    stepAt=0;
     if (!player) {
       player = document.createElement('dialog');
       player.className = 'reel-player';
@@ -60,12 +59,14 @@
     player.showModal(); syncPlayback();
     if (!reduced.matches) video.play().catch(()=>{});
   }
-  let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0, currentSpread = 0;
-  let holdElapsed = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
-  let geometry = {x:0,y:0,w:0,h:0,titleShift:0,socialShift:0}, stepFrom = 0, stepTo = 0, stepAt = 0;
+  let visible = false, hover = false, focused = false, dragging = false;
+  let phase = 0, last = 0, raf = 0, pointerX = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
+  let stepFrom = 0, stepTo = 0, stepAt = 0;
+  let geometry = {x:0,y:0,w:0,h:0,length:1,points:[],focal:0};
+  const wrap = value => ((value + .5) % 1 + 1) % 1 - .5;
   const ease = t => { t = Math.max(0, Math.min(1,t)); return t*t*(3-2*t); };
-  const setState = next => { state = next; section.dataset.reelsState = next; social.inert = next === 'idle'; };
-  social.inert = true;
+  const setState = next => { state = next; section.dataset.reelsState = next; social.inert = false; };
+  social.inert = false;
   const valid = item => item && typeof item.alt === 'string' && item.alt.trim() &&
     (item.preview === true
       ? item.url === 'https://www.instagram.com/harperhotels/reels/' && typeof item.cover === 'string'
@@ -83,25 +84,40 @@
       social.append(icon);
     }
   }
+  // Sample arc length once on resize. Equal distances, rather than equal angles,
+  // keep the cards separated around the narrow ends of the ellipse.
   function measure() {
-    stage.setAttribute('aria-description', phone.matches ? 'Swipe to browse Moments, or use the left and right arrow keys. Open a cover to watch.' : 'Drag to rotate the covers, or focus a cover and use the left and right arrow keys');
+    stage.setAttribute('aria-description', 'Drag or swipe to rotate Moments. Focus a reel and use the left and right arrow keys. Press Enter to watch.');
     const box = orbit.getBoundingClientRect();
-    const mobile = box.width < 650;
-    const w = Math.min(mobile ? 82 : 200, Math.max(64, box.width * (mobile ? .21 : .15)));
-    const h = w * 340 / 190;
-    const scale = 1 + Math.min(.65, Math.max(.35, 210/w-1));
-    const centerHeight = center.offsetHeight;
-    const titleHeight = center.querySelector('h2').offsetHeight;
-    const socialHeight = social.offsetHeight;
-    const socialMargin = parseFloat(getComputedStyle(social).marginTop) || 0;
-    const cardTop = box.height/2 - h*scale/2;
-    const cardBottom = box.height/2 + h*scale/2;
-    const titleBottom = box.height/2 - centerHeight/2 + titleHeight;
-    const socialTop = titleBottom + socialMargin;
-    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.28,box.height/2-h*.8/2-20)),titleShift:cardTop-14-titleBottom,socialShift:cardBottom-socialHeight-Math.max(20,h*scale*.1)-socialTop};
-    stage.style.setProperty('--reels-orbit-width', `${geometry.x*2}px`);
-    stage.style.setProperty('--reels-orbit-height', `${geometry.y*2}px`);
-    render(performance.now());
+    const mobile = phone.matches;
+    const activeHeight = Math.min(mobile ? 400 : 430, box.height * (mobile ? .78 : .62));
+    const h = activeHeight * .66;
+    const w = h * 9 / 16;
+    const x = mobile ? box.width * .90 : Math.max(0, box.width / 2 - w / 2 - 20);
+    const y = box.height * (mobile ? .13 : .17);
+    const points = [{theta:0,length:0}];
+    let length = 0, previous = [x,0];
+    for (let i = 1; i <= 720; i++) {
+      const theta = i / 720 * Math.PI * 2;
+      const point = [Math.cos(theta)*x, Math.sin(theta)*y];
+      length += Math.hypot(point[0]-previous[0],point[1]-previous[1]);
+      points.push({theta,length}); previous = point;
+    }
+    const focalTheta = mobile ? Math.PI/2 : Math.acos(.38);
+    const focal = points[Math.round(focalTheta/(Math.PI*2)*720)].length / Math.max(1,length);
+    geometry = {x,y,w,h,length,points,focal};
+    orbit.style.setProperty('--orbit-width', `${x*2}px`);
+    orbit.style.setProperty('--orbit-height', `${y*2}px`);
+    render();
+  }
+  function pointAt(progress) {
+    const target = ((progress % 1 + 1) % 1) * geometry.length;
+    const list = geometry.points;
+    let lo=0, hi=list.length-1;
+    while (hi-lo>1) {const mid=(lo+hi)>>1;if(list[mid].length<target)lo=mid;else hi=mid;}
+    const a=list[lo],b=list[hi];
+    const theta=a.theta+(b.theta-a.theta)*(target-a.length)/Math.max(.001,b.length-a.length);
+    return [Math.cos(theta)*geometry.x,Math.sin(theta)*geometry.y];
   }
   function renderCards() {
     orbit.replaceChildren();
@@ -137,7 +153,7 @@
         if (performance.now() < suppressClickUntil) { e.preventDefault(); return; }
         if (item.video && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); openVideo(item); }
       });
-      link.addEventListener('focus', () => { focusIndex = i; alignTo(i); highlight(i); syncPlayback(); });
+      link.addEventListener('focus', () => { if (!pointerActive) alignTo(i); });
       link.addEventListener('keydown', e => {
         if (e.code !== 'Space' || !link.querySelector('video')) return;
         e.preventDefault();
@@ -148,115 +164,87 @@
     });
     measure();
   }
-  function render(now) {
-    if (!cards.length) return;
-    if (phone.matches) {
-      social.inert = false;
-      cards.forEach(card => { card.tabIndex = 0; });
-      return;
-    }
-    const scrollDriven = section.classList.contains('motion-ready') && !reduced.matches;
-    const sectionProgress = parseFloat(section.style.getPropertyValue('--handoff-enter')) || 0;
-    const timedSpread = state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
-    const spread = reduced.matches ? 1 : timedSpread * (scrollDriven ? ease((sectionProgress - .12) / .82) : 1);
-    currentSpread = spread;
-    const centerProgress = reduced.matches ? 1 : ease((spread - .18) / .77);
-    social.inert = state === 'idle' || (spread < .9 && !social.contains(document.activeElement));
-    center.style.setProperty('--reels-title-y', `${(0).toFixed(1)}px`);
-    center.style.setProperty('--reels-social-y', `${(0).toFixed(1)}px`);
-    const n = cards.length;
-    // Highlight at the side of the orbit so the headline and socials stay clear.
-    let front = 0, frontX = -Infinity;
-    cards.forEach((card,i) => {const x=Math.cos(i*Math.PI*2/n+(n===2?0:-Math.PI/2)+angle);if(x>frontX){front=i;frontX=x;}});
-    highlight(focusIndex >= 0 ? focusIndex : spread < .8 ? 0 : stepAt ? stepIndex : front);
+  function render() {
+    if (!cards.length || !geometry.points.length) return;
+    const n=cards.length;
+    let nearest=0, distance=Infinity;
     cards.forEach((card,i) => {
-      const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
-      const stagger = reduced.matches ? 1 : ease((spread - i * .045) / Math.max(.65, 1 - i * .045));
-      const radius = i === 0 ? spread : stagger;
-      const x = Math.cos(phase)*geometry.x*radius * (i === featuredIndex ? .46 : 1);
-      const y = Math.sin(phase)*geometry.y*radius + (i === featuredIndex ? 28 * spread : 0);
-      card.style.width = `${geometry.w}px`;
-      card.style.height = `${geometry.h}px`;
-      const scale = i === featuredIndex ? 1.35 + (1-spread)*.05 : .70 + .10*stagger;
-      card.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${scale.toFixed(3)})`;
-      card.style.opacity = i === 0 || reduced.matches ? '1' : String(stagger);
-      card.style.zIndex = String(i === featuredIndex ? 400 : Math.round(100+y));
-      card.tabIndex = i === 0 || spread >= .95 ? 0 : -1;
+      const offset=wrap(i/n+phase);
+      if(Math.abs(offset)<distance){distance=Math.abs(offset);nearest=i;}
+      const [x,y]=pointAt(geometry.focal+i/n+phase);
+      const weight=Math.exp(-Math.pow(offset*n/.43,2));
+      const scale=.94+(1/.66-.94)*weight;
+      card.style.width=`${geometry.w}px`;
+      card.style.height=`${geometry.h}px`;
+      card.style.setProperty('--card-width',`${geometry.w}px`);card.style.setProperty('--card-height',`${geometry.h}px`);
+      card.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${y.toFixed(3)}px,0) scale(${scale.toFixed(5)})`;
+      card.style.setProperty('--card-transform',card.style.transform);
+      const visibility=phone.matches ? 1-ease((Math.abs(offset)*n-.85)/.65) : 1;
+      card.style.setProperty('opacity',String(visibility),'important');
+      card.style.pointerEvents=visibility>.05?'auto':'none';
+      card.style.zIndex=String(Math.round(100+weight*200+y));
+      card.style.setProperty('--reel-blur',`${(.65*(1-weight)).toFixed(3)}px`);
+      card.style.setProperty('--reel-saturation',String(.82+.18*weight));
+      card.dataset.orbitX=x.toFixed(3);card.dataset.orbitY=y.toFixed(3);
+      card.tabIndex=phone.matches&&Math.abs(offset)*n>.6?-1:0;
     });
+    highlight(nearest);
   }
   function frame(now) {
-    if (phone.matches) { render(now); raf = 0; return; }
-    const dt = Math.min(250,Math.max(0,now-last)); last=now;
-    if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 2000){setState('spreading');spreadAt=now;}}
-    if (state === 'spreading' && now-spreadAt > Math.max(1250,900+(cards.length-1)*55)){setState('spinning');}
-    if (stepAt) {
-      const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
-      angle = stepFrom+(stepTo-stepFrom)*progress;
-      if (progress >= 1) stepAt = 0;
-    } else if (state === 'spinning' && visible && currentSpread >= .98 && !document.hidden && !dragging && !player?.open && !reduced.matches) {
-      if (Math.abs(velocity) > .00008) {angle += velocity*dt;velocity *= Math.exp(-dt*.014);}
-      else {velocity=0;if (!hover && !focused) angle += dt * (5*Math.PI/180)/1000;}
+    const dt=Math.min(64,Math.max(0,now-last));last=now;
+    const before=phase;
+    const motion = !visible?'offscreen':document.hidden?'hidden':hover?'hover':focused?'focus':pointerActive?'drag':player?.open?'player':reduced.matches?'reduced':'running';
+    if(section.dataset.orbitMotion!==motion)section.dataset.orbitMotion=motion;
+    if(stepAt){
+      const t=reduced.matches?1:ease((now-stepAt)/650);
+      phase=stepFrom+(stepTo-stepFrom)*t;
+      if(t>=1)stepAt=0;
+    } else if(visible&&!document.hidden&&!hover&&!focused&&!pointerActive&&!player?.open&&!reduced.matches){
+      phase += 18 * dt / 1000 / geometry.length;
     }
-    render(now);
+    // Phase wraps continuously: there is no reset frame or positional jump.
+    phase=((phase%1)+1)%1;
+    if(phase!==before)render();
     raf=requestAnimationFrame(frame);
-  }
-  function start() {
-    if (state !== 'idle') return;
-    setState(reduced.matches ? 'spinning' : 'holding');
   }
   function initialize(data) {
     items=(data.items || []).filter(valid);
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
     renderCards();
-    const mobileIndex = () => Math.max(0, Math.min(cards.length - 1, Math.round(orbit.scrollLeft / (cards[0].offsetWidth + 12))));
-    updateMobile = () => {
-      mobileScrollFrame = 0;
-      const index = mobileIndex();
-      highlight(index);
-
-    };
-    const moveMobile = direction => {
-      const index = Math.max(0, Math.min(cards.length - 1, mobileIndex() + direction));
-      orbit.scrollTo({left:index * (cards[0].offsetWidth + 12),behavior:reduced.matches?'instant':'smooth'});
-    };
-    orbit.addEventListener('scroll', () => { if (phone.matches && !mobileScrollFrame) mobileScrollFrame = requestAnimationFrame(updateMobile); }, {passive:true});
-    orbit.addEventListener('touchstart', event => { if (phone.matches) mobileTouch = [event.touches[0].clientX, event.touches[0].clientY]; }, {passive:true});
-    orbit.addEventListener('touchend', event => {
-      if (mobileTouch && Math.abs(event.changedTouches[0].clientX - mobileTouch[0]) > 10) suppressClickUntil = performance.now() + 400;
-      mobileTouch = null;
-    }, {passive:true});
-    phone.addEventListener('change', () => {
-      render(performance.now());
-      if(phone.matches) updateMobile(); else { focusIndex=-1;render(performance.now()); }
+    const cardObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => { entry.target.dataset.inView = String(entry.isIntersecting && entry.intersectionRatio > .05); });
       syncPlayback();
-      if (!phone.matches && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
-    });
-    if(phone.matches)updateMobile();
-    const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio >= .25;if(visible)start();syncPlayback();},{threshold:[0,.25]});observer.observe(stage);
+    }, {threshold:[0,.05]});
+    cards.forEach(card => cardObserver.observe(card));
+    setState('spinning');
+    const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio>=.25;syncPlayback();},{threshold:[0,.25]});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();syncPlayback();});
-    orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
-    orbit.addEventListener('pointerout',e=>{if(e.target.closest('.reels-card') && !e.relatedTarget?.closest?.('.reels-card'))hover=false;});
-    stage.addEventListener('focusin',()=>{focused=true;});stage.addEventListener('focusout',()=>{queueMicrotask(()=>{focused=stage.contains(document.activeElement);if(!document.activeElement.closest?.('.reels-card')){focusIndex=-1;manualPreview=false;}syncPlayback();});});
-    orbit.addEventListener('pointerdown',e=>{if(phone.matches||state!=='spinning'||currentSpread<.95||e.button!==0)return;pointerActive=true;stepAt=0;pointerStart=e.clientX;pointerX=e.clientX;pointerAt=performance.now();velocity=0;});
-    orbit.addEventListener('pointermove',e=>{
-      if (!pointerActive || e.buttons!==1 || state!=='spinning') return;
-      if (!dragging && Math.abs(e.clientX-pointerStart)>7) {dragging=true;orbit.setPointerCapture(e.pointerId);}
-      if (!dragging) return;
-      const dx=e.clientX-pointerX, elapsed=Math.max(1,performance.now()-pointerAt);
-      const delta=dx/Math.max(110,stage.clientWidth*.38);
-      angle+=delta;velocity=delta/elapsed*.25;pointerX=e.clientX;pointerAt=performance.now();
+    orbit.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')hover=true;});
+    orbit.addEventListener('pointerleave',()=>{hover=false;});
+    orbit.addEventListener('focusin',()=>{focused=true;});
+    orbit.addEventListener('focusout',()=>queueMicrotask(()=>{focused=orbit.contains(document.activeElement);if(!focused)manualPreview=false;syncPlayback();}));
+    orbit.addEventListener('pointerdown',event=>{
+      if(event.button!==0)return;
+      pointerActive=true;stepAt=0;pointerX=pointerStart=event.clientX;
     });
-    const finish=()=>{if(dragging)suppressClickUntil=performance.now()+350;dragging=false;pointerActive=false;};
-    orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
-    const step = dir => {
-      if(state!=='spinning'||currentSpread<.95||cards.length<2)return;
-      focusIndex=-1;
-      alignTo((featuredIndex+dir+cards.length)%cards.length);
-    };
-    orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();if(phone.matches)moveMobile(e.key==='ArrowRight'?1:-1);else {step(e.key==='ArrowRight'?1:-1);if(stepIndex>=0)cards[stepIndex].focus({preventScroll:true});}}});
+    orbit.addEventListener('pointermove',event=>{
+      if(!pointerActive)return;
+      if(!dragging&&Math.abs(event.clientX-pointerStart)>8){dragging=true;stepAt=0;orbit.setPointerCapture(event.pointerId);}
+      if(!dragging)return;
+      phase+=(event.clientX-pointerX)/geometry.length;
+      pointerX=event.clientX;render();
+    });
+    const finish=()=>{if(dragging)suppressClickUntil=performance.now()+400;dragging=false;pointerActive=false;};
+    orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);orbit.addEventListener('lostpointercapture',finish);
+    orbit.addEventListener('keydown',event=>{
+      if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;
+      event.preventDefault();
+      const index=(featuredIndex+(event.key==='ArrowRight'?1:-1)+cards.length)%cards.length;
+      cards[index].focus({preventScroll:true});alignTo(index);
+    });
     addEventListener('resize',measure);
-    reduced.addEventListener('change',()=>{manualPreview=false;if(reduced.matches)setState('spinning');render(performance.now());syncPlayback();});
+    reduced.addEventListener('change',()=>{manualPreview=false;if(reduced.matches&&stepAt){phase=stepTo;stepAt=0;}render();syncPlayback();});
     last=performance.now();raf=requestAnimationFrame(frame);
   }
   fetch('./data/reels.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Reel manifest unavailable');return r.json();}).then(initialize).catch(()=>initialize({profiles:{instagram:'https://www.instagram.com/harperhotels/reels/'},items:[]}));
