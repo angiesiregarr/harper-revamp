@@ -35,7 +35,7 @@ const fanEase = value => {
 function makeGeometry(width, height) {
   const mobile = width < 640, tablet = width < 1050;
   const frontWidth = mobile ? Math.min(width * .76, 390) : tablet ? Math.min(width * .57, 510) : Math.min(width * .36, 600);
-  const frontHeight = mobile ? 235 : tablet ? 285 : height < 820 ? 270 : 312;
+  const frontHeight = mobile ? Math.min(310, Math.max(260, width * .72)) : tablet ? 285 : height < 820 ? 270 : 312;
   const nearX = width * (mobile ? .33 : tablet ? .39 : .30);
   const outerX = width * (mobile ? .52 : tablet ? .47 : .42);
   const upperX = width * (mobile ? .29 : tablet ? .31 : .235);

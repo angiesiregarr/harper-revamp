@@ -187,7 +187,7 @@
       const lean=phone.matches?0:-1.2*x/geometry.x-.6*weight;
       card.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${y.toFixed(3)}px,0) rotate(${lean.toFixed(3)}deg) scale(${scale.toFixed(5)})`;
       card.style.setProperty('--card-transform',card.style.transform);
-      const visibility=phone.matches ? 1-ease((Math.abs(offset)*n-.85)/.65) : 1;
+      const visibility=(phone.matches ? 1-ease((Math.abs(offset)*n-.85)/.65) : 1) * (.76+.24*weight);
       card.style.setProperty('opacity',String(visibility),'important');
       card.style.pointerEvents=visibility>.05?'auto':'none';
       const light=lights[i];
@@ -195,8 +195,9 @@
       light.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${(y+geometry.h*scale/2+14).toFixed(3)}px,0)`;
       light.style.opacity=String(visibility*(.30+.22*weight));
       card.style.zIndex=String(Math.round(100+weight*200+y));
-      card.style.setProperty('--reel-blur',`${(.65*(1-weight)).toFixed(3)}px`);
-      card.style.setProperty('--reel-saturation',String(.82+.18*weight));
+      card.style.setProperty('--reel-blur',`${(2.1*(1-weight)).toFixed(3)}px`);
+      card.style.setProperty('--reel-saturation',String(.67+.33*weight));
+      card.style.setProperty('--reel-brightness',String(.78+.22*weight));
       card.dataset.orbitX=x.toFixed(3);card.dataset.orbitY=y.toFixed(3);
       card.tabIndex=phone.matches&&Math.abs(offset)*n>.6?-1:0;
     });

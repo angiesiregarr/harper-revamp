@@ -191,3 +191,24 @@
  .reels-orbit-spark{width:3px;height:3px;opacity:.65}
  .harper-reels .reels-contour{opacity:.09}
 }
+/* Final spacing pass: breathing room outside, tighter content rhythm on phones. */
+.harper-reels{padding-top:64px;padding-bottom:58px}
+.harper-reels .reels-stage{height:calc(100svh - var(--top-nav-height,64px) - 122px)}
+.harper-reels .reels-card img,.harper-reels .reels-card video,.harper-reels .reels-card.is-highlighted img,.harper-reels .reels-card.is-highlighted video{filter:blur(var(--reel-blur,0px)) saturate(var(--reel-saturation,1)) brightness(var(--reel-brightness,1))}
+@media(max-width:700px){
+ .harper-reels{padding-top:44px;padding-bottom:40px}
+ .harper-reels .reels-stage{height:calc(100svh - 148px)}
+ .harper-reels .reels-orbit{transform:translateY(-116px)}
+ .hero.hero-contour{padding-top:calc(var(--top-nav-height) + 28px)}
+ .hero-contour .hero-orbit{height:clamp(276px,calc(72vw + 16px),326px);margin-top:20px}
+ .hero-contour .hero-booking{margin-top:16px;grid-template-rows:64px 64px 70px}
+ .hero-contour .hero-booking-field small{font-size:12px;line-height:1.25}
+ .hero-contour .hero-booking-field strong,.hero-contour .hero-booking-field[data-hero-field=guests] strong{font-size:14px;line-height:1.35}
+ .hero-contour .hero-booking-submit{font-size:12px;gap:6px;letter-spacing:0}
+ .mobile-city-controls{gap:0;margin:8px 0 10px}
+ .mobile-city-controls button{min-width:24px;width:24px;height:44px;padding:0 2.5px;flex:none}
+ .mobile-city-controls button span{width:19px;height:19px;border-radius:20px}
+ .mobile-city-controls button[aria-current=page]{width:43px}
+ .mobile-city-controls button[aria-current=page] span{width:38px}
+}
+@media(max-width:350px){.hero-contour .hero-booking .hero-booking-field{gap:6px;padding-inline:6px}.hero-contour .hero-booking-submit{font-size:11px;gap:5px}}
