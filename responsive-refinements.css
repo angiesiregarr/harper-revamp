@@ -1,0 +1,93 @@
+/* Shared Moments hierarchy and a native video player with local playback controls. */
+.reels-card img,.reels-card video{filter:blur(.8px);transition:filter .25s ease}
+.reels-card.is-highlighted img,.reels-card.is-highlighted video{filter:none}
+.reels-card.is-highlighted{border-color:#fff8edc9;box-shadow:0 18px 36px #25262940}
+.harper-reels .reels-stage{overflow:visible}
+.harper-reels .mobile-reels-controls{display:flex;position:absolute;left:50%;bottom:-58px;transform:translateX(-50%);width:200px;align-items:center;justify-content:space-between;color:#fff8ed;z-index:202;margin:0;gap:16px}
+.mobile-reels-controls button{display:grid;place-items:center;flex:none;width:44px;min-height:44px;padding:8px;border:1px solid #fff8ed88;background:#ffffff14;color:#fff8ed;cursor:pointer}
+.mobile-reels-controls button:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+.harper-reels{padding-bottom:106px}
+.reel-player{width:min(420px,calc(100vw - 28px));max-height:calc(100svh - 28px);padding:16px;border:1px solid #fff9ed80;background:#363839;color:#fff8ed;box-shadow:0 20px 70px #0006;overflow:auto}
+.reel-player::backdrop{background:#161819bd;backdrop-filter:blur(5px)}
+.reel-player-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.reel-player h3{margin:0;font:400 20px var(--serif)}
+.reel-player-heading button{display:grid;place-items:center;min-width:44px;min-height:44px;background:transparent;border:1px solid #fff6;color:white;font-size:25px;cursor:pointer}
+.reel-player video{display:block;width:100%;max-height:68svh;aspect-ratio:9/16;object-fit:contain;background:#111}
+.reel-player>a{display:flex;align-items:center;min-height:44px;color:#fff8ed;font:700 12px var(--sans);margin-top:8px}
+.reel-player :focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+/* The glass is a background layer at twelve percent, never the section opacity. */
+.membership .membership-stage{background:radial-gradient(ellipse at 68% 30%,#606367,transparent 58%),linear-gradient(135deg,#565a5e,#4f5357)}
+.membership .membership-stage::before{content:'';position:absolute;z-index:0;inset:0;background:rgb(255 255 255 / 12%);backdrop-filter:blur(18px);pointer-events:none}
+.membership .membership-visual::before{opacity:.12}
+.membership .membership-stores{position:relative;z-index:3}
+@media(min-width:701px) and (max-width:1050px){
+ .hero.hero-contour{height:auto;min-height:0;padding:calc(var(--top-nav-height) + 32px) 0 40px}
+ .hero-contour .hero-heading{position:relative;inset:auto;margin:0 24px}
+ .hero-contour h1{font-size:clamp(48px,6.6vw,65px)}
+ .hero-contour .hero-orbit{position:relative;inset:auto!important;height:330px;margin-top:38px}
+ .hero-contour .hero-booking{position:relative;inset:auto;width:92%;margin:38px auto 0}
+}
+@media(max-width:700px){
+ .site-nav,.site-nav.is-over-hero:not(.is-compact),.site-nav.is-compact{height:64px;min-height:64px;padding:8px 14px;gap:8px;transition:transform .24s cubic-bezier(.22,1,.36,1);will-change:transform}
+ .site-nav .brand,.site-nav.is-compact .brand,.site-nav.is-over-hero:not(.is-compact) .brand{width:clamp(110px,32vw,145px);height:44px;order:0;flex:none;margin-right:auto}
+ .site-nav .brand img,.site-nav.is-compact .brand img{width:100%;height:44px;max-height:none;object-fit:contain}
+ .site-nav .nav-book,.site-nav.is-over-hero .nav-book,.site-nav.is-compact .nav-book{order:1;min-width:100px;min-height:44px;padding:10px 11px;font-size:12px}
+ .site-nav .menu-toggle,.site-nav.is-compact .menu-toggle{order:2;flex:none;width:44px;height:44px;min-width:44px;padding:11px}
+ .site-nav.is-mobile-hidden:not(:focus-within){transform:translateY(-110%)}
+ .hero.hero-contour{padding-top:calc(var(--top-nav-height) + 40px);padding-bottom:24px}
+ .hero-contour .hero-heading{margin-inline:20px}
+ .hero-contour h1{font-size:clamp(32px,9.2vw,43px)!important;line-height:1.06}
+ .hero-contour .hero-orbit{height:300px;margin-top:40px}
+ .hero-contour .hero-booking{width:calc(100% - 32px);margin-top:32px;padding:8px;grid-template-rows:60px 60px 64px}
+ .hero-contour .hero-booking .hero-booking-field{padding:8px;gap:8px}
+ .hero-contour .hero-booking-submit{margin-bottom:2px}
+ .mobile-city-controls{display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0 14px}
+ .mobile-city-controls button{display:grid;place-items:center;min-width:44px;height:44px;padding:0;background:none;border:0;cursor:pointer}
+ .mobile-city-controls button span{display:block;width:7px;height:7px;border-radius:8px;background:#8082856b;transition:width .24s ease,background .24s ease}
+ .mobile-city-controls button[aria-current=page] span{width:25px;background:var(--orange)}
+ .mobile-city-controls button:focus-visible{outline:2px solid var(--orange);outline-offset:-3px}
+ .hotels .city-view{margin-top:10px}
+ .offers .pixel-card .offer-body a,.offers .pixel-card .offer-body a:visited{background:#fff;color:#86420e;border:1px solid #b76620;border-image:none;text-shadow:none}
+ .offers .pixel-card .offer-body a:hover,.offers .pixel-card .offer-body a:focus-visible{background:#fff7e9;color:#65300b;border-color:#b65d15;outline-offset:3px}
+ .offers .pixel-card .offer-body a:active{background:#f3e5d2;color:#4a250b;transform:translateY(1px)}
+ .harper-reels{padding-bottom:38px}
+ .harper-reels .reels-orbit{padding-block:18px}
+ .harper-reels .reels-card{scale:.87;opacity:.91!important;transform-origin:center;transition:scale .24s cubic-bezier(.22,1,.36,1),opacity .24s ease}
+ .harper-reels .reels-card.is-highlighted{scale:1;opacity:1!important}
+ .harper-reels .mobile-reels-controls{position:relative;inset:auto;transform:none;align-self:stretch;width:auto;max-width:360px;margin:12px 24px 0;gap:16px;z-index:2}
+ .membership .membership-stage{gap:24px;padding:40px 24px 40px}
+ .membership .membership-content{order:0;max-width:500px}
+ .membership .membership-content h2{margin:18px 0;font-size:clamp(29px,8vw,38px)}
+ .membership .membership-description{font-size:14px;line-height:1.55}
+ .membership .membership-benefits{font-size:14px;line-height:1.45;margin-top:22px;gap:12px}
+ .membership .membership-visual{order:1;width:100%;max-width:420px;height:clamp(410px,115vw,490px);margin:0 auto;flex:none}
+ .membership .membership-device{--mobile-phone-width:clamp(166px,47vw,205px);width:var(--mobile-phone-width);height:calc(var(--mobile-phone-width) * 2.12);aspect-ratio:auto}
+ .membership .membership-phone{position:absolute;inset:0;width:100%;height:100%;padding:5px;border-width:2px;border-radius:29px}
+ .membership .membership-phone::before{border-radius:24px}
+ .membership .membership-phone::after{inset:5px;border-radius:22px}
+ .membership .membership-screen{border-radius:22px}
+ .membership .membership-print{width:clamp(38px,11vw,52px);filter:opacity(.45)}
+ .membership .membership-stores{order:2;display:flex;align-items:center;justify-content:center;width:100%;gap:10px;margin:0 auto;max-width:350px}
+ .membership .membership-stores a{display:flex;align-items:center;min-height:48px;width:calc(50% - 5px);max-width:170px;background:#000}
+ .membership .membership-stores img{width:100%;height:auto;object-fit:contain}
+}
+@media(max-width:350px){
+ .hero-contour .hero-orbit{height:280px;margin-top:36px}
+ .hero-contour .hero-booking{margin-top:28px}
+ .hero-contour .hero-booking-submit{gap:5px;font-size:10px}
+ .hero-contour .hero-field-chevron{width:12px;height:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .site-nav,.reels-card,.reels-card img,.reels-card video,.mobile-city-controls button span{transition:none!important}
+}
+@media(min-width:701px) and (max-width:960px){
+ .membership .membership-visual{height:540px}
+ .membership .membership-stage{padding-top:48px;padding-bottom:48px}
+}
+@media(max-width:700px){
+ .membership.motion-ready .membership-device.is-awake{opacity:1;transform:translate(-50%,-50%);animation:membership-rise .75s cubic-bezier(.18,.72,.2,1) both}
+ .membership.motion-ready .membership-device.is-awake .membership-screen{filter:brightness(1);animation:membership-wake .75s .2s ease-out both}
+}
+@media(max-width:700px) and (prefers-reduced-motion:reduce){
+ .membership.motion-ready .membership-device.is-awake,.membership.motion-ready .membership-device.is-awake .membership-screen{animation:none}
+}

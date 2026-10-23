@@ -16,13 +16,53 @@
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
   let cards = [], items = [], state = 'idle';
-  let playbackPaused = false, playbackButton = null;
+  let playbackPaused = false, manualPreview = false, player = null, featuredIndex = 0, focusIndex = -1, stepIndex = -1;
+  let updateMobile = () => {};
   function syncPlayback() {
-    const playing = visible && !document.hidden && !playbackPaused;
-    for (const video of orbit.querySelectorAll('video')) {
-      if (playing) video.play().catch(() => { /* The poster and Instagram link remain available. */ });
+    const playing = visible && !document.hidden && !player?.open && (manualPreview || (!reduced.matches && !playbackPaused));
+    cards.forEach((card,index) => {
+      const video = card.querySelector('video');
+      if (!video) return;
+      if (playing && index === featuredIndex) video.play().catch(() => {});
       else video.pause();
+    });
+  }
+  function highlight(index) {
+    if (featuredIndex !== index) { featuredIndex = index; manualPreview = false; syncPlayback(); }
+    cards.forEach((card,i) => {
+      card.classList.toggle('is-highlighted',i === index);
+      if (i === index) card.setAttribute('aria-current','true'); else card.removeAttribute('aria-current');
+    });
+    if (mobileControls) mobileControls.querySelector('span').setAttribute('aria-live',phone.matches||focused?'polite':'off');
+    if (mobileControls && !phone.matches) {
+      mobileControls.querySelector('span').textContent = `${String(index+1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;
+      mobileControls.querySelectorAll('button').forEach(button => {button.disabled = state !== 'spinning' || currentSpread < .95;});
     }
+  }
+  function alignTo(index) {
+    if (phone.matches || currentSpread < .95) return;
+    stepIndex = index;
+    const target = Math.PI/2-index*2*Math.PI/cards.length;
+    stepFrom=angle;stepTo=angle+Math.atan2(Math.sin(target-angle),Math.cos(target-angle));stepAt=performance.now();velocity=0;
+  }
+  function openVideo(item) {
+    stepAt=0;velocity=0;
+    if (!player) {
+      player = document.createElement('dialog');
+      player.className = 'reel-player';
+      player.setAttribute('aria-label','Watch this Moment');
+      player.innerHTML = '<div class="reel-player-heading"><h3>Moments at Harper</h3><button type="button" aria-label="Close video">×</button></div><video controls playsinline preload="metadata"></video><a target="_blank" rel="noopener noreferrer">View original Reel on Instagram ↗</a>';
+      document.body.append(player);
+      player.querySelector('button').addEventListener('click',()=>player.close());
+      player.addEventListener('close',()=>{const video=player.querySelector('video');video.pause();video.removeAttribute('src');video.load();syncPlayback();});
+      player.addEventListener('click',event=>{if(event.target===player){const r=player.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)player.close();}});
+    }
+    const video = player.querySelector('video');
+    video.src = item.video; video.poster = item.cover || item.thumbnail;
+    video.setAttribute('aria-label',item.alt);
+    player.querySelector('a').href = item.url;
+    player.showModal(); syncPlayback();
+    if (!reduced.matches) video.play().catch(()=>{});
   }
   let visible = false, hover = false, focused = false, dragging = false, angle = -.2, velocity = 0, spreadAt = 0, currentSpread = 0;
   let holdElapsed = 0, last = 0, raf = 0, pointerX = 0, pointerAt = 0, pointerStart = 0, pointerActive = false, suppressClickUntil = 0;
@@ -62,7 +102,7 @@
     const cardBottom = box.height/2 + h*scale/2;
     const titleBottom = box.height/2 - centerHeight/2 + titleHeight;
     const socialTop = titleBottom + socialMargin;
-    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.38,box.height/2-h/2-22)),titleShift:cardTop-14-titleBottom,socialShift:cardBottom-socialHeight-Math.max(20,h*scale*.1)-socialTop};
+    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.32,box.height/2-h*1.4/2-32)),titleShift:cardTop-14-titleBottom,socialShift:cardBottom-socialHeight-Math.max(20,h*scale*.1)-socialTop};
     stage.style.setProperty('--reels-orbit-width', `${geometry.x*2}px`);
     stage.style.setProperty('--reels-orbit-height', `${geometry.y*2}px`);
     render(performance.now());
@@ -76,9 +116,9 @@
       if (item.cover || item.thumbnail) {
         if (/^\.\/assets\/reels\/[\w-]+\.mp4$/.test(item.video || '')) {
           const video = document.createElement('video');
-          video.muted = true; video.defaultMuted = true; video.autoplay = true; video.loop = true; video.playsInline = true;
+          video.muted = true; video.defaultMuted = true; video.autoplay = false; video.loop = true; video.playsInline = true;
           video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
-          video.poster = item.cover || item.thumbnail; video.preload = 'metadata';
+          video.poster = item.cover || item.thumbnail; video.preload = 'none';
           video.setAttribute('aria-hidden', 'true'); video.src = item.video;
           link.classList.add('has-video'); link.append(video);
         } else {
@@ -96,7 +136,18 @@
         link.append(placeholder);
       }
       orbit.append(link);
-      link.addEventListener('click', e => { if (performance.now() < suppressClickUntil) e.preventDefault(); });
+      link.setAttribute('aria-description', 'Press Space to play or pause the preview. Press Enter to open the video player.');
+      link.addEventListener('click', e => {
+        if (performance.now() < suppressClickUntil) { e.preventDefault(); return; }
+        if (item.video && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); openVideo(item); }
+      });
+      link.addEventListener('focus', () => { focusIndex = i; alignTo(i); highlight(i); syncPlayback(); });
+      link.addEventListener('keydown', e => {
+        if (e.code !== 'Space' || !link.querySelector('video')) return;
+        e.preventDefault();
+        if (reduced.matches) manualPreview = !manualPreview; else playbackPaused = !playbackPaused;
+        syncPlayback();
+      });
       return link;
     });
     measure();
@@ -118,6 +169,10 @@
     center.style.setProperty('--reels-title-y', `${(geometry.titleShift*(1-centerProgress)).toFixed(1)}px`);
     center.style.setProperty('--reels-social-y', `${(geometry.socialShift*(1-centerProgress)).toFixed(1)}px`);
     const n = cards.length;
+    // Highlight at the side of the orbit so the headline and socials stay clear.
+    let front = 0, frontX = -Infinity;
+    cards.forEach((card,i) => {const x=Math.cos(i*Math.PI*2/n+(n===2?0:-Math.PI/2)+angle);if(x>frontX){front=i;frontX=x;}});
+    highlight(focusIndex >= 0 ? focusIndex : spread < .8 ? 0 : stepAt ? stepIndex : front);
     cards.forEach((card,i) => {
       const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
       const stagger = reduced.matches ? 1 : ease((spread - i * .045) / Math.max(.65, 1 - i * .045));
@@ -126,7 +181,7 @@
       const y = Math.sin(phase)*geometry.y*radius;
       card.style.width = `${geometry.w}px`;
       card.style.height = `${geometry.h}px`;
-      const scale = i === 0 ? 1 + (1-spread)*Math.min(.65, Math.max(.35, 210/geometry.w-1)) : .72 + .28*stagger;
+      const scale = i === featuredIndex ? 1.4 + (1-spread)*.2 : .72 + .08*stagger;
       card.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${scale.toFixed(3)})`;
       card.style.opacity = i === 0 || reduced.matches ? '1' : String(stagger);
       card.style.zIndex = String(Math.round(100+y));
@@ -142,7 +197,7 @@
       const progress = reduced.matches ? 1 : ease((now-stepAt)/650);
       angle = stepFrom+(stepTo-stepFrom)*progress;
       if (progress >= 1) stepAt = 0;
-    } else if (state === 'spinning' && visible && currentSpread >= .98 && !document.hidden && !dragging && !reduced.matches) {
+    } else if (state === 'spinning' && visible && currentSpread >= .98 && !document.hidden && !dragging && !player?.open && !reduced.matches) {
       if (Math.abs(velocity) > .00008) {angle += velocity*dt;velocity *= Math.exp(-dt*.014);}
       else {velocity=0;if (!hover && !focused) angle += dt * (5*Math.PI/180)/1000;}
     }
@@ -158,25 +213,15 @@
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
     renderCards();
-    if (orbit.querySelector('video')) {
-      playbackButton = document.createElement('button');
-      playbackButton.type = 'button'; playbackButton.className = 'reels-playback';
-      playbackButton.textContent = 'Pause videos'; playbackButton.setAttribute('aria-pressed', 'false');
-      playbackButton.addEventListener('click', () => {
-        playbackPaused = !playbackPaused;
-        playbackButton.textContent = playbackPaused ? 'Play videos' : 'Pause videos';
-        playbackButton.setAttribute('aria-pressed', String(playbackPaused)); syncPlayback();
-      });
-      stage.append(playbackButton);
-    }
     mobileControls = document.createElement('div');
     mobileControls.className = 'mobile-pager mobile-reels-controls';
     mobileControls.innerHTML = '<button type="button" data-reel-step="-1" aria-label="Previous moment">←</button><span aria-live="polite"></span><button type="button" data-reel-step="1" aria-label="Next moment">→</button>';
     orbit.after(mobileControls);
     const mobileIndex = () => Math.max(0, Math.min(cards.length - 1, Math.round(orbit.scrollLeft / (cards[0].offsetWidth + 12))));
-    const updateMobile = () => {
+    updateMobile = () => {
       mobileScrollFrame = 0;
       const index = mobileIndex();
+      highlight(index);
       mobileControls.querySelector('span').textContent = `${String(index + 1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;
       mobileControls.querySelector('[data-reel-step="-1"]').disabled = index === 0;
       mobileControls.querySelector('[data-reel-step="1"]').disabled = index === cards.length - 1;
@@ -187,7 +232,7 @@
     };
     mobileControls.addEventListener('click', event => {
       const button = event.target.closest('[data-reel-step]');
-      if (button) moveMobile(Number(button.dataset.reelStep));
+      if (button) { if(phone.matches) moveMobile(Number(button.dataset.reelStep)); else step(Number(button.dataset.reelStep)); }
     });
     orbit.addEventListener('scroll', () => { if (phone.matches && !mobileScrollFrame) mobileScrollFrame = requestAnimationFrame(updateMobile); }, {passive:true});
     orbit.addEventListener('touchstart', event => { if (phone.matches) mobileTouch = [event.touches[0].clientX, event.touches[0].clientY]; }, {passive:true});
@@ -197,15 +242,16 @@
     }, {passive:true});
     phone.addEventListener('change', () => {
       render(performance.now());
-      updateMobile();
+      if(phone.matches) updateMobile(); else { focusIndex=-1;render(performance.now()); }
+      syncPlayback();
       if (!phone.matches && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
     });
-    updateMobile();
+    if(phone.matches)updateMobile();
     const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio >= .25;if(visible)start();syncPlayback();},{threshold:[0,.25]});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();syncPlayback();});
     orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
     orbit.addEventListener('pointerout',e=>{if(e.target.closest('.reels-card') && !e.relatedTarget?.closest?.('.reels-card'))hover=false;});
-    stage.addEventListener('focusin',()=>{focused=true;});stage.addEventListener('focusout',()=>{focused=stage.contains(document.activeElement);});
+    stage.addEventListener('focusin',()=>{focused=true;});stage.addEventListener('focusout',()=>{queueMicrotask(()=>{focused=stage.contains(document.activeElement);if(!document.activeElement.closest?.('.reels-card')){focusIndex=-1;manualPreview=false;}syncPlayback();});});
     orbit.addEventListener('pointerdown',e=>{if(phone.matches||state!=='spinning'||currentSpread<.95||e.button!==0)return;pointerActive=true;stepAt=0;pointerStart=e.clientX;pointerX=e.clientX;pointerAt=performance.now();velocity=0;});
     orbit.addEventListener('pointermove',e=>{
       if (!pointerActive || e.buttons!==1 || state!=='spinning') return;
@@ -217,10 +263,14 @@
     });
     const finish=()=>{if(dragging)suppressClickUntil=performance.now()+350;dragging=false;pointerActive=false;};
     orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
-    const step = dir => {if(state!=='spinning'||currentSpread<.95||cards.length<2)return;stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;};
-    orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();if(phone.matches)moveMobile(e.key==='ArrowRight'?1:-1);else step(e.key==='ArrowRight'?1:-1);}});
+    const step = dir => {
+      if(state!=='spinning'||currentSpread<.95||cards.length<2)return;
+      focusIndex=-1;
+      alignTo((featuredIndex+dir+cards.length)%cards.length);
+    };
+    orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();if(phone.matches)moveMobile(e.key==='ArrowRight'?1:-1);else {step(e.key==='ArrowRight'?1:-1);if(stepIndex>=0)cards[stepIndex].focus({preventScroll:true});}}});
     addEventListener('resize',measure);
-    reduced.addEventListener('change',()=>{if(reduced.matches)setState('spinning');render(performance.now());});
+    reduced.addEventListener('change',()=>{manualPreview=false;if(reduced.matches)setState('spinning');render(performance.now());syncPlayback();});
     last=performance.now();raf=requestAnimationFrame(frame);
   }
   fetch('./data/reels.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Reel manifest unavailable');return r.json();}).then(initialize).catch(()=>initialize({profiles:{instagram:'https://www.instagram.com/harperhotels/reels/'},items:[]}));

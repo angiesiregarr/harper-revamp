@@ -106,3 +106,51 @@
   show(0);
   sync();
 })();
+
+/* Hide the phone header by transform, leaving its flow height unchanged. */
+(() => {
+  const nav = document.getElementById('site-nav');
+  const menu = nav.querySelector('.menu-toggle');
+  const phone = matchMedia('(max-width:700px)');
+  const bookingLink = nav.querySelector('.nav-book');
+  function arrangeHeader() {
+    const focused = document.activeElement === bookingLink;
+    if (phone.matches) nav.insertBefore(bookingLink,menu); else nav.append(bookingLink);
+    if (focused) bookingLink.focus({preventScroll:true});
+  }
+  arrangeHeader();
+  let lastY = scrollY, travel = 0, direction = 0, frame = 0;
+  function update() {
+    frame = 0;
+    const y = Math.max(0,scrollY), delta = y - lastY;
+    const nextDirection = Math.sign(delta);
+    if (nextDirection && nextDirection !== direction) { travel = 0; direction = nextDirection; }
+    travel += Math.abs(delta);
+    lastY = y;
+    if (!phone.matches || y < 90 || menu.getAttribute('aria-expanded') === 'true' || nav.contains(document.activeElement)) {
+      nav.classList.remove('is-mobile-hidden'); travel = 0; return;
+    }
+    if (direction > 0 && travel > 12) nav.classList.add('is-mobile-hidden');
+    if (direction < 0 && travel > 6) nav.classList.remove('is-mobile-hidden');
+  }
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+  addEventListener('scroll',schedule,{passive:true});
+  phone.addEventListener('change',()=>{arrangeHeader();lastY=scrollY;travel=0;update();});
+  nav.addEventListener('focusin',()=>nav.classList.remove('is-mobile-hidden'));
+  new MutationObserver(schedule).observe(menu,{attributes:true,attributeFilter:['aria-expanded']});
+  update();
+})();
+/* Keep download links after the phone in reading and keyboard order on phones. */
+(() => {
+  const stage = document.querySelector('.membership-stage');
+  const content = stage.querySelector('.membership-content');
+  const stores = stage.querySelector('.membership-stores');
+  const phone = matchMedia('(max-width:700px)');
+  function arrange() {
+    const focused = stores.contains(document.activeElement) ? document.activeElement : null;
+    (phone.matches ? stage : content).append(stores);
+    focused?.focus({preventScroll:true});
+  }
+  phone.addEventListener('change',arrange);
+  arrange();
+})();

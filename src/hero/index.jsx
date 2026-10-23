@@ -118,14 +118,10 @@ function RusticOrbit() {
         card.style.width = `${width}px`;
         card.style.height = `${height}px`;
         card.style.transform = `translate(-50%,-50%) translate(${safeX}px,${y}px)`;
-        // Keep the card surface solid while it crosses the left woven arc.
-        const leftEdge = orbitWidth / 2 + safeX - width / 2;
-        const rattanOpacity = orbitWidth < 640 && safeX < 0
-          ? Math.max(0, Math.min(1, (98 - leftEdge) / 30)) : 0;
-        const visibleOpacity = Math.max(opacity, rattanOpacity);
+        const visibleOpacity = opacity;
         card.style.opacity = String(visibleOpacity * introProgress);
-        card.style.zIndex = String(20 - Math.round(shortest * 2));
         const featured = index === nearest;
+        card.style.zIndex = featured && orbitWidth < 640 ? '40' : String(20 - Math.round(shortest * 2));
         const gray = featured ? 0 : 1;
         const blur = Math.min(2.7, Math.max(0, shortest - .42) * .85);
         card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${1 - gray * .82}) blur(${featured ? 0 : blur}px)`;

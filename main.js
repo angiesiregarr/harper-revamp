@@ -69,19 +69,21 @@ function renderCity() {
   let cityPage = 0;
   const cityPager = document.createElement('div');
   cityPager.className = 'mobile-city-controls';
-  cityPager.innerHTML = '<label class="mobile-city-slider-label" for="city-page-slider">Browse cities</label><input id="city-page-slider" type="range" min="1" max="4" value="1" step="1" aria-label="City page"><span class="mobile-city-count" aria-live="polite"></span>';
+  cityPager.setAttribute('role', 'group');
+  cityPager.setAttribute('aria-label', 'City pages');
+  cityPager.innerHTML = Array.from({length:Math.ceil(waypoints.length / 4)}, (_, i) => `<button type="button" data-city-page="${i}" aria-label="City page ${i + 1}"><span aria-hidden="true"></span></button>`).join('');
   waypointHost.after(cityPager);
   function showCityPage(index = visibleIndex, followSelection = false) {
     if (followSelection && index !== null) cityPage = Math.floor(index / 4);
     waypoints.forEach((point, i) => point.classList.toggle('is-mobile-hidden', Math.floor(i / 4) !== cityPage));
-    const total = Math.ceil(waypoints.length / 4);
-    cityPager.querySelector('.mobile-city-count').textContent = `${String(cityPage + 1).padStart(2,'0')} / ${String(total).padStart(2,'0')} city pages`;
-    const slider = cityPager.querySelector('input');
-    slider.max = String(total);
-    slider.value = String(cityPage + 1);
-    slider.setAttribute('aria-valuetext', `City page ${cityPage + 1} of ${total}`);
+    cityPager.querySelectorAll('[data-city-page]').forEach((dot, i) => {
+      if (i === cityPage) dot.setAttribute('aria-current','page'); else dot.removeAttribute('aria-current');
+    });
   }
-  cityPager.querySelector('input').addEventListener('input', event => { cityPage = Number(event.target.value) - 1; showCityPage(); });
+  cityPager.addEventListener('click', event => {
+    const dot = event.target.closest('[data-city-page]');
+    if (dot) { cityPage = Number(dot.dataset.cityPage); showCityPage(); }
+  });
   let citySwipe = null, citySuppressClickUntil = 0;
   waypointHost.addEventListener('touchstart', event => { citySwipe = [event.touches[0].clientX,event.touches[0].clientY]; }, {passive:true});
   waypointHost.addEventListener('touchend', event => {
