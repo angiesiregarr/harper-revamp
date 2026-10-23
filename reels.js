@@ -9,7 +9,7 @@
   const empty = document.getElementById('reels-empty');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const phone = matchMedia('(max-width: 700px)');
-  let mobileControls = null, mobileScrollFrame = 0, mobileTouch = null;
+  let mobileScrollFrame = 0, mobileTouch = null;
   const icons = {
     instagram: '<rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="18" cy="6.3" r="1" fill="currentColor" stroke="none"/>',
     facebook: '<path d="M14.4 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.5 1.6-1.5h1.7V3.3a22 22 0 0 0-2.5-.1c-2.5 0-4.2 1.5-4.2 4.3v2.3H8.3V13H11v8z" fill="currentColor" stroke="none"/>',
@@ -33,11 +33,7 @@
       card.classList.toggle('is-highlighted',i === index);
       if (i === index) card.setAttribute('aria-current','true'); else card.removeAttribute('aria-current');
     });
-    if (mobileControls) mobileControls.querySelector('span').setAttribute('aria-live',phone.matches||focused?'polite':'off');
-    if (mobileControls && !phone.matches) {
-      mobileControls.querySelector('span').textContent = `${String(index+1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;
-      mobileControls.querySelectorAll('button').forEach(button => {button.disabled = state !== 'spinning' || currentSpread < .95;});
-    }
+
   }
   function alignTo(index) {
     if (phone.matches || currentSpread < .95) return;
@@ -88,10 +84,10 @@
     }
   }
   function measure() {
-    stage.setAttribute('aria-description', phone.matches ? 'Swipe to browse Moments. Use the previous and next controls, or open a cover to watch on Instagram.' : 'Drag to rotate the covers, or focus a cover and use the left and right arrow keys');
-    const box = stage.getBoundingClientRect();
+    stage.setAttribute('aria-description', phone.matches ? 'Swipe to browse Moments, or use the left and right arrow keys. Open a cover to watch.' : 'Drag to rotate the covers, or focus a cover and use the left and right arrow keys');
+    const box = orbit.getBoundingClientRect();
     const mobile = box.width < 650;
-    const w = Math.min(mobile ? 82 : 124, Math.max(64, box.width * (mobile ? .21 : .14)));
+    const w = Math.min(mobile ? 82 : 200, Math.max(64, box.width * (mobile ? .21 : .15)));
     const h = w * 340 / 190;
     const scale = 1 + Math.min(.65, Math.max(.35, 210/w-1));
     const centerHeight = center.offsetHeight;
@@ -102,7 +98,7 @@
     const cardBottom = box.height/2 + h*scale/2;
     const titleBottom = box.height/2 - centerHeight/2 + titleHeight;
     const socialTop = titleBottom + socialMargin;
-    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.32,box.height/2-h*1.4/2-32)),titleShift:cardTop-14-titleBottom,socialShift:cardBottom-socialHeight-Math.max(20,h*scale*.1)-socialTop};
+    geometry = {w,h,x:Math.max(0,Math.min(box.width*(mobile ? .38 : cards.length === 2 ? .3 : .38),box.width/2-w/2-22)),y:Math.max(0,Math.min(box.height*.28,box.height/2-h*.8/2-20)),titleShift:cardTop-14-titleBottom,socialShift:cardBottom-socialHeight-Math.max(20,h*scale*.1)-socialTop};
     stage.style.setProperty('--reels-orbit-width', `${geometry.x*2}px`);
     stage.style.setProperty('--reels-orbit-height', `${geometry.y*2}px`);
     render(performance.now());
@@ -166,8 +162,8 @@
     currentSpread = spread;
     const centerProgress = reduced.matches ? 1 : ease((spread - .18) / .77);
     social.inert = state === 'idle' || (spread < .9 && !social.contains(document.activeElement));
-    center.style.setProperty('--reels-title-y', `${(geometry.titleShift*(1-centerProgress)).toFixed(1)}px`);
-    center.style.setProperty('--reels-social-y', `${(geometry.socialShift*(1-centerProgress)).toFixed(1)}px`);
+    center.style.setProperty('--reels-title-y', `${(0).toFixed(1)}px`);
+    center.style.setProperty('--reels-social-y', `${(0).toFixed(1)}px`);
     const n = cards.length;
     // Highlight at the side of the orbit so the headline and socials stay clear.
     let front = 0, frontX = -Infinity;
@@ -177,14 +173,14 @@
       const phase = i * Math.PI*2/n + (n === 2 ? 0 : -Math.PI/2) + angle;
       const stagger = reduced.matches ? 1 : ease((spread - i * .045) / Math.max(.65, 1 - i * .045));
       const radius = i === 0 ? spread : stagger;
-      const x = Math.cos(phase)*geometry.x*radius;
-      const y = Math.sin(phase)*geometry.y*radius;
+      const x = Math.cos(phase)*geometry.x*radius * (i === featuredIndex ? .46 : 1);
+      const y = Math.sin(phase)*geometry.y*radius + (i === featuredIndex ? 28 * spread : 0);
       card.style.width = `${geometry.w}px`;
       card.style.height = `${geometry.h}px`;
-      const scale = i === featuredIndex ? 1.4 + (1-spread)*.2 : .72 + .08*stagger;
+      const scale = i === featuredIndex ? 1.35 + (1-spread)*.05 : .70 + .10*stagger;
       card.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${scale.toFixed(3)})`;
       card.style.opacity = i === 0 || reduced.matches ? '1' : String(stagger);
-      card.style.zIndex = String(Math.round(100+y));
+      card.style.zIndex = String(i === featuredIndex ? 400 : Math.round(100+y));
       card.tabIndex = i === 0 || spread >= .95 ? 0 : -1;
     });
   }
@@ -213,27 +209,17 @@
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
     renderCards();
-    mobileControls = document.createElement('div');
-    mobileControls.className = 'mobile-pager mobile-reels-controls';
-    mobileControls.innerHTML = '<button type="button" data-reel-step="-1" aria-label="Previous moment">←</button><span aria-live="polite"></span><button type="button" data-reel-step="1" aria-label="Next moment">→</button>';
-    orbit.after(mobileControls);
     const mobileIndex = () => Math.max(0, Math.min(cards.length - 1, Math.round(orbit.scrollLeft / (cards[0].offsetWidth + 12))));
     updateMobile = () => {
       mobileScrollFrame = 0;
       const index = mobileIndex();
       highlight(index);
-      mobileControls.querySelector('span').textContent = `${String(index + 1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;
-      mobileControls.querySelector('[data-reel-step="-1"]').disabled = index === 0;
-      mobileControls.querySelector('[data-reel-step="1"]').disabled = index === cards.length - 1;
+
     };
     const moveMobile = direction => {
       const index = Math.max(0, Math.min(cards.length - 1, mobileIndex() + direction));
       orbit.scrollTo({left:index * (cards[0].offsetWidth + 12),behavior:reduced.matches?'instant':'smooth'});
     };
-    mobileControls.addEventListener('click', event => {
-      const button = event.target.closest('[data-reel-step]');
-      if (button) { if(phone.matches) moveMobile(Number(button.dataset.reelStep)); else step(Number(button.dataset.reelStep)); }
-    });
     orbit.addEventListener('scroll', () => { if (phone.matches && !mobileScrollFrame) mobileScrollFrame = requestAnimationFrame(updateMobile); }, {passive:true});
     orbit.addEventListener('touchstart', event => { if (phone.matches) mobileTouch = [event.touches[0].clientX, event.touches[0].clientY]; }, {passive:true});
     orbit.addEventListener('touchend', event => {

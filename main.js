@@ -239,6 +239,11 @@ function setupNews() {
   forward.setAttribute('aria-label', 'Next journal spread');
   forward.innerHTML = '<span aria-hidden="true">›</span>';
   book.append(forward);
+  const backward = forward.cloneNode(true);
+  backward.className = 'journal-page-back';
+  backward.setAttribute('aria-label', 'Previous journal spread');
+  backward.innerHTML = '<span aria-hidden="true">‹</span>';
+  book.append(backward);
   let lastPointer = null;
   let current = 0, opening = false, coverAnimation = null, pageAnimation = null;
   book.classList.add('journal-simple');
@@ -291,27 +296,34 @@ function setupNews() {
     next.disabled = current === spreads.length - 1 || !book.classList.contains('is-open');
     if (animate && !reduced.matches) pageAnimation = spreads[current].animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'cubic-bezier(.22,1,.36,1)'});
     forward.hidden = current === spreads.length - 1 || !book.classList.contains('is-open');
+    backward.hidden = current === 0 || !book.classList.contains('is-open');
     updateCursor();
     measure();
   }
   function hideCursor() { cursor?.classList.remove('is-visible'); section.classList.remove('has-journal-cursor'); }
-  function canAdvance(target) {
-    return book.classList.contains('is-open') && !mobile.matches && current < spreads.length - 1 &&
-      (target.closest('.journal-page-forward') || (book.contains(target) && !target.closest('a,button,input,select,textarea')));
+  function pageAction(target, x = lastPointer?.x) {
+    if (!book.classList.contains('is-open') || mobile.matches) return 0;
+    if (target.closest('.journal-page-back')) return current > 0 ? -1 : 0;
+    if (target.closest('.journal-page-forward')) return current < spreads.length - 1 ? 1 : 0;
+    if (!book.contains(target) || target.closest('a,button,input,select,textarea')) return 0;
+    const rect = book.getBoundingClientRect();
+    const direction = x < rect.left + rect.width / 2 ? -1 : 1;
+    return current + direction >= 0 && current + direction < spreads.length ? direction : 0;
   }
   function updateCursor() {
     if (!cursor || !lastPointer || mobile.matches || reduced.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) { hideCursor(); return; }
     const {x,y} = lastPointer;
     const target = document.elementFromPoint(x,y);
-    if (!target || !(book.classList.contains('is-closed') && target.closest('.journal-cover')) && !canAdvance(target) && !(target.closest('#journal-next') && !next.disabled)) { hideCursor(); return; }
+    if (!target || !(book.classList.contains('is-closed') && target.closest('.journal-cover')) && !pageAction(target) && !(target.closest('#journal-next') && !next.disabled) && !(target.closest('#journal-prev') && !previous.disabled)) { hideCursor(); return; }
     cursor.style.transform = `translate3d(${x}px,${y}px,0)`;
     cursor.querySelector('.journal-drag-label').style.transform = `translate(${x > innerWidth - 145 ? -127 : 30}px,8px)`;
     cursor.classList.add('is-visible');
     section.classList.add('has-journal-cursor');
   }
   book.addEventListener('click', event => {
-    if (!canAdvance(event.target) || window.getSelection()?.toString()) return;
-    show(current + 1, true);
+    const direction = pageAction(event.target, event.clientX);
+    if (!direction || window.getSelection()?.toString()) return;
+    show(current + direction, true);
   });
   async function open(immediate = false) {
     if (opening || book.classList.contains('is-open')) return;
@@ -351,7 +363,7 @@ function setupNews() {
       updateCursor();
     }, {passive:true});
     section.addEventListener('pointerleave', () => { lastPointer = null; hideCursor(); });
-    addEventListener('scroll', hideCursor, {passive:true});
+    addEventListener('scroll', () => requestAnimationFrame(updateCursor), {passive:true});
   }
   addEventListener('resize', measure);
   new ResizeObserver(measure).observe(nav);
@@ -607,7 +619,7 @@ function setupSectionPortalMotion() {
       const offers = sections[0];
       const overlap = Math.min(120, Math.max(80, innerWidth * .08));
       const swipe = clamp((innerHeight + overlap - bounds[1].top) / Math.max(1, innerHeight - top));
-      const hotelExit = ease((swipe - .18) / .31);
+      const hotelExit = ease(swipe / .20);
       set(city, '--swipe-city-exit', hotelExit);
       city.querySelector('.hotel-content').inert = hotelExit >= .99;
       set(offers, '--swipe-heading', ease((swipe - .52) / .26));

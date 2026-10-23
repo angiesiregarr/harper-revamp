@@ -91,3 +91,61 @@
 @media(max-width:700px) and (prefers-reduced-motion:reduce){
  .membership.motion-ready .membership-device.is-awake,.membership.motion-ready .membership-device.is-awake .membership-screen{animation:none}
 }
+/* Keep the complete city caption inside the area below the fixed navigation. */
+@media(min-width:961px){
+ .hotels{min-height:var(--city-available);height:auto;padding-top:26px;padding-bottom:64px;box-sizing:border-box}
+ .hotels .city-heading h2{margin-bottom:12px}
+ .hotels .city-constellation{height:clamp(130px,20svh,190px);margin-top:26px}
+ .hotels .prism-gallery{height:clamp(160px,23svh,230px)}
+ .hotels .prism-footer{margin-top:20px;padding-bottom:16px}
+}
+.journal-page-back{position:absolute;z-index:35;left:0;top:0;bottom:0;width:42px;border:0;background:linear-gradient(270deg,transparent,#b99e7020);color:#ad6933;cursor:pointer;display:grid;place-items:center;font:400 34px var(--serif)}
+.journal-page-back[hidden]{display:none}
+.journal-page-back:hover{background:linear-gradient(270deg,transparent,#f08b1d28)}
+.journal-page-back:focus-visible{outline:3px solid var(--orange);outline-offset:-5px}
+/* Warm gray glass gallery: the heading sits above the orbit, as in the approved reference. */
+.harper-reels{padding:70px max(20px,4vw) 65px;overflow:hidden;background:radial-gradient(ellipse at 24% 4%,#d7d1c344,transparent 55%),linear-gradient(160deg,#a5a39e 0%,#898985 45%,#696c6b 100%)}
+.harper-reels::before{background:radial-gradient(ellipse at 65% 35%,#fff8ed12,transparent 65%);backdrop-filter:blur(2px)}
+.harper-reels::after{opacity:.09}
+.harper-reels .reels-stage{height:clamp(630px,47vw,790px);max-width:1500px;overflow:visible}
+.harper-reels .reels-center{top:0;left:0;width:100%;transform:none!important;z-index:200}
+.harper-reels .reels-center h2{font-size:clamp(30px,3.2vw,51px);line-height:1.15;transform:none!important;letter-spacing:-.025em}
+.harper-reels .reels-center h2 br{display:none}
+.reels-floral{display:block;width:190px;height:30px;margin:8px auto 0;color:var(--orange)}
+.harper-reels .reels-social{margin:4px auto 0;gap:18px;transform:none!important}
+.harper-reels .reels-social-icon{position:relative;width:44px;height:44px;border:0;border-radius:0;background:transparent;color:#fff9ee;box-shadow:none}
+.harper-reels .reels-social-icon:not(:last-child)::after{content:'';position:absolute;right:-9px;top:14px;height:16px;width:1px;background:#fff9ee66}
+.harper-reels .reels-social-icon svg{width:24px;height:24px}
+.harper-reels .reels-social-icon[href]:hover{background:transparent;color:#fff;transform:translateY(-2px)}
+.harper-reels .reels-orbit{top:175px;bottom:0;z-index:1}
+.harper-reels .reels-stage::before,.harper-reels .reels-stage::after{content:'';position:absolute;top:calc(50% + 87px);left:50%;width:90%;height:43%;border:1px solid #f4e5cb38;border-radius:50%;transform:translate(-50%,-50%) rotate(4deg);pointer-events:none;z-index:0}
+.harper-reels .reels-stage::after{width:85%;height:55%;transform:translate(-50%,-50%) rotate(-7deg)}
+.harper-reels .reels-card{border:1px solid #f9e4c19c;border-radius:12px;box-shadow:0 16px 28px #28282440,inset 0 1px 0 #fff9; background:#ffffff14}
+.harper-reels .reels-card::before{content:'';position:absolute;inset:1px;z-index:2;border-radius:10px;box-shadow:inset 0 1px 0 #fff9ed59;pointer-events:none}
+.harper-reels .reels-card img,.harper-reels .reels-card video{filter:blur(.65px) saturate(.8)}
+.harper-reels .reels-card.is-highlighted img,.harper-reels .reels-card.is-highlighted video{filter:none}
+.harper-reels .reels-card.is-highlighted{border-color:#fff0d9;box-shadow:0 20px 36px #28282450,0 0 0 1px #ffe1b336}
+.harper-reels .reels-card-badge{background:transparent;backdrop-filter:none}
+.harper-reels .mobile-reels-controls{display:none!important}
+.reels-contour{position:absolute!important;width:560px;height:360px;background:url('./assets/reels-contours.svg') center/contain no-repeat;opacity:.22;pointer-events:none;z-index:0!important}
+.reels-contour-top{top:-90px;right:-70px;transform:rotate(13deg)}
+.reels-contour-bottom{bottom:-110px;left:-90px;transform:rotate(190deg)}
+.reels-organic-shadow{position:absolute!important;top:-45px;left:-70px;width:420px;height:420px;background:url('./assets/palm-shadow.svg') center/contain no-repeat;filter:blur(12px);opacity:.16;pointer-events:none;z-index:0!important}
+@media(max-width:700px){
+ .journal .journal-page-back{display:none}
+ .harper-reels{padding:46px 0 38px}
+ .harper-reels .reels-stage{height:auto}
+ .harper-reels .reels-center{margin-bottom:16px;padding:0 24px}
+ .harper-reels .reels-center h2{font-size:clamp(28px,7.5vw,36px)}
+ .reels-floral{width:150px;height:26px;margin-top:10px}
+ .harper-reels .reels-social{margin-top:2px;gap:18px}
+ .harper-reels .reels-orbit{inset:auto;padding:28px 12%;scroll-padding-left:12%;gap:12px}
+ .harper-reels .reels-card{flex-basis:100%;width:100%!important;aspect-ratio:9/16;max-height:460px;scale:.83;translate:0 16px;transition:scale .25s ease,translate .25s ease}
+ .harper-reels .reels-card.is-highlighted{scale:1;translate:0 0}
+ .harper-reels .reels-stage::before,.harper-reels .reels-stage::after{top:66%;width:125%;height:35%;opacity:.6}
+ .reels-contour{width:270px;height:260px;opacity:.10}
+ .reels-organic-shadow{width:200px;height:250px;opacity:.10}
+}
+@media(prefers-reduced-motion:reduce){.harper-reels .reels-card{transition:none}}
+@media(min-width:701px){.harper-reels .reels-stage{width:100%;max-width:1500px;height:min(740px,calc(100svh - 195px))}}
+.harper-reels>.journal-cloud-transition{opacity:.2}

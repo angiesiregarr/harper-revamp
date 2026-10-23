@@ -12,7 +12,7 @@ media.add({
 }, ({ conditions }) => {
   if (!conditions.desktop) return;
   const nav = document.getElementById('site-nav');
-  const scenes = [['hotels', .18], ...(conditions.tall ? [['journal', .13]] : []), ['moments', .16], ['membership', .13]];
+  const scenes = [['hotels', .45], ...(conditions.tall ? [['journal', .13]] : []), ['moments', .16], ['membership', .13]];
   const pins = scenes.map(([id, distance]) => {
     const section = document.getElementById(id);
     section.classList.add('motion-pinned');
@@ -25,7 +25,7 @@ media.add({
       pin: section,
       pinSpacing: true,
       start: () => `top top+=${nav.getBoundingClientRect().height}`,
-      end: () => `+=${Math.round(Math.min(innerHeight * distance, 170))}`,
+      end: () => `+=${Math.round(Math.min(innerHeight * distance, id === 'hotels' ? 460 : 170))}`,
       animation: timeline,
       scrub: true,
       anticipatePin: 1,
