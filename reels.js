@@ -8,6 +8,8 @@
   const social = document.getElementById('reels-social');
   const empty = document.getElementById('reels-empty');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const phone = matchMedia('(max-width: 700px)');
+  let mobileControls = null, mobileScrollFrame = 0, mobileTouch = null;
   const icons = {
     instagram: '<rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="18" cy="6.3" r="1" fill="currentColor" stroke="none"/>',
     facebook: '<path d="M14.4 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.5 1.6-1.5h1.7V3.3a22 22 0 0 0-2.5-.1c-2.5 0-4.2 1.5-4.2 4.3v2.3H8.3V13H11v8z" fill="currentColor" stroke="none"/>',
@@ -38,6 +40,7 @@
     }
   }
   function measure() {
+    stage.setAttribute('aria-description', phone.matches ? 'Swipe to browse Moments. Use the previous and next controls, or open a cover to watch on Instagram.' : 'Drag to rotate the covers, or focus a cover and use the left and right arrow keys');
     const box = stage.getBoundingClientRect();
     const mobile = box.width < 650;
     const w = Math.min(mobile ? 82 : 124, Math.max(64, box.width * (mobile ? .21 : .14)));
@@ -83,6 +86,11 @@
   }
   function render(now) {
     if (!cards.length) return;
+    if (phone.matches) {
+      social.inert = false;
+      cards.forEach(card => { card.tabIndex = 0; });
+      return;
+    }
     const scrollDriven = section.classList.contains('motion-ready') && !reduced.matches;
     const sectionProgress = parseFloat(section.style.getPropertyValue('--handoff-enter')) || 0;
     const timedSpread = state === 'holding' || state === 'idle' ? 0 : state === 'spreading' ? ease((now-spreadAt)/900) : 1;
@@ -109,6 +117,7 @@
     });
   }
   function frame(now) {
+    if (phone.matches) { render(now); raf = 0; return; }
     const dt = Math.min(250,Math.max(0,now-last)); last=now;
     if (state === 'holding' && visible && !document.hidden) {holdElapsed += dt; if(holdElapsed >= 2000){setState('spreading');spreadAt=now;}}
     if (state === 'spreading' && now-spreadAt > Math.max(1250,900+(cards.length-1)*55)){setState('spinning');}
@@ -132,12 +141,44 @@
     renderSocial(data.profiles);
     if (!items.length) {empty.hidden=false;setState('empty');return;}
     renderCards();
+    mobileControls = document.createElement('div');
+    mobileControls.className = 'mobile-pager mobile-reels-controls';
+    mobileControls.innerHTML = '<button type="button" data-reel-step="-1" aria-label="Previous moment">←</button><span aria-live="polite"></span><button type="button" data-reel-step="1" aria-label="Next moment">→</button>';
+    orbit.after(mobileControls);
+    const mobileIndex = () => Math.max(0, Math.min(cards.length - 1, Math.round(orbit.scrollLeft / (cards[0].offsetWidth + 12))));
+    const updateMobile = () => {
+      mobileScrollFrame = 0;
+      const index = mobileIndex();
+      mobileControls.querySelector('span').textContent = `${String(index + 1).padStart(2,'0')} / ${String(cards.length).padStart(2,'0')}`;
+      mobileControls.querySelector('[data-reel-step="-1"]').disabled = index === 0;
+      mobileControls.querySelector('[data-reel-step="1"]').disabled = index === cards.length - 1;
+    };
+    const moveMobile = direction => {
+      const index = Math.max(0, Math.min(cards.length - 1, mobileIndex() + direction));
+      orbit.scrollTo({left:index * (cards[0].offsetWidth + 12),behavior:reduced.matches?'instant':'smooth'});
+    };
+    mobileControls.addEventListener('click', event => {
+      const button = event.target.closest('[data-reel-step]');
+      if (button) moveMobile(Number(button.dataset.reelStep));
+    });
+    orbit.addEventListener('scroll', () => { if (phone.matches && !mobileScrollFrame) mobileScrollFrame = requestAnimationFrame(updateMobile); }, {passive:true});
+    orbit.addEventListener('touchstart', event => { if (phone.matches) mobileTouch = [event.touches[0].clientX, event.touches[0].clientY]; }, {passive:true});
+    orbit.addEventListener('touchend', event => {
+      if (mobileTouch && Math.abs(event.changedTouches[0].clientX - mobileTouch[0]) > 10) suppressClickUntil = performance.now() + 400;
+      mobileTouch = null;
+    }, {passive:true});
+    phone.addEventListener('change', () => {
+      render(performance.now());
+      updateMobile();
+      if (!phone.matches && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+    });
+    updateMobile();
     const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio >= .25;if(visible)start();},{threshold:[0,.25]});observer.observe(stage);
     document.addEventListener('visibilitychange',()=>{last=performance.now();});
     orbit.addEventListener('pointerover',e=>{if(e.target.closest('.reels-card'))hover=true;});
     orbit.addEventListener('pointerout',e=>{if(e.target.closest('.reels-card') && !e.relatedTarget?.closest?.('.reels-card'))hover=false;});
     stage.addEventListener('focusin',()=>{focused=true;});stage.addEventListener('focusout',()=>{focused=stage.contains(document.activeElement);});
-    orbit.addEventListener('pointerdown',e=>{if(state!=='spinning'||currentSpread<.95||e.button!==0)return;pointerActive=true;stepAt=0;pointerStart=e.clientX;pointerX=e.clientX;pointerAt=performance.now();velocity=0;});
+    orbit.addEventListener('pointerdown',e=>{if(phone.matches||state!=='spinning'||currentSpread<.95||e.button!==0)return;pointerActive=true;stepAt=0;pointerStart=e.clientX;pointerX=e.clientX;pointerAt=performance.now();velocity=0;});
     orbit.addEventListener('pointermove',e=>{
       if (!pointerActive || e.buttons!==1 || state!=='spinning') return;
       if (!dragging && Math.abs(e.clientX-pointerStart)>7) {dragging=true;orbit.setPointerCapture(e.pointerId);}
@@ -149,7 +190,7 @@
     const finish=()=>{if(dragging)suppressClickUntil=performance.now()+350;dragging=false;pointerActive=false;};
     orbit.addEventListener('pointerup',finish);orbit.addEventListener('pointercancel',finish);
     const step = dir => {if(state!=='spinning'||currentSpread<.95||cards.length<2)return;stepFrom=angle;stepTo=angle+dir*2*Math.PI/cards.length;stepAt=performance.now();velocity=0;};
-    orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();step(e.key==='ArrowRight'?1:-1);}});
+    orbit.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();if(phone.matches)moveMobile(e.key==='ArrowRight'?1:-1);else step(e.key==='ArrowRight'?1:-1);}});
     addEventListener('resize',measure);
     reduced.addEventListener('change',()=>{if(reduced.matches)setState('spinning');render(performance.now());});
     last=performance.now();raf=requestAnimationFrame(frame);

@@ -15,14 +15,16 @@
     <link rel="stylesheet" href="./offers-pixel.css?v=2ae00141a9a6" />
     <script>document.documentElement.classList.add('js','hero-intro-pending');try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&(!location.hash||new URLSearchParams(location.search).get('entrance')==='replay'))document.documentElement.classList.add('entrance-pending')}catch{document.documentElement.classList.add('entrance-pending')}setTimeout(()=>document.documentElement.classList.remove('entrance-pending'),6500)</script>
     <script src="./entrance.js?v=7815b5f6d0bd" defer></script>
-    <script src="./reels.js?v=6bc0150d3fc6" defer></script>
-    <script src="./main.js?v=c3b161b104db" defer></script>
+    <script src="./reels.js?v=4e6fbba0bb7e" defer></script>
+    <script src="./main.js?v=754d8830eea2" defer></script>
     <link rel="stylesheet" href="./hero-carousel.css?v=7a18a2113b70" />
     <script src="./hero-carousel.js?v=53458c3373e9" defer></script>
     <script src="./offers-pixel.js?v=390e9c7feeec" defer></script>
-    <script src="./scroll-blur.js?v=7d335f59c50e" defer></script>
+    <script src="./scroll-blur.js?v=4edd6025202d" defer></script>
     <script src="./animated-content.js?v=e0dda09228a5" defer></script>
     <script src="./section-motion.js?v=ae7760302961" defer></script>
+    <link rel="stylesheet" href="./mobile-layout.css?v=75a9aca03d8c" />
+    <script src="./mobile-layout.js?v=b6e73b2132f3" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -68,7 +70,7 @@
           <button type="button" class="hero-booking-field" data-hero-field="checkin"><svg class="hero-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18"/></svg><span><small>Check-in</small><strong id="hero-checkin-value">Select date</strong></span><svg class="hero-field-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <button type="button" class="hero-booking-field" data-hero-field="checkout"><svg class="hero-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18"/></svg><span><small>Check-out</small><strong id="hero-checkout-value">Select date</strong></span><svg class="hero-field-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <button type="button" class="hero-booking-field" data-hero-field="guests"><svg class="hero-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="7" r="3.4"/><path d="M4.5 21v-2.5a7.5 7.5 0 0 1 15 0V21Z"/></svg><span><small>Guests</small><strong id="hero-guests-value">2 guests · 1 room</strong></span><svg class="hero-field-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <button type="button" class="hero-booking-submit" id="hero-booking-submit" aria-label="Search stays"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m15.6 15.6 5.2 5.2"/></svg></button>
+          <button type="button" class="hero-booking-submit" id="hero-booking-submit" aria-label="Search stays"><span class="mobile-search-label">Search stays</span><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m15.6 15.6 5.2 5.2"/></svg></button>
         </div>
       </section>
 
@@ -310,7 +312,7 @@
       </form>
     </dialog>
     <dialog id="booking-results" class="booking-results" aria-labelledby="booking-results-title"><button type="button" class="booking-close" aria-label="Close search results">×</button><p class="eyebrow">Your next Harper stay</p><h2 id="booking-results-title">A place to come home to.</h2><p id="booking-summary"></p><p class="booking-results-note">Explore your matching stays below. Confirm live availability, rates and your stay details on the official booking site.</p><div id="booking-matches"></div></dialog>
-    <script src="./booking.js?v=f0b1d12d295d" defer></script>
+    <script src="./booking.js?v=f941438d218b" defer></script>
     <dialog class="story-dialog" id="story-dialog" aria-labelledby="story-dialog-title"><button class="dialog-close" type="button" aria-label="Close story">×</button><p class="section-kicker">The Harper Journal</p><h2 id="story-dialog-title"></h2><p id="story-dialog-body"></p><a href="https://harperhotels.com/" target="_blank" rel="noopener noreferrer">Explore Harper <span aria-hidden="true">↗</span></a></dialog>
   </body>
 </html>

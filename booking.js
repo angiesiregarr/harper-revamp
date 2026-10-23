@@ -47,11 +47,12 @@
     nav.classList.toggle('is-over-hero', !scrolled && Boolean(hero && hero.getBoundingClientRect().bottom > height));
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
     const wasHidden = heroBooking.classList.contains('is-hidden');
-    heroBooking.classList.toggle('is-hidden', scrolled);
-    heroBooking.toggleAttribute('inert', scrolled);
-    heroBooking.setAttribute('aria-hidden', String(scrolled));
+    const hideBooking = scrolled && !matchMedia('(max-width: 700px)').matches;
+    heroBooking.classList.toggle('is-hidden', hideBooking);
+    heroBooking.toggleAttribute('inert', hideBooking);
+    heroBooking.setAttribute('aria-hidden', String(hideBooking));
     document.documentElement.style.setProperty('--booking-offset','0px');
-    if (wasHidden !== scrolled) window.dispatchEvent(new Event('harper:booking-position'));
+    if (wasHidden !== hideBooking) window.dispatchEvent(new Event('harper:booking-position'));
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
   function openBooking(event, field = 'destination') {
@@ -120,7 +121,15 @@
     const done=document.createElement('button');done.type='button';done.className='booking-done';done.textContent='Done';done.addEventListener('click',()=>closeField(true));popup.append(done);
   }
   fields.forEach(button=>button.addEventListener('click',()=>active===button.dataset.field?closeField(true):openField(button.dataset.field)));
-  document.querySelectorAll('[data-booking-open]').forEach(button=>button.addEventListener('click',openBooking));
+  document.querySelectorAll('[data-booking-open]').forEach(button=>button.addEventListener('click',event=>{
+    if (button.classList.contains('nav-book') && matchMedia('(max-width: 700px)').matches) {
+      event.preventDefault();
+      heroBooking.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+      heroBooking.querySelector('button').focus({preventScroll:true});
+      return;
+    }
+    openBooking(event);
+  }));
   document.querySelectorAll('[data-hero-field]').forEach(button=>button.addEventListener('click',event=>openBooking(event,button.dataset.heroField)));
   document.getElementById('hero-booking-submit').addEventListener('click',event=>{
     opener=event.currentTarget;

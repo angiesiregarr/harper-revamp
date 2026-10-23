@@ -65,6 +65,27 @@ function renderCity() {
   }, {rootMargin: '600px'});
   imagePreloader.observe(document.getElementById('hotels'));
   const waypoints = [...waypointHost.querySelectorAll('.city-waypoint')];
+  const mobileCities = matchMedia('(max-width: 700px)');
+  let cityPage = 0;
+  const cityPager = document.createElement('div');
+  cityPager.className = 'mobile-city-controls';
+  cityPager.innerHTML = '<div class="mobile-pager"><button type="button" data-city-page="-1" aria-label="Previous city page">←</button><span class="mobile-city-count" aria-live="polite"></span><button type="button" data-city-page="1" aria-label="Next city page">→</button></div><p class="mobile-city-selection" aria-live="polite"></p>';
+  waypointHost.after(cityPager);
+  function showCityPage(index = visibleIndex, followSelection = false) {
+    if (followSelection && index !== null) cityPage = Math.floor(index / 4);
+    waypoints.forEach((point, i) => point.classList.toggle('is-mobile-hidden', Math.floor(i / 4) !== cityPage));
+    const total = Math.ceil(waypoints.length / 4);
+    cityPager.querySelector('.mobile-city-count').textContent = `${String(cityPage + 1).padStart(2,'0')} / ${String(total).padStart(2,'0')} city pages`;
+    cityPager.querySelector('[data-city-page="-1"]').disabled = cityPage === 0;
+    cityPager.querySelector('[data-city-page="1"]').disabled = cityPage === total - 1;
+    cityPager.querySelector('.mobile-city-selection').textContent = index === null ? 'Choose a city' : `Selected: ${cityHotels[index].label || cityHotels[index].place.split(',')[0]}`;
+  }
+  cityPager.addEventListener('click', event => {
+    const button = event.target.closest('[data-city-page]');
+    if (!button) return;
+    cityPage = Math.max(0, Math.min(Math.ceil(waypoints.length / 4) - 1, cityPage + Number(button.dataset.cityPage)));
+    showCityPage();
+  });
   let committed = null;
   let hovered = null;
   let focused = null;
@@ -108,6 +129,7 @@ function renderCity() {
     if (hotel) setRoute(index, hovered === index ? routeBend : 0);
     document.getElementById('hotel-location').textContent = hotel?.place || '';
     document.getElementById('hotel-name').textContent = hotel?.title || 'Choose a city to explore';
+    showCityPage(index, true);
     const inCity = hotel ? cityHotels.map((item, i) => ({item, i})).filter(({item}) => item.city === hotel.city) : [];
     const selector = document.getElementById('city-properties');
     selector.hidden = inCity.length < 2;
@@ -127,7 +149,8 @@ function renderCity() {
   };
   const currentCity = () => new URLSearchParams(window.location.search).get('city')?.toLowerCase();
   const selectedFromUrl = () => { const index = cityHotels.findIndex(hotel => hotel.city === currentCity()); return index < 0 ? null : index; };
-  select(selectedFromUrl());
+  select(selectedFromUrl() ?? (mobileCities.matches ? 0 : null));
+  mobileCities.addEventListener('change', () => { if (mobileCities.matches && committed === null) select(0); showCityPage(visibleIndex, true); });
   const showPreview = () => show(hovered ?? focused ?? committed);
   waypoints.forEach((point) => {
     const index = cityHotels.findIndex(hotel => hotel.city === point.dataset.city);
