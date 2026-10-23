@@ -175,3 +175,19 @@
 }
 .harper-reels .reels-orbit{transform:translateY(-40px)}
 @media(max-width:700px){.harper-reels .reels-orbit{transform:translateY(-80px)}}
+/* Local amber bounce light gives the glass depth without tinting the gray canvas. */
+.harper-reels .reels-card{border-color:rgb(248 228 203 / .58);box-shadow:0 22px 32px rgb(30 29 28 / .24),0 8px 24px rgb(237 168 101 / .10)}
+.harper-reels .reels-card.is-highlighted{border-color:rgb(255 232 203 / .84);box-shadow:0 26px 42px rgb(30 29 28 / .30),0 10px 30px rgb(244 174 103 / .17),0 0 0 1px rgb(255 227 190 / .10)}
+.harper-reels .reels-card::before{box-shadow:inset 0 1px 0 #fff8e7a3,inset 1px 0 0 #ffebd03b; background:linear-gradient(135deg,#fff8ed0b,transparent 25%)}
+.reels-card-light{position:absolute;top:50%;left:50%;z-index:0;display:block;border-radius:50%;background:radial-gradient(ellipse,#e9ac71a8 0%,#e8b18163 30%,transparent 72%);filter:blur(20px);pointer-events:none;will-change:transform}
+.harper-reels .reels-orbit::before{border-color:#f0d6b44d;box-shadow:0 0 1px #ffefce29}
+.reels-orbit-spark{position:absolute;top:50%;left:50%;z-index:0;width:4px;height:4px;border-radius:50%;background:#ffe1b8;box-shadow:0 0 4px 2px #ffd7a461,0 0 12px 4px #f3bb7533;pointer-events:none}
+.reels-organic-shadow{background-image:url('./assets/reels-leaf-shadow.svg');top:-70px;left:-80px;width:480px;height:540px;transform:rotate(-10deg);filter:blur(11px);opacity:.17}
+.harper-reels::before{background:radial-gradient(ellipse at 38% 6%,#ffffff0e,transparent 54%),radial-gradient(ellipse at 90% 95%,#25252512,transparent 65%)}
+.harper-reels .reels-contour{opacity:.13}
+@media(max-width:700px){
+ .reels-organic-shadow{top:-55px;left:-85px;width:290px;height:360px;filter:blur(9px);opacity:.15}
+ .reels-card-light{filter:blur(16px)}
+ .reels-orbit-spark{width:3px;height:3px;opacity:.65}
+ .harper-reels .reels-contour{opacity:.09}
+}

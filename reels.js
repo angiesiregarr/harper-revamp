@@ -14,7 +14,7 @@
     facebook: '<path d="M14.4 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.5 1.6-1.5h1.7V3.3a22 22 0 0 0-2.5-.1c-2.5 0-4.2 1.5-4.2 4.3v2.3H8.3V13H11v8z" fill="currentColor" stroke="none"/>',
     x: '<path d="M3.5 3.5h3.8l13.2 17h-3.8zM20.5 3.5l-17 17"/>'
   };
-  let cards = [], items = [], state = 'idle';
+  let cards = [], lights = [], sparks = [], items = [], state = 'idle';
   let playbackPaused = false, manualPreview = false, player = null, featuredIndex = 0;
   function syncPlayback() {
     const playing = visible && !document.hidden && !player?.open && (manualPreview || (!reduced.matches && !playbackPaused));
@@ -121,6 +121,10 @@
   }
   function renderCards() {
     orbit.replaceChildren();
+    lights = [];
+    sparks = [.08,.31,.59,.83].map(progress => {
+      const spark=document.createElement('span');spark.className='reels-orbit-spark';spark.setAttribute('aria-hidden','true');orbit.append(spark);return {node:spark,progress};
+    });
     cards = items.map((item,i) => {
       const link = document.createElement('a');
       link.className = 'reels-card'; link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
@@ -147,7 +151,9 @@
         placeholder.innerHTML = '<span class="reels-card-play" aria-hidden="true"><svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M6 3.5v13l10-6.5z"/></svg></span><span>Watch this Reel</span><small>On Instagram ↗</small>';
         link.append(placeholder);
       }
-      orbit.append(link);
+      const light=document.createElement('span');
+      light.className='reels-card-light';light.setAttribute('aria-hidden','true');
+      lights.push(light);orbit.append(light,link);
       link.setAttribute('aria-description', 'Press Space to play or pause the preview. Press Enter to open the video player.');
       link.addEventListener('click', e => {
         if (performance.now() < suppressClickUntil) { e.preventDefault(); return; }
@@ -167,6 +173,7 @@
   function render() {
     if (!cards.length || !geometry.points.length) return;
     const n=cards.length;
+    sparks.forEach(({node,progress})=>{const [x,y]=pointAt(progress);node.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;});
     let nearest=0, distance=Infinity;
     cards.forEach((card,i) => {
       const offset=wrap(i/n+phase);
@@ -177,11 +184,16 @@
       card.style.width=`${geometry.w}px`;
       card.style.height=`${geometry.h}px`;
       card.style.setProperty('--card-width',`${geometry.w}px`);card.style.setProperty('--card-height',`${geometry.h}px`);
-      card.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${y.toFixed(3)}px,0) scale(${scale.toFixed(5)})`;
+      const lean=phone.matches?0:-1.2*x/geometry.x-.6*weight;
+      card.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${y.toFixed(3)}px,0) rotate(${lean.toFixed(3)}deg) scale(${scale.toFixed(5)})`;
       card.style.setProperty('--card-transform',card.style.transform);
       const visibility=phone.matches ? 1-ease((Math.abs(offset)*n-.85)/.65) : 1;
       card.style.setProperty('opacity',String(visibility),'important');
       card.style.pointerEvents=visibility>.05?'auto':'none';
+      const light=lights[i];
+      light.style.width=`${geometry.w*scale*1.4}px`;light.style.height=`${geometry.h*scale*.18}px`;
+      light.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${(y+geometry.h*scale/2+14).toFixed(3)}px,0)`;
+      light.style.opacity=String(visibility*(.30+.22*weight));
       card.style.zIndex=String(Math.round(100+weight*200+y));
       card.style.setProperty('--reel-blur',`${(.65*(1-weight)).toFixed(3)}px`);
       card.style.setProperty('--reel-saturation',String(.82+.18*weight));
