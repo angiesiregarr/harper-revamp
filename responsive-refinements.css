@@ -287,6 +287,7 @@
 
 /* Translucent hotel-count badges; card hover surfaces remain unchanged. */
 .offers .offer-image > span{
+ border-radius:0 0 8px 0;
  background:linear-gradient(145deg,rgb(255 255 255 / 68%),rgb(255 255 255 / 56%));
  backdrop-filter:blur(12px) saturate(1.1);
  -webkit-backdrop-filter:blur(12px) saturate(1.1);
@@ -298,3 +299,5 @@
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
  .offers .offer-image > span{background:rgb(255 255 255 / 88%)}
 }
+
+.offers .offer-card:is(:hover,:focus-within) .offer-image > span{background:#fff}
