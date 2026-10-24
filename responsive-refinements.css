@@ -301,3 +301,6 @@
 }
 
 .offers .offer-card:is(:hover,:focus-within) .offer-image > span{background:#fff}
+/* The badge touches this corner: its parent must not round it by clipping. */
+.offers .offer-image{border-top-left-radius:0}
+.offers .offer-image > span,.offers .offer-card:is(:hover,:focus-within) .offer-image > span{border-radius:0 0 8px 0}
