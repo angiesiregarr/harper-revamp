@@ -216,3 +216,24 @@
 /* Enlarged frames stay clear of the heading while the orbit keeps its proportions. */
 @media(min-width:701px){.harper-reels .reels-orbit{transform:translateY(-18px)}}
 @media(max-width:700px){.harper-reels .reels-orbit{transform:translateY(-74px)}}
+
+/* One continuous surface joins Moments and Membership, including their pin spacers. */
+.harper-grey-sequence{position:relative;isolation:isolate;overflow-x:clip;margin-top:clamp(80px,9vw,120px);background:radial-gradient(ellipse at 50% 0%,#ffffff08,transparent 60%),linear-gradient(180deg,#9a9a9a 0%,#929292 18%,var(--gray) 36%,#737373 55%,#686a6c 100%)}
+.harper-grey-sequence::before{content:'';position:absolute;inset:0;z-index:0;background:url('./assets/paper-grain.svg') repeat;background-size:190px;opacity:.09;pointer-events:none}
+.harper-grey-sequence .harper-reels{margin-top:0;background:transparent;overflow:visible}
+.harper-grey-sequence .harper-reels::before{mask-image:linear-gradient(to bottom,#000 calc(100% - 180px),transparent)}
+.harper-grey-sequence .harper-reels::after{content:none}
+.harper-grey-sequence .membership,.harper-grey-sequence .membership-stage{background:transparent}
+.harper-grey-sequence .membership-stage::before{background:rgb(255 255 255 / 3%);mask-image:linear-gradient(to bottom,transparent,#000 180px)}
+/* Only the Offers label's attached solid bar uses the existing Harper gray. */
+.offers .framed-kicker{--kicker-block:var(--gray)}
+@media(max-width:700px){
+ .harper-grey-sequence{margin-top:40px}
+ /* Small visible marks, with 44px-high tap areas and a constant total row width. */
+ .mobile-city-controls{gap:0}
+ .mobile-city-controls button{min-width:24px;width:24px;height:44px;padding:0 8px;margin-inline:-4px}
+ .mobile-city-controls button span{width:8px;height:8px;border-radius:8px;transition:background .2s ease}
+ .mobile-city-controls button[aria-current=page]{width:42px}
+ .mobile-city-controls button[aria-current=page] span{width:26px}
+ .harper-grey-sequence .membership-stage::before{background:rgb(255 255 255 / 3%);mask-image:linear-gradient(to bottom,transparent,#000 120px)}
+}
