@@ -281,3 +281,6 @@
 @media(max-width:800px){.booking-sheet .booking-sheet-heading{position:sticky;top:0;z-index:3;background:#fff8ef;box-shadow:0 5px 8px #fff8ef}}
 .booking-sheet .booking-popover.is-calendar{scroll-margin-bottom:22px}
 .is-calendar .calendar-grid button.is-range-edge:disabled{opacity:1;color:#fff}
+/* Keep the booking action icon-only, with its accessible name intact. */
+.hero-contour .hero-booking-submit,.hero-contour .hero-booking-submit:hover,.booking-sheet .booking-search,.booking-sheet .booking-search:hover{color:#000}
+.hero-contour .hero-booking-submit svg{width:26px;height:26px}

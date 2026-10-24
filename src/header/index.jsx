@@ -5,6 +5,7 @@ import PillNav from './PillNav';
 import StaggeredMenu from './StaggeredMenu';
 import './HarperHeader.css';
 
+const languages = [{ code: 'id', label: 'Indonesia', short: 'ID' }, { code: 'en', label: 'English', short: 'EN' }, { code: 'es', label: 'Español', short: 'ES' }];
 const Chevron = () => <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>;
 const HeaderLink = forwardRef(function HeaderLink({ href, className = '', ...props }, ref) {
   const external = href?.startsWith('https://');
@@ -22,6 +23,15 @@ function HeaderNavigation() {
     return () => query.removeEventListener('change', sync);
   }, []);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [language, setLanguage] = useState(() => {
+    try { return languages.find(item => item.code === localStorage.getItem('harper-language')) || languages[1]; } catch { return languages[1]; }
+  });
+  const selectLanguage = option => {
+    setLanguage(option);
+    try { localStorage.setItem('harper-language', option.code); } catch {}
+    dispatchEvent(new CustomEvent('harper-language-change', { detail: { language: option.code } }));
+    closeLanguage(true);
+  };
   const [activeHref, setActiveHref] = useState(location.hash);
   const [languagePosition, setLanguagePosition] = useState({});
   const languageTrigger = useRef(null);
@@ -41,7 +51,7 @@ function HeaderNavigation() {
       event.preventDefault();
       languageTrigger.current = event.currentTarget;
       const r = event.currentTarget.getBoundingClientRect();
-      setLanguagePosition({ left: Math.max(14, Math.min(r.right - 160, innerWidth - 174)), top: Math.min(r.bottom + 8, innerHeight - 62) });
+      setLanguagePosition({ left: Math.max(14, Math.min(r.right - 160, innerWidth - 174)), top: Math.min(r.bottom + 8, innerHeight - 156) });
       setLanguageOpen(open => !open);
     } else closeLanguage();
   }, [closeLanguage]);
@@ -62,7 +72,7 @@ function HeaderNavigation() {
     return () => removeEventListener('hashchange', sync);
   }, []);
   useLayoutEffect(() => {
-    if (languageOpen) languageMenu.current?.querySelector('button')?.focus({ preventScroll: true });
+    if (languageOpen) languageMenu.current?.querySelector('[aria-checked="true"]')?.focus({ preventScroll: true });
   }, [languageOpen]);
   useEffect(() => {
     if (!languageOpen) return;
@@ -86,14 +96,22 @@ function HeaderNavigation() {
     { label: 'News', href: '#journal' },
     { label: 'Book Now', href: '#booking-form', kind: 'booking' },
     { label: '', href: '#membership', kind: 'membership', ariaLabel: 'Archipelago Membership', icon: <img className="header-membership-logo" src="./assets/archipelago-membership-nav.svg" alt="" aria-hidden="true" /> },
-    { label: '', kind: 'language', ariaLabel: 'Language: English', popup: 'menu', controls: 'nav-language-menu', expanded: languageOpen, keepMenuOpen: true, icon: <span className="header-language-label">EN <Chevron /></span> }
+    { label: '', kind: 'language', ariaLabel: `Language: ${language.label}`, popup: 'menu', controls: 'nav-language-menu', expanded: languageOpen, keepMenuOpen: true, icon: <span className="header-language-label">{language.short} <Chevron /></span> }
   ];
   return <div className="header-nav-content">
     {(phone || collapsed) && <a className="header-book-shortcut nav-book" href="#booking-form" data-booking-open>Book Now</a>}
-    {phone ? <StaggeredMenu items={items} onMenuToggle={menuChange} onLanguageClick={choose} languageOpen={languageOpen} /> : <PillNav items={items} activeHref={activeHref} linkComponent={HeaderLink} theme="light" layout="split" itemStyle="plain" hoverEffect="fill" indicator="none" surface="none" size="md" intro={false} collapse="auto" centerItemsCount={5} highlightColor="#f08b1d" highlightTextColor="#242424" textColor="#242424" barColor="#fff8ef" onItemClick={choose} onMenuToggle={menuChange} onCollapseChange={setCollapsed} ariaLabel="Main navigation" style={{ '--pn-h': '48px', '--pn-inner': '40px', '--pn-x': '14px', '--pn-font': '14px', '--pn-surface': 'transparent', '--pn-blur': 'none', '--pn-text': '#242424', '--pn-tile': 'transparent', '--pn-tile-rim': 'none', '--pn-shadow': 'none', '--pn-edge': 'transparent', '--pn-rim': 'transparent', '--pn-ring': '#a64c00', '--pn-row-hover': '#f08b1d14'  }}>
+    {phone ? <StaggeredMenu items={items} onMenuToggle={menuChange} onLanguageClick={choose} languageOpen={languageOpen} /> : <PillNav items={items} activeHref={activeHref} linkComponent={HeaderLink} theme="light" layout="split" itemStyle="plain" hoverEffect="fill" indicator="none" surface="none" size="md" intro={false} collapse="auto" centerItemsCount={5} highlightColor="#f08b1d" highlightTextColor="#ffffff" textColor="#242424" barColor="#fff8ef" onItemClick={choose} onMenuToggle={menuChange} onCollapseChange={setCollapsed} ariaLabel="Main navigation" style={{ '--pn-h': '48px', '--pn-inner': '40px', '--pn-x': '14px', '--pn-font': '14px', '--pn-surface': 'transparent', '--pn-blur': 'none', '--pn-text': '#242424', '--pn-tile': 'transparent', '--pn-tile-rim': 'none', '--pn-shadow': 'none', '--pn-edge': 'transparent', '--pn-rim': 'transparent', '--pn-ring': '#a64c00', '--pn-row-hover': '#f08b1d'  }}>
 
     </PillNav>}
-      {languageOpen && createPortal(<div ref={languageMenu} className="header-language-menu" id="nav-language-menu" role="menu" aria-label="Choose language" style={languagePosition}><button type="button" role="menuitemradio" aria-checked="true" onClick={() => { document.documentElement.lang = 'en'; closeLanguage(true); }}>English <span aria-hidden="true">✓</span></button></div>, document.body)}
+      {languageOpen && createPortal(<div ref={languageMenu} className="header-language-menu" id="nav-language-menu" role="menu" aria-label="Choose language" style={languagePosition} onKeyDown={event => {
+        const buttons = [...languageMenu.current.querySelectorAll('button')];
+        const index = buttons.indexOf(document.activeElement);
+        if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'Tab'].includes(event.key)) {
+          event.preventDefault();
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowUp' || (event.key === 'Tab' && event.shiftKey) ? -1 : 1) + buttons.length) % buttons.length;
+          buttons[next].focus({ preventScroll: true });
+        }
+      }}>{languages.map(option => <button key={option.code} type="button" role="menuitemradio" aria-checked={language.code === option.code} onClick={() => selectLanguage(option)}>{option.label}<span aria-hidden="true">{language.code === option.code ? '✓' : ''}</span></button>)}</div>, document.body)}
   </div>;
 }
 

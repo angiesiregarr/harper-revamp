@@ -47,3 +47,9 @@
    lower controls never scrolls the sticky header's normal-flow position. */
 .site-nav.has-pill-nav[data-menu-open]{backdrop-filter:none;-webkit-backdrop-filter:none;will-change:auto;transform:none}
 .has-pill-nav .pill-nav__panel{position:fixed;top:calc(var(--top-nav-height) + 8px);right:max(14px,6vw)}
+/* Orange booking frame, black at rest and white on interaction. */
+.site-nav.has-pill-nav :is(.pill-nav__item.nav-book,.pill-nav__row.nav-book,.header-book-shortcut){color:#000;background:var(--orange)}
+.site-nav.has-pill-nav :is(.pill-nav__item,.pill-nav__row,.header-book-shortcut):is(:hover,:focus-visible){color:#fff;background:var(--orange)}
+.site-nav.has-pill-nav .pill-nav__item[data-kind=membership]:hover,.site-nav.has-pill-nav .pill-nav__row[data-kind=membership]:hover{background:transparent;outline:none;box-shadow:none;transform:none;filter:none}
+.has-pill-nav .pill-nav__item[data-kind=membership] :is(.pill-nav__face,.pill-nav__face-alt){transform:none;transition:none}
+.header-language-menu button:is(:hover,:focus-visible){color:#fff;background:var(--orange)}

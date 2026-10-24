@@ -755,9 +755,9 @@ const PillNav = ({
                   }}
                   className={SLOT}
                   data-on={fill && indicator === 'pill' && index === activeIndex ? '' : undefined}
-                  onPointerEnter={event => engineRef.current?.enter(index, event)}
+                  onPointerEnter={event => item.kind === 'membership' ? engineRef.current?.leave() : engineRef.current?.enter(index, event)}
                   onPointerDown={event => engineRef.current?.press(event)}
-                  onFocus={event => engineRef.current?.focus(index, event)}
+                  onFocus={event => item.kind !== 'membership' && engineRef.current?.focus(index, event)}
                   onBlur={() => engineRef.current?.blur()}
                 >
                   {link(
@@ -773,9 +773,9 @@ const PillNav = ({
                       onClick: event => choose(item, index, event)
                     },
                     <>
-                      {fill && <span className={FILL} aria-hidden="true" />}
+                      {fill && item.kind !== 'membership' && <span className={FILL} aria-hidden="true" />}
                       <span className={FACE}>{face(item)}</span>
-                      {fill && (
+                      {fill && item.kind !== 'membership' && (
                         <span className={FACE_ALT} aria-hidden="true">
                           {face(item)}
                         </span>

@@ -123,7 +123,7 @@ export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, la
           <div className="sm-utilities sm-detail">
             <a className="sm-book nav-book" href="#booking-form" data-booking-open onClick={event => follow(utilities[0], event)}>Book Now</a>
             <a className="sm-membership" href="#membership" aria-label="Archipelago Membership" onClick={event => follow(utilities[1], event)}>{utilities[1].icon}</a>
-            <button className="sm-language" type="button" data-kind="language" aria-label="Language: English" aria-haspopup="menu" aria-controls="nav-language-menu" aria-expanded={languageOpen} onClick={event => follow(utilities[2], event)}>{utilities[2].icon}</button>
+            <button className="sm-language" type="button" data-kind="language" aria-label={utilities[2].ariaLabel} aria-haspopup="menu" aria-controls="nav-language-menu" aria-expanded={languageOpen} onClick={event => follow(utilities[2], event)}>{utilities[2].icon}</button>
           </div>
           <div className="sm-socials sm-detail"><p className="sm-socials-title">Stay connected</p><ul className="sm-socials-list">{socials.map(([label, href]) => <li key={label}><a className="sm-socials-link" href={href} target="_blank" rel="noopener noreferrer">{label}</a></li>)}</ul></div>
         </div>

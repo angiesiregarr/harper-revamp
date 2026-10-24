@@ -33,3 +33,8 @@
 @media(max-height:640px){.sm-panel-inner{padding-top:12px;gap:16px}.sm-panel-list{gap:1px}.staggered-menu-panel .sm-panel-item{min-height:44px;font-size:30px}.sm-socials{padding-top:0}.staggered-menu-header{min-height:66px}}
 @media(prefers-reduced-motion:reduce){.staggered-menu-wrapper *{transition:none!important}}
 .staggered-menu-panel .sm-book.nav-book{margin:0;min-width:0;box-shadow:none}
+.staggered-menu-panel .sm-book.nav-book{color:#000;background:var(--orange)}
+.staggered-menu-panel :is(.sm-panel-item,.sm-socials-link,.sm-book,.sm-language,.sm-close):is(:hover,:focus-visible){color:#fff;background:var(--orange)}
+.staggered-menu-panel .sm-panel-item:is(:hover,:focus-visible) .sm-item-number{color:#fff}
+.site-nav.has-pill-nav .header-book-shortcut:is(:hover,:focus-visible){color:#fff;background:var(--orange)}
+.staggered-menu-panel .sm-membership:hover{background:transparent;box-shadow:none;transform:none;filter:none}
