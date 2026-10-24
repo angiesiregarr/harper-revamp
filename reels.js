@@ -21,8 +21,14 @@
     cards.forEach((card,index) => {
       const video = card.querySelector('video');
       if (!video) return;
-      if (playing && index === featuredIndex && card.dataset.inView === 'true') video.play().catch(() => {});
-      else video.pause();
+      const wanted = playing && card.dataset.inView === 'true' && card.dataset.orbitVisible === 'true' && (!reduced.matches || index === featuredIndex);
+      if (wanted && card.dataset.playbackWanted !== 'true') {
+        card.dataset.playbackWanted = 'true';
+        video.play().catch(() => { card.dataset.playbackWanted = 'false'; });
+      } else if (!wanted) {
+        card.dataset.playbackWanted = 'false';
+        if (!video.paused) video.pause();
+      }
     });
   }
   function highlight(index) {
@@ -90,11 +96,12 @@
     stage.setAttribute('aria-description', 'Drag or swipe to rotate Moments. Focus a reel and use the left and right arrow keys. Press Enter to watch.');
     const box = orbit.getBoundingClientRect();
     const mobile = phone.matches;
-    const activeHeight = Math.min(mobile ? 400 : 430, box.height * (mobile ? .78 : .62));
+    const previousHeight = Math.min(mobile ? 400 : 430, box.height * (mobile ? .78 : .62));
+    const activeHeight = Math.min(previousHeight * 1.30, mobile ? (box.width - 12) * 16 / 9 : Infinity);
     const h = activeHeight * .66;
     const w = h * 9 / 16;
     const x = mobile ? box.width * .90 : Math.max(0, box.width / 2 - w / 2 - 20);
-    const y = box.height * (mobile ? .13 : .17);
+    const y = box.height * (mobile ? .13 : .20);
     const points = [{theta:0,length:0}];
     let length = 0, previous = [x,0];
     for (let i = 1; i <= 720; i++) {
@@ -174,7 +181,7 @@
     if (!cards.length || !geometry.points.length) return;
     const n=cards.length;
     sparks.forEach(({node,progress})=>{const [x,y]=pointAt(progress);node.style.transform=`translate(-50%,-50%) translate(${x}px,${y}px)`;});
-    let nearest=0, distance=Infinity;
+    let nearest=0, distance=Infinity, visibilityChanged=false;
     cards.forEach((card,i) => {
       const offset=wrap(i/n+phase);
       if(Math.abs(offset)<distance){distance=Math.abs(offset);nearest=i;}
@@ -187,7 +194,13 @@
       const lean=phone.matches?0:-1.2*x/geometry.x-.6*weight;
       card.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${y.toFixed(3)}px,0) rotate(${lean.toFixed(3)}deg) scale(${scale.toFixed(5)})`;
       card.style.setProperty('--card-transform',card.style.transform);
-      const visibility=(phone.matches ? 1-ease((Math.abs(offset)*n-.85)/.65) : 1) * (.76+.24*weight);
+      // Fade the back cards at the narrow outer turns, where enlarged frames
+      // would overlap. Every reel remains in the continuous/manual orbit.
+      const backEdge = !phone.matches && n > 6
+        ? ease((Math.abs(x)/geometry.x-.68)/.15) * ease((-y/geometry.y-.05)/.20) : 0;
+      const visibility=(phone.matches ? 1-ease((Math.abs(offset)*n-.85)/.65) : 1-backEdge) * (.86+.14*weight);
+      const orbitVisible=String(visibility>.08);
+      if(card.dataset.orbitVisible!==orbitVisible){card.dataset.orbitVisible=orbitVisible;visibilityChanged=true;}
       card.style.setProperty('opacity',String(visibility),'important');
       card.style.pointerEvents=visibility>.05?'auto':'none';
       const light=lights[i];
@@ -195,13 +208,14 @@
       light.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${(y+geometry.h*scale/2+14).toFixed(3)}px,0)`;
       light.style.opacity=String(visibility*(.30+.22*weight));
       card.style.zIndex=String(Math.round(100+weight*200+y));
-      card.style.setProperty('--reel-blur',`${(2.1*(1-weight)).toFixed(3)}px`);
-      card.style.setProperty('--reel-saturation',String(.67+.33*weight));
-      card.style.setProperty('--reel-brightness',String(.78+.22*weight));
+      card.style.setProperty('--reel-blur',`${(.8*(1-weight)).toFixed(3)}px`);
+      card.style.setProperty('--reel-saturation',String(.86+.14*weight));
+      card.style.setProperty('--reel-brightness',String(.91+.09*weight));
       card.dataset.orbitX=x.toFixed(3);card.dataset.orbitY=y.toFixed(3);
-      card.tabIndex=phone.matches&&Math.abs(offset)*n>.6?-1:0;
+      card.tabIndex=visibility<.08 || (phone.matches&&Math.abs(offset)*n>.6)?-1:0;
     });
     highlight(nearest);
+    if(visibilityChanged)syncPlayback();
   }
   function frame(now) {
     const dt=Math.min(64,Math.max(0,now-last));last=now;
@@ -231,7 +245,7 @@
     }, {threshold:[0,.05]});
     cards.forEach(card => cardObserver.observe(card));
     setState('spinning');
-    const observer=new IntersectionObserver(entries=>{visible=entries[0].intersectionRatio>=.25;syncPlayback();},{threshold:[0,.25]});observer.observe(stage);
+    const observer=new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;syncPlayback();},{threshold:0});observer.observe(section);
     document.addEventListener('visibilitychange',()=>{last=performance.now();syncPlayback();});
     orbit.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')hover=true;});
     orbit.addEventListener('pointerleave',()=>{hover=false;});

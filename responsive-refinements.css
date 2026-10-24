@@ -212,3 +212,7 @@
  .mobile-city-controls button[aria-current=page] span{width:38px}
 }
 @media(max-width:350px){.hero-contour .hero-booking .hero-booking-field{gap:6px;padding-inline:6px}.hero-contour .hero-booking-submit{font-size:11px;gap:5px}}
+
+/* Enlarged frames stay clear of the heading while the orbit keeps its proportions. */
+@media(min-width:701px){.harper-reels .reels-orbit{transform:translateY(-18px)}}
+@media(max-width:700px){.harper-reels .reels-orbit{transform:translateY(-74px)}}
