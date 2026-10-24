@@ -17,11 +17,13 @@
     { name: 'Harper Cikarang', city: 'Bekasi', image: 'hero-dining.png', url: 'https://harperhotels.com/' },
     { name: 'Reserva Real Harper', city: 'Dominican Republic', image: 'hero-room.png', url: 'https://harperhotels.com/' },
   ];
+  const singleMonth = matchMedia('(max-width: 800px)');
   const state = { destination: '', checkin: '', checkout: '', rooms: 1, adults: 2, children: 0 };
   let active = '', anchor = null, opener = null, month = new Date(), frame = 0;
   const iso = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   const today = () => iso(new Date());
   const parse = value => new Date(`${value}T12:00:00`);
+  const dayNumber = value => { const [year,month,day]=value.split('-').map(Number); return Date.UTC(year,month-1,day)/86400000; };
   const nextDay = value => { const date = parse(value); date.setDate(date.getDate()+1); return iso(date); };
   const pretty = value => value ? parse(value).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : 'Select date';
   function updateLabels() {
@@ -43,7 +45,10 @@
     frame = 0;
     const scrolled = window.scrollY > 8;
     nav.classList.toggle('is-compact', scrolled);
-    const height = nav.getBoundingClientRect().height;
+    const navBounds = nav.getBoundingClientRect(), navStyle = getComputedStyle(nav);
+    const height = navBounds.height;
+    document.documentElement.style.setProperty('--booking-inset-start',`${navBounds.left + parseFloat(navStyle.paddingLeft)}px`);
+    document.documentElement.style.setProperty('--booking-inset-end',`${innerWidth - navBounds.right + parseFloat(navStyle.paddingRight)}px`);
     nav.classList.toggle('is-over-hero', !scrolled && Boolean(hero && hero.getBoundingClientRect().bottom > height));
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
     const wasHidden = heroBooking.classList.contains('is-hidden');
@@ -63,6 +68,7 @@
   function openField(name) {
     active = name; anchor = fields.find(button => button.dataset.field === name);
     fields.forEach(button => button.setAttribute('aria-expanded',String(button===anchor)));
+    popup.classList.toggle('is-calendar',name==='checkin'||name==='checkout');
     popup.hidden = false; popup.setAttribute('aria-label',anchor.querySelector('span').textContent);
     if (name==='destination') renderDestination();
     else if (name==='guests') renderGuests();
@@ -89,26 +95,77 @@
   }
   function renderCalendar() {
     const minimum = active==='checkout' && state.checkin ? nextDay(state.checkin) : today();
-    popup.innerHTML = '<div class="calendar-header"><button type="button" data-month="-1" aria-label="Previous month">‹</button><strong aria-live="polite"></strong><button type="button" data-month="1" aria-label="Next month">›</button></div><div class="calendar-grid"></div>';
-    popup.querySelector('strong').textContent=month.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
-    const grid=popup.querySelector('.calendar-grid');
-    ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(day=>{ const label=document.createElement('span');label.textContent=day;grid.append(label); });
-    const offset=(month.getDay()+6)%7;
-    for(let i=0;i<offset;i++) grid.append(document.createElement('i'));
-    const count=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
-    for(let day=1;day<=count;day++) {
-      const value=iso(new Date(month.getFullYear(),month.getMonth(),day));
-      const button=document.createElement('button');button.type='button';button.textContent=day;button.dataset.date=value;button.disabled=value<minimum;
-      button.setAttribute('aria-label',pretty(value));button.setAttribute('aria-pressed',String(state[active]===value));
-      button.addEventListener('click',()=>{const chosen=active;state[chosen]=value;if(chosen==='checkin' && state.checkout<=value)state.checkout='';updateLabels();closeField(true);if(chosen==='checkin')openField('checkout');});grid.append(button);
+    const monthCount = singleMonth.matches ? 1 : 2;
+    const dateTitle = value => value ? parse(value).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : 'DD MM YYYY';
+    const nights = state.checkin && state.checkout ? dayNumber(state.checkout)-dayNumber(state.checkin) : 0;
+    popup.innerHTML = '<div class="calendar-summary"><strong></strong><span></span></div><div class="calendar-months"></div><div class="calendar-footer"><i aria-hidden="true"></i><span>Rates in IDR</span></div>';
+    popup.querySelector('.calendar-summary strong').textContent = `${dateTitle(state.checkin)} – ${dateTitle(state.checkout)}`;
+    popup.querySelector('.calendar-summary span').textContent = nights > 0 ? `${nights} ${nights===1?'night':'nights'}` : '1 night minimum';
+    const months = popup.querySelector('.calendar-months');
+    for (let index=0; index<monthCount; index++) {
+      const current = new Date(month.getFullYear(),month.getMonth()+index,1);
+      const panel = document.createElement('section');panel.className='calendar-month';
+      panel.setAttribute('aria-label',current.toLocaleDateString('en-GB',{month:'long',year:'numeric'}));
+      const header = document.createElement('div');header.className='calendar-header';
+      const heading = document.createElement('h3');heading.textContent=panel.getAttribute('aria-label');header.append(heading);
+      for (const direction of [-1,1]) {
+        if ((direction===-1 && index!==0) || (direction===1 && index!==monthCount-1)) continue;
+        const button=document.createElement('button');button.type='button';button.dataset.month=String(direction);
+        button.setAttribute('aria-label',direction<0?'Previous month':'Next month');
+        button.innerHTML=`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${direction<0?'m15 5-7 7 7 7':'m9 5 7 7-7 7'}"/></svg>`;
+        const target=new Date(month.getFullYear(),month.getMonth()+direction,1);
+        button.disabled=direction<0 && iso(new Date(target.getFullYear(),target.getMonth()+1,0))<minimum;
+        button.addEventListener('click',()=>{month=target;renderCalendar();popup.querySelector(`[data-month="${direction}"]`)?.focus({preventScroll:true});});
+        header.append(button);
+      }
+      panel.append(header);
+      const grid=document.createElement('div');grid.className='calendar-grid';
+      ['SU','MO','TU','WE','TH','FR','SA'].forEach(day=>{const label=document.createElement('span');label.textContent=day;label.setAttribute('aria-hidden','true');grid.append(label);});
+      const first=new Date(current.getFullYear(),current.getMonth(),1-current.getDay());
+      const cells=Math.ceil((current.getDay()+new Date(current.getFullYear(),current.getMonth()+1,0).getDate())/7)*7;
+      for(let cell=0;cell<cells;cell++) {
+        const date=new Date(first.getFullYear(),first.getMonth(),first.getDate()+cell), value=iso(date);
+        const button=document.createElement('button');button.type='button';button.dataset.date=value;
+        button.classList.toggle('is-outside',date.getMonth()!==current.getMonth());
+        button.classList.toggle('is-sunday',date.getDay()===0);
+        button.classList.toggle('is-today',value===today());
+        button.classList.toggle('is-range-edge',value===state.checkin||value===state.checkout);
+        button.classList.toggle('is-between',Boolean(state.checkin&&state.checkout&&value>state.checkin&&value<state.checkout));
+        button.disabled=value<minimum;button.tabIndex=-1;
+        button.setAttribute('aria-label',date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+        button.setAttribute('aria-pressed',String(value===state.checkin||value===state.checkout));
+        if(value===today())button.setAttribute('aria-current','date');
+        button.innerHTML=`<span>${date.getDate()}</span>${value===today()?'<small>TODAY</small>':''}`;
+        button.addEventListener('click',()=>{const chosen=active;state[chosen]=value;if(chosen==='checkin'&&state.checkout<=value)state.checkout='';updateLabels();closeField(true);if(chosen==='checkin')openField('checkout');});
+        grid.append(button);
+      }
+      grid.addEventListener('focusin',event=>{if(event.target.dataset.date)popup.querySelectorAll('[data-date]').forEach(button=>{button.tabIndex=button===event.target?0:-1;});});
+      grid.addEventListener('keydown',event=>{
+        if(!event.target.dataset.date)return;
+        const deltas={ArrowLeft:-1,ArrowRight:1,ArrowUp:-7,ArrowDown:7};
+        const date=parse(event.target.dataset.date);
+        if(event.key in deltas)date.setDate(date.getDate()+deltas[event.key]);
+        else if(event.key==='Home')date.setDate(date.getDate()-date.getDay());
+        else if(event.key==='End')date.setDate(date.getDate()+6-date.getDay());
+        else if(event.key==='PageUp'||event.key==='PageDown'){
+          const day=date.getDate();date.setDate(1);date.setMonth(date.getMonth()+(event.key==='PageDown'?1:-1));date.setDate(Math.min(day,new Date(date.getFullYear(),date.getMonth()+1,0).getDate()));
+        } else return;
+        event.preventDefault();const value=iso(date);if(value<minimum)return;
+        const find=()=>popup.querySelector(`[data-date="${value}"]:not(.is-outside):not(:disabled)`)||popup.querySelector(`[data-date="${value}"]:not(:disabled)`);
+        if(!find()){month=new Date(date.getFullYear(),date.getMonth(),1);renderCalendar();}
+        find()?.focus({preventScroll:true});
+      });
+      panel.append(grid);months.append(panel);
     }
-    popup.querySelectorAll('[data-month]').forEach(button=>{
-      const direction=Number(button.dataset.month),target=new Date(month.getFullYear(),month.getMonth()+direction,1);
-      button.disabled=direction<0 && new Date(target.getFullYear(),target.getMonth()+1,0)<parse(minimum);
-      button.addEventListener('click',()=>{month=target;renderCalendar();positionPopup();popup.querySelector(`[data-month="${direction}"]`).focus();});
-    });
-    grid.addEventListener('keydown',event=>{const delta={ArrowLeft:-1,ArrowRight:1,ArrowUp:-7,ArrowDown:7}[event.key];if(!delta || !event.target.dataset.date)return;event.preventDefault();const date=parse(event.target.dataset.date);date.setDate(date.getDate()+delta);grid.querySelector(`[data-date="${iso(date)}"]:not(:disabled)`)?.focus();});
+    const firstTab=popup.querySelector(`[data-date="${state[active]||minimum}"]:not(.is-outside):not(:disabled)`)||popup.querySelector('[data-date]:not(:disabled)');
+    if(firstTab)firstTab.tabIndex=0;
   }
+  singleMonth.addEventListener('change',()=>{
+    if(popup.hidden || !['checkin','checkout'].includes(active))return;
+    const value=popup.contains(document.activeElement)?document.activeElement.dataset.date:null;
+    if(value)month=new Date(parse(value).getFullYear(),parse(value).getMonth(),1);
+    renderCalendar();if(value)popup.querySelector(`[data-date="${value}"]:not(.is-outside):not(:disabled)`)?.focus({preventScroll:true});
+  });
   function renderGuests() {
     popup.innerHTML='<h3>Make room for everyone</h3>';
     [['rooms','Rooms',1,8],['adults','Adults',1,16],['children','Children',0,8]].forEach(([key,label,min,max])=>{
