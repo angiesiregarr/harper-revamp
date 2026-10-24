@@ -2,6 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, use
 import { createRoot } from 'react-dom/client';
 import { flushSync, createPortal } from 'react-dom';
 import PillNav from './PillNav';
+import StaggeredMenu from './StaggeredMenu';
 import './HarperHeader.css';
 
 const Chevron = () => <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m5 7.5 5 5 5-5" /></svg>;
@@ -13,6 +14,13 @@ const HeaderLink = forwardRef(function HeaderLink({ href, className = '', ...pro
 
 function HeaderNavigation() {
   const [collapsed, setCollapsed] = useState(false);
+  const [phone, setPhone] = useState(() => matchMedia('(max-width:700px)').matches);
+  useEffect(() => {
+    const query = matchMedia('(max-width:700px)');
+    const sync = () => { setPhone(query.matches); setLanguageOpen(false); };
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [activeHref, setActiveHref] = useState(location.hash);
   const [languagePosition, setLanguagePosition] = useState({});
@@ -81,10 +89,11 @@ function HeaderNavigation() {
     { label: '', kind: 'language', ariaLabel: 'Language: English', popup: 'menu', controls: 'nav-language-menu', expanded: languageOpen, keepMenuOpen: true, icon: <span className="header-language-label">EN <Chevron /></span> }
   ];
   return <div className="header-nav-content">
-    {collapsed && <a className="header-book-shortcut nav-book" href="#booking-form" data-booking-open>Book Now</a>}
-    <PillNav items={items} activeHref={activeHref} linkComponent={HeaderLink} theme="light" layout="split" itemStyle="plain" hoverEffect="fill" indicator="none" surface="none" size="md" intro={false} collapse="auto" centerItemsCount={5} highlightColor="#f08b1d" highlightTextColor="#242424" textColor="#242424" barColor="#fff8ef" onItemClick={choose} onMenuToggle={menuChange} onCollapseChange={setCollapsed} ariaLabel="Main navigation" style={{ '--pn-h': '48px', '--pn-inner': '40px', '--pn-x': '14px', '--pn-font': '14px', '--pn-surface': 'transparent', '--pn-blur': 'none', '--pn-text': '#242424', '--pn-tile': 'transparent', '--pn-tile-rim': 'none', '--pn-shadow': 'none', '--pn-edge': 'transparent', '--pn-rim': 'transparent', '--pn-ring': '#a64c00', '--pn-row-hover': '#f08b1d14'  }}>
+    {(phone || collapsed) && <a className="header-book-shortcut nav-book" href="#booking-form" data-booking-open>Book Now</a>}
+    {phone ? <StaggeredMenu items={items} onMenuToggle={menuChange} onLanguageClick={choose} languageOpen={languageOpen} /> : <PillNav items={items} activeHref={activeHref} linkComponent={HeaderLink} theme="light" layout="split" itemStyle="plain" hoverEffect="fill" indicator="none" surface="none" size="md" intro={false} collapse="auto" centerItemsCount={5} highlightColor="#f08b1d" highlightTextColor="#242424" textColor="#242424" barColor="#fff8ef" onItemClick={choose} onMenuToggle={menuChange} onCollapseChange={setCollapsed} ariaLabel="Main navigation" style={{ '--pn-h': '48px', '--pn-inner': '40px', '--pn-x': '14px', '--pn-font': '14px', '--pn-surface': 'transparent', '--pn-blur': 'none', '--pn-text': '#242424', '--pn-tile': 'transparent', '--pn-tile-rim': 'none', '--pn-shadow': 'none', '--pn-edge': 'transparent', '--pn-rim': 'transparent', '--pn-ring': '#a64c00', '--pn-row-hover': '#f08b1d14'  }}>
+
+    </PillNav>}
       {languageOpen && createPortal(<div ref={languageMenu} className="header-language-menu" id="nav-language-menu" role="menu" aria-label="Choose language" style={languagePosition}><button type="button" role="menuitemradio" aria-checked="true" onClick={() => { document.documentElement.lang = 'en'; closeLanguage(true); }}>English <span aria-hidden="true">✓</span></button></div>, document.body)}
-    </PillNav>
   </div>;
 }
 
