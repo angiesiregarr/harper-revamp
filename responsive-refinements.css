@@ -304,3 +304,16 @@
 /* The badge touches this corner: its parent must not round it by clipping. */
 .offers .offer-image{border-top-left-radius:0}
 .offers .offer-image > span,.offers .offer-card:is(:hover,:focus-within) .offer-image > span{border-radius:0 0 8px 0}
+/* Icon-only booking actions take their natural compact width. */
+.hero-contour .hero-booking-submit,.booking-sheet .booking-search{box-sizing:border-box;width:62px;min-width:62px;height:62px;min-height:62px;padding:18px;gap:0;align-self:center;justify-self:end}
+.booking-sheet .booking-search{padding:17px}
+@media(min-width:1201px){
+ .hero-contour .hero-booking{grid-template-columns:minmax(220px,1.3fr) repeat(3,minmax(150px,1fr)) 78px}
+}
+@media(min-width:701px) and (max-width:1200px){
+ .hero-contour .hero-booking{grid-template-columns:repeat(2,minmax(0,1fr)) 78px}
+}
+@media(max-width:700px){
+ .hero-contour .hero-booking-submit,.booking-sheet .booking-search{width:52px;min-width:52px;height:52px;min-height:52px;padding:13px;margin:0 3px 0 0}
+ .booking-sheet .booking-search{padding:12px}
+}
