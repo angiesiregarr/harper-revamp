@@ -161,6 +161,7 @@ const PillNav = ({
   collapse = 'auto',
   onMenuToggle,
   onCollapseChange,
+  centerItemsCount = 0,
   children,
   ariaLabel = 'Main',
   className = '',
@@ -319,7 +320,7 @@ const PillNav = ({
         const half = (width * scale) / 2;
         const center = (state.x0 + state.x1) / 2;
         const inset = (trackHeight * (1 - scale * squash)) / 2;
-        ink.style.clipPath = `inset(${inset}px ${trackWidth - center - half}px ${inset}px ${center - half}px round ${trackHeight / 2}px)`;
+        ink.style.clipPath = `inset(${inset}px ${trackWidth - center - half}px ${inset}px ${center - half}px round 0px)`;
         ink.style.opacity = `${state.alpha}`;
       }
       if (dot) {
@@ -552,7 +553,20 @@ const PillNav = ({
       const need = joined
         ? pad * 2 + (hasLogo ? inner + 2 : 0) + listWidth
         : (hasLogo ? height + gap : 0) + listWidth + pad * 2;
-      const next = need > available + 0.5;
+      let centeredCollision = false;
+      const host = root.closest('.site-nav');
+      if (centerItemsCount > 0 && host) {
+        const measured = [...(measureListRef.current?.children || [])];
+        const itemGap = readVar(root, '--pn-item-gap') || 2;
+        const groupWidth = nodes => nodes.reduce((sum, node) => sum + node.offsetWidth, 0) + Math.max(0,nodes.length-1)*itemGap;
+        const menuWidth = groupWidth(measured.slice(0, centerItemsCount));
+        const utilityWidth = groupWidth(measured.slice(centerItemsCount));
+        const bounds = host.getBoundingClientRect();
+        const logoRight = host.querySelector('.brand')?.getBoundingClientRect().right || bounds.left;
+        const utilityLeft = bounds.right - parseFloat(getComputedStyle(host).paddingRight) - utilityWidth;
+        centeredCollision = bounds.left+bounds.width/2-menuWidth/2 < logoRight+16 || bounds.left+bounds.width/2+menuWidth/2 > utilityLeft-16;
+      }
+      const next = need > available + 0.5 || centeredCollision;
       if (introRef.current && next !== collapsed) pendingRef.current = next;
       setCollapsed(next);
     };
@@ -561,7 +575,7 @@ const PillNav = ({
     if (root.parentElement) observer.observe(root.parentElement);
     observer.observe(measureEl);
     return () => observer.disconnect();
-  }, [collapse, collapsed, joined, hasLogo, size]);
+  }, [collapse, collapsed, joined, hasLogo, size, centerItemsCount]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -584,8 +598,8 @@ const PillNav = ({
       const height = element.offsetHeight;
       element.animate(
         [
-          { clipPath: `inset(0px ${Math.max(0, width - height)}px 0px 0px round ${height / 2}px)` },
-          { clipPath: `inset(0px 0px 0px 0px round ${height / 2}px)` }
+          { clipPath: `inset(0px ${Math.max(0, width - height)}px 0px 0px round 0px)` },
+          { clipPath: `inset(0px 0px 0px 0px round 0px)` }
         ],
         { duration: 760, delay: 90, easing: EASE_OUT, fill: 'backwards' }
       );
@@ -621,8 +635,8 @@ const PillNav = ({
     const height = panel.offsetHeight;
     const header = joined ? root.offsetHeight : (toggleRef.current?.offsetHeight ?? 44);
     const start = joined
-      ? `inset(0px 0px ${Math.max(0, height - header)}px 0px round ${header / 2}px)`
-      : `inset(0px 0px ${Math.max(0, height - header)}px ${Math.max(0, width - header)}px round ${header / 2}px)`;
+      ? `inset(0px 0px ${Math.max(0, height - header)}px 0px round 0px)`
+      : `inset(0px 0px ${Math.max(0, height - header)}px ${Math.max(0, width - header)}px round 0px)`;
     const end = 'inset(0px 0px 0px 0px round 24px)';
     const rows = panel.querySelectorAll('li');
     const running = [];
@@ -668,7 +682,7 @@ const PillNav = ({
     if (!open) return undefined;
     const onPointerDown = event => {
       const target = event.target;
-      if (target instanceof Node && rootRef.current?.contains(target)) return;
+      if (target instanceof Node && (rootRef.current?.contains(target) || target.parentElement?.closest('#nav-language-menu'))) return;
       setOpen(false);
     };
     const onKeyDown = event => {
@@ -731,35 +745,10 @@ const PillNav = ({
     </>
   );
 
-  return (
-    <nav
-      ref={rootRef}
-      className={[ROOT, joined ? SURFACE : '', className].filter(Boolean).join(' ')}
-      data-layout={layout}
-      data-items={itemStyle}
-      data-collapsed={collapsed ? '' : undefined}
-      data-open={open ? '' : undefined}
-      data-panel={panelShown ? '' : undefined}
-      style={{ ...vars, ...style }}
-      aria-label={ariaLabel}
-    >
-      {logo && (
-        <span ref={logoRef} className={[LOGO, joined ? '' : SURFACE].filter(Boolean).join(' ')}>
-          <LinkComponent href={logoHref} className={LOGO_LINK} aria-label={logoAlt} onPointerEnter={spin}>
-            <span ref={markRef} className={MARK}>
-              {typeof logo === 'string' ? <img src={logo} alt="" draggable={false} /> : logo}
-            </span>
-          </LinkComponent>
-          {!joined && <span className={RIM} />}
-        </span>
-      )}
-
-      {!collapsed && (
-        <div ref={barRef} className={[BAR, joined ? '' : SURFACE].filter(Boolean).join(' ')}>
-          <div ref={trackRef} className={TRACK} onPointerLeave={() => engineRef.current?.leave()}>
-            <ul className={LIST}>
-              {items.map((item, index) => (
-                <li
+  const renderSlots = (group, offset = 0) => group.map((item, groupIndex) => {
+    const index = groupIndex + offset;
+    return (
+<li
                   key={`${item.label}-${index}`}
                   ref={element => {
                     slotRefs.current[index] = element;
@@ -794,8 +783,41 @@ const PillNav = ({
                     </>
                   )}
                 </li>
-              ))}
-            </ul>
+    );
+  });
+
+  return (
+    <nav
+      ref={rootRef}
+      className={[ROOT, joined ? SURFACE : '', className].filter(Boolean).join(' ')}
+      data-layout={layout}
+      data-items={itemStyle}
+      data-collapsed={collapsed ? '' : undefined}
+      data-open={open ? '' : undefined}
+      data-panel={panelShown ? '' : undefined}
+      style={{ ...vars, ...style }}
+      aria-label={ariaLabel}
+    >
+      {logo && (
+        <span ref={logoRef} className={[LOGO, joined ? '' : SURFACE].filter(Boolean).join(' ')}>
+          <LinkComponent href={logoHref} className={LOGO_LINK} aria-label={logoAlt} onPointerEnter={spin}>
+            <span ref={markRef} className={MARK}>
+              {typeof logo === 'string' ? <img src={logo} alt="" draggable={false} /> : logo}
+            </span>
+          </LinkComponent>
+          {!joined && <span className={RIM} />}
+        </span>
+      )}
+
+      {!collapsed && (
+        <div ref={barRef} className={[BAR, joined ? '' : SURFACE].filter(Boolean).join(' ')}>
+          <div ref={trackRef} className={TRACK} onPointerLeave={() => engineRef.current?.leave()}>
+            {centerItemsCount > 0 ? (
+              <div className="pill-nav__groups">
+                <ul className={`${LIST} pill-nav__menu-links`} aria-label="Page sections">{renderSlots(items.slice(0, centerItemsCount))}</ul>
+                <ul className={`${LIST} pill-nav__utility-links`} aria-label="Booking, membership and language">{renderSlots(items.slice(centerItemsCount), centerItemsCount)}</ul>
+              </div>
+            ) : <ul className={LIST}>{renderSlots(items)}</ul>}
             {glide && <span ref={glideRef} className={GLIDE} aria-hidden="true" />}
             {glide && (
               <div ref={inkRef} className={INK} aria-hidden="true">

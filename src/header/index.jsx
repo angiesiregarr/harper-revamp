@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { flushSync } from 'react-dom';
+import { flushSync, createPortal } from 'react-dom';
 import PillNav from './PillNav';
 import './HarperHeader.css';
 
@@ -77,13 +77,13 @@ function HeaderNavigation() {
     { label: 'Weddings', href: 'https://www.harperhotels.com/en/weddings' },
     { label: 'News', href: '#journal' },
     { label: 'Book Now', href: '#booking-form', kind: 'booking' },
-    { label: '', href: '#membership', kind: 'membership', ariaLabel: 'Archipelago Membership', icon: <img className="header-membership-logo" src="./assets/membership-mark.png" alt="" aria-hidden="true" /> },
+    { label: '', href: '#membership', kind: 'membership', ariaLabel: 'Archipelago Membership', icon: <img className="header-membership-logo" src="./assets/archipelago-membership-nav.svg" alt="" aria-hidden="true" /> },
     { label: '', kind: 'language', ariaLabel: 'Language: English', popup: 'menu', controls: 'nav-language-menu', expanded: languageOpen, keepMenuOpen: true, icon: <span className="header-language-label">EN <Chevron /></span> }
   ];
   return <div className="header-nav-content">
     {collapsed && <a className="header-book-shortcut nav-book" href="#booking-form" data-booking-open>Book Now</a>}
-    <PillNav items={items} activeHref={activeHref} linkComponent={HeaderLink} theme="light" layout="split" itemStyle="pill" hoverEffect="fill" indicator="none" surface="glass" size="md" intro={false} collapse="auto" highlightColor="#f08b1d" highlightTextColor="#242424" textColor="#242424" barColor="#fff8ef" onItemClick={choose} onMenuToggle={menuChange} onCollapseChange={setCollapsed} ariaLabel="Main navigation" style={{ '--pn-h': '48px', '--pn-inner': '40px', '--pn-x': '14px', '--pn-font': '14px', '--pn-surface': 'rgba(255,248,239,.96)', '--pn-blur': 'blur(12px)', '--pn-tile': '#fffaf3', '--pn-tile-rim': 'inset 0 0 0 1px rgba(128,130,133,.16), inset 0 1px 0 #fff', '--pn-shadow': '0 3px 14px #574c3d0a', '--pn-edge': '#80828526', '--pn-rim': '#ffffff80', '--pn-ring': '#a64c00', '--pn-row-hover': '#f08b1d14' }}>
-      {languageOpen && <div ref={languageMenu} className="header-language-menu" id="nav-language-menu" role="menu" aria-label="Choose language" style={languagePosition}><button type="button" role="menuitemradio" aria-checked="true" onClick={() => { document.documentElement.lang = 'en'; closeLanguage(true); }}>English <span aria-hidden="true">✓</span></button></div>}
+    <PillNav items={items} activeHref={activeHref} linkComponent={HeaderLink} theme="light" layout="split" itemStyle="plain" hoverEffect="fill" indicator="none" surface="none" size="md" intro={false} collapse="auto" centerItemsCount={5} highlightColor="#f08b1d" highlightTextColor="#242424" textColor="#242424" barColor="#fff8ef" onItemClick={choose} onMenuToggle={menuChange} onCollapseChange={setCollapsed} ariaLabel="Main navigation" style={{ '--pn-h': '48px', '--pn-inner': '40px', '--pn-x': '14px', '--pn-font': '14px', '--pn-surface': 'transparent', '--pn-blur': 'none', '--pn-text': '#242424', '--pn-tile': 'transparent', '--pn-tile-rim': 'none', '--pn-shadow': 'none', '--pn-edge': 'transparent', '--pn-rim': 'transparent', '--pn-ring': '#a64c00', '--pn-row-hover': '#f08b1d14'  }}>
+      {languageOpen && createPortal(<div ref={languageMenu} className="header-language-menu" id="nav-language-menu" role="menu" aria-label="Choose language" style={languagePosition}><button type="button" role="menuitemradio" aria-checked="true" onClick={() => { document.documentElement.lang = 'en'; closeLanguage(true); }}>English <span aria-hidden="true">✓</span></button></div>, document.body)}
     </PillNav>
   </div>;
 }
