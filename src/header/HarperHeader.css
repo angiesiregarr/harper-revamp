@@ -1,0 +1,41 @@
+/* Harper palette and existing rectangular wordmark, paired with React Bits PillNav. */
+.site-nav.has-pill-nav .primary-links{display:block;position:relative;inset:auto;flex:1;min-width:0;width:auto;padding:0;margin:0;background:none;box-shadow:none}
+.header-nav-content{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0;width:100%;font-family:var(--sans)}
+.header-nav-content>.pill-nav{flex:none}
+.header-nav-content>.pill-nav[data-collapsed]{flex:1;min-width:48px;width:auto;justify-content:flex-end}
+.has-pill-nav .pill-nav__item{padding:0 var(--pn-x);border-bottom:0;font-size:var(--pn-font)}
+.has-pill-nav .pill-nav__row{padding:0 16px;border-bottom:0;font-size:calc(var(--pn-font) + 1px)}
+.site-nav.has-pill-nav .pill-nav__item.nav-book,.site-nav.has-pill-nav .pill-nav__row.nav-book{min-width:0;min-height:0;margin:0;border:0;background:var(--orange);color:var(--ink);font:700 var(--pn-font)/1 var(--sans);letter-spacing:.015em;box-shadow:none}
+.site-nav.has-pill-nav .pill-nav__item.nav-book{height:100%;padding:0 var(--pn-x);border-radius:999px}
+.site-nav.has-pill-nav .pill-nav__row.nav-book{height:46px;min-height:44px;justify-content:flex-start;padding-inline:16px;border-radius:18px}
+.has-pill-nav .pill-nav__ink-item[data-kind=booking]{font-weight:700}
+.header-membership-logo{display:block;width:34px;height:34px;flex:none;object-fit:contain;border-radius:5px}
+.header-language-label{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.has-pill-nav .header-language-label svg{width:14px;height:14px}
+.has-pill-nav .pill-nav__panel{top:calc(100% + 8px);left:auto;right:0;width:min(360px,calc(100vw - 28px));max-height:calc(100svh - var(--top-nav-height) - 20px);padding:8px;overflow:auto;overscroll-behavior:contain;z-index:6}
+.has-pill-nav .pill-nav__menu .header-membership-logo{width:32px;height:32px}
+.site-nav.has-pill-nav .header-book-shortcut{display:flex;align-items:center;justify-content:center;flex:none;order:0;min-width:100px;min-height:44px;height:44px;padding:0 14px;margin:0;border:0;border-radius:999px;background:var(--orange);color:var(--ink);font:700 12px var(--sans);letter-spacing:.02em}
+.header-language-menu{position:fixed;z-index:10;width:160px;padding:6px;border:1px solid #80828542;border-radius:12px;background:#fff8ef;box-shadow:0 8px 22px #24242420;font:400 14px var(--sans)}
+.header-language-menu button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:40px;padding:8px 12px;border:0;border-radius:8px;background:#f08b1d12;color:var(--ink);font:inherit;cursor:pointer}
+.header-language-menu button:focus-visible,.header-book-shortcut:focus-visible{outline:2px solid var(--orange-ink);outline-offset:2px}
+.header-fallback{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+@media(max-width:700px){
+ .header-nav-content{gap:7px}
+ .site-nav.has-pill-nav .brand{width:clamp(104px,30vw,140px)}
+ .site-nav.has-pill-nav .header-book-shortcut{min-width:90px;padding-inline:10px;font-size:12px}
+ .has-pill-nav .pill-nav__toggle{width:44px;height:44px}
+}
+
+/* Contain the off-screen sizing copy without changing its intrinsic measurement. */
+.has-pill-nav .pill-nav__measure{position:fixed;top:-10000px;left:0;width:max-content;max-width:100vw;height:1px;overflow:hidden}
+.has-pill-nav .pill-nav__measure>.pill-nav__list{flex:none;width:max-content}
+.has-pill-nav .pill-nav__ink-item[data-kind=booking]{text-transform:uppercase;letter-spacing:.015em}
+.has-pill-nav button.pill-nav__item,.has-pill-nav button.pill-nav__toggle{border-radius:999px!important}
+.has-pill-nav button.pill-nav__row{border-radius:18px!important}
+.has-pill-nav .nav-book>.pill-nav__fill{display:block}
+.has-pill-nav .nav-book>.pill-nav__face-alt{display:inline-flex}
+.has-pill-nav .primary-links .pill-nav__item:hover,.site-nav.has-pill-nav .nav-book:hover{color:var(--ink);text-decoration:none;transform:none;filter:none}
+.header-membership-logo{background:#0d284e}
+.header-language-menu button{border-radius:8px!important}
+
+.site-nav.has-pill-nav .brand img{max-width:100%}

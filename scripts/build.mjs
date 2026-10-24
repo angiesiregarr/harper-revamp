@@ -14,7 +14,9 @@ await build({ entryPoints: [new URL('src/section-motion/index.js', root).pathnam
   bundle: true, minify: true, format: 'iife', platform: 'browser', target: 'es2020' });
 await build({ entryPoints: [new URL('src/entrance/index.js', root).pathname], outfile: new URL('entrance.js', root).pathname,
   bundle: true, minify: true, format: 'iife', platform: 'browser', target: 'es2020' });
-const assets = ['responsive-refinements.css', 'hero-contour.css', 'mobile-layout.css', 'mobile-layout.js', 'styles.css', 'hero-carousel.css', 'main.js', 'reels.js', 'booking.js', 'hero-carousel.js', 'offers-pixel.js', 'offers-pixel.css', 'scroll-blur.js', 'animated-content.js', 'section-motion.js', 'entrance.js'];
+await build({ entryPoints: [new URL('src/header/index.jsx', root).pathname], outfile: new URL('header-nav.js', root).pathname,
+  bundle: true, minify: true, format: 'iife', platform: 'browser', target: 'es2020', jsx: 'automatic' });
+const assets = ['header-nav.js', 'header-nav.css', 'responsive-refinements.css', 'hero-contour.css', 'mobile-layout.css', 'mobile-layout.js', 'styles.css', 'hero-carousel.css', 'main.js', 'reels.js', 'booking.js', 'hero-carousel.js', 'offers-pixel.js', 'offers-pixel.css', 'scroll-blur.js', 'animated-content.js', 'section-motion.js', 'entrance.js'];
 let html = await readFile(new URL('index.html', root), 'utf8');
 for (const name of assets) {
   const content = await readFile(new URL(name, root));

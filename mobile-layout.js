@@ -110,15 +110,7 @@
 /* Hide the phone header by transform, leaving its flow height unchanged. */
 (() => {
   const nav = document.getElementById('site-nav');
-  const menu = nav.querySelector('.menu-toggle');
   const phone = matchMedia('(max-width:700px)');
-  const bookingLink = nav.querySelector('.nav-book');
-  function arrangeHeader() {
-    const focused = document.activeElement === bookingLink;
-    if (phone.matches) nav.insertBefore(bookingLink,menu); else nav.append(bookingLink);
-    if (focused) bookingLink.focus({preventScroll:true});
-  }
-  arrangeHeader();
   let lastY = scrollY, travel = 0, direction = 0, frame = 0;
   function update() {
     frame = 0;
@@ -127,7 +119,7 @@
     if (nextDirection && nextDirection !== direction) { travel = 0; direction = nextDirection; }
     travel += Math.abs(delta);
     lastY = y;
-    if (!phone.matches || y < 90 || menu.getAttribute('aria-expanded') === 'true' || nav.contains(document.activeElement)) {
+    if (!phone.matches || y < 90 || nav.hasAttribute('data-menu-open') || nav.contains(document.activeElement)) {
       nav.classList.remove('is-mobile-hidden'); travel = 0; return;
     }
     if (direction > 0 && travel > 12) nav.classList.add('is-mobile-hidden');
@@ -135,9 +127,9 @@
   }
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
   addEventListener('scroll',schedule,{passive:true});
-  phone.addEventListener('change',()=>{arrangeHeader();lastY=scrollY;travel=0;update();});
+  phone.addEventListener('change',()=>{lastY=scrollY;travel=0;update();});
   nav.addEventListener('focusin',()=>nav.classList.remove('is-mobile-hidden'));
-  new MutationObserver(schedule).observe(menu,{attributes:true,attributeFilter:['aria-expanded']});
+  new MutationObserver(schedule).observe(nav,{attributes:true,attributeFilter:['data-menu-open']});
   update();
 })();
 /* Keep download links after the phone in reading and keyboard order on phones. */

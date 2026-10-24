@@ -62,6 +62,7 @@
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
   function openBooking(event, field = 'destination') {
     event?.preventDefault(); opener = event?.currentTarget || document.activeElement;
+    if (opener?.closest('.pill-nav__panel')) opener=nav.querySelector('.pill-nav__toggle')||opener;
     if (!sheet.open) sheet.showModal();
     openField(field);
   }
@@ -178,15 +179,17 @@
     const done=document.createElement('button');done.type='button';done.className='booking-done';done.textContent='Done';done.addEventListener('click',()=>closeField(true));popup.append(done);
   }
   fields.forEach(button=>button.addEventListener('click',()=>active===button.dataset.field?closeField(true):openField(button.dataset.field)));
-  document.querySelectorAll('[data-booking-open]').forEach(button=>button.addEventListener('click',event=>{
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('[data-booking-open]');
+    if(!button)return;
     if (button.classList.contains('nav-book') && matchMedia('(max-width: 700px)').matches) {
       event.preventDefault();
       heroBooking.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
       heroBooking.querySelector('button').focus({preventScroll:true});
       return;
     }
-    openBooking(event);
-  }));
+    openBooking({preventDefault:()=>event.preventDefault(),currentTarget:button});
+  });
   document.querySelectorAll('[data-hero-field]').forEach(button=>button.addEventListener('click',event=>openBooking(event,button.dataset.heroField)));
   document.getElementById('hero-booking-submit').addEventListener('click',event=>{
     opener=event.currentTarget;

@@ -196,6 +196,7 @@ function renderCity() {
 }
 
 function setupMenu() {
+  if (document.querySelector('.site-nav.has-pill-nav')) return; // PillNav owns its responsive menu.
   const button = document.querySelector('.menu-toggle');
   const menu = document.getElementById('primary-links');
   const close = () => {
