@@ -5,11 +5,11 @@ import { gsap } from 'gsap';
 import './StaggeredMenu.css';
 
 const socials = [
-  ['Instagram', 'https://www.instagram.com/harperhotels/'],
-  ['Facebook', 'https://www.facebook.com/HARPERHotels'],
-  ['TikTok', 'https://www.tiktok.com/@harperhotels'],
-  ['X', 'https://twitter.com/harperhotels'],
-  ['YouTube', 'https://www.youtube.com/@HarperHotels']
+  ['Facebook', 'https://www.facebook.com/HARPERHotels', 'facebook'],
+  ['Instagram', 'https://www.instagram.com/harperhotels/', 'instagram'],
+  ['TikTok', 'https://www.tiktok.com/@harperhotels', 'tiktok'],
+  ['X', 'https://twitter.com/harperhotels', 'x'],
+  ['YouTube', 'https://www.youtube.com/@HarperHotels', 'youtube']
 ];
 
 export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, languageOpen }) {
@@ -115,17 +115,23 @@ export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, la
       <div className="sm-prelayers" aria-hidden="true"><div className="sm-prelayer sm-layer-orange" /><div className="sm-prelayer sm-layer-grey" /></div>
       <aside ref={panel} className="staggered-menu-panel" id="staggered-menu-panel">
         <div className="staggered-menu-header">
-          <a href="#main" aria-label="HARPER home" onClick={() => close(false)}><img src="./assets/harper-logo-hd.png" alt="HARPER by ASTON" /></a>
-          <button ref={closeButton} className="sm-close" type="button" aria-label="Close menu" onClick={() => close()}><span>Close</span><span className="sm-close-icon" aria-hidden="true">×</span></button>
+          <a href="#main" aria-label="HARPER home" onClick={() => close(false)}><img src="./assets/harper-logo-white.png" alt="HARPER by ASTON" /></a>
+          <div className="sm-header-actions">
+            <button className="sm-language" type="button" data-kind="language" aria-label={utilities[2].ariaLabel} aria-haspopup="menu" aria-controls="nav-language-menu" aria-expanded={languageOpen} onClick={event => follow(utilities[2], event)}>{utilities[2].icon}</button>
+            <button ref={closeButton} className="sm-close" type="button" aria-label="Close menu" onClick={() => close()}><span className="sm-close-icon" aria-hidden="true">×</span></button>
+          </div>
         </div>
         <div className="sm-panel-inner">
-          <nav aria-label="Mobile navigation"><ul className="sm-panel-list">{items.slice(0, 5).map((item, i) => <li className="sm-panel-itemWrap" key={item.label}><a className="sm-panel-item" href={item.href} target={item.href.startsWith('https:') ? '_blank' : undefined} rel={item.href.startsWith('https:') ? 'noopener noreferrer' : undefined} onClick={event => follow(item, event)}><span className="sm-panel-itemLabel">{item.label}<span className="sm-item-number" aria-hidden="true">0{i + 1}</span></span></a></li>)}</ul></nav>
-          <div className="sm-utilities sm-detail">
+          <nav aria-label="Mobile navigation"><ul className="sm-panel-list">{items.slice(0, 5).map((item, i) => <li className="sm-panel-itemWrap" key={item.label}><a className="sm-panel-item" href={item.href} target={item.href.startsWith('https:') ? '_blank' : undefined} rel={item.href.startsWith('https:') ? 'noopener noreferrer' : undefined} onClick={event => follow(item, event)}><span className="sm-panel-itemLabel"><span className="sm-item-number" aria-hidden="true">0{i + 1}</span><span>{item.label}</span></span></a></li>)}</ul></nav>
+          <a className="sm-membership sm-detail" href="#membership" aria-label="Archipelago Membership" onClick={event => follow(utilities[1], event)}>
+            {utilities[1].icon}
+            <span className="sm-membership-copy"><span>Archipelago Membership</span><small>Member rates and rewards</small></span>
+            <span className="sm-membership-arrow" aria-hidden="true">→</span>
+          </a>
+          <div className="sm-menu-footer sm-detail">
             <a className="sm-book nav-book" href="#booking-form" data-booking-open onClick={event => follow(utilities[0], event)}>Book Now</a>
-            <a className="sm-membership" href="#membership" aria-label="Archipelago Membership" onClick={event => follow(utilities[1], event)}>{utilities[1].icon}</a>
-            <button className="sm-language" type="button" data-kind="language" aria-label={utilities[2].ariaLabel} aria-haspopup="menu" aria-controls="nav-language-menu" aria-expanded={languageOpen} onClick={event => follow(utilities[2], event)}>{utilities[2].icon}</button>
+            <div className="sm-socials" aria-label="Harper social profiles"><ul className="sm-socials-list">{socials.map(([label, href, icon]) => <li key={label}><a className="sm-socials-link" href={href} aria-label={`Harper on ${label}`} target="_blank" rel="noopener noreferrer"><img src={`./assets/footer-social/${icon}.png`} alt="" /></a></li>)}</ul></div>
           </div>
-          <div className="sm-socials sm-detail"><p className="sm-socials-title">Stay connected</p><ul className="sm-socials-list">{socials.map(([label, href]) => <li key={label}><a className="sm-socials-link" href={href} target="_blank" rel="noopener noreferrer">{label}</a></li>)}</ul></div>
         </div>
       </aside>
     </div>, document.body)}
