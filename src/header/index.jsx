@@ -99,7 +99,7 @@ function HeaderNavigation() {
     { label: '', kind: 'language', ariaLabel: `Language: ${language.label}`, popup: 'menu', controls: 'nav-language-menu', expanded: languageOpen, keepMenuOpen: true, icon: <span className="header-language-label">{language.short} <Chevron /></span> }
   ];
   return <div className="header-nav-content">
-    {(phone || collapsed) && <a className="header-book-shortcut nav-book" href="#booking-form" data-booking-open>Book Now</a>}
+    {!phone && collapsed && <a className="header-book-shortcut nav-book" href="#booking-form" data-booking-open>Book Now</a>}
     {phone ? <StaggeredMenu items={items} onMenuToggle={menuChange} onLanguageClick={choose} languageOpen={languageOpen} /> : <PillNav items={items} activeHref={activeHref} linkComponent={HeaderLink} theme="light" layout="split" itemStyle="plain" hoverEffect="fill" indicator="none" surface="none" size="md" intro={false} collapse="auto" centerItemsCount={5} highlightColor="#f08b1d" highlightTextColor="#ffffff" textColor="#242424" barColor="#fff8ef" onItemClick={choose} onMenuToggle={menuChange} onCollapseChange={setCollapsed} ariaLabel="Main navigation" style={{ '--pn-h': '48px', '--pn-inner': '40px', '--pn-x': '14px', '--pn-font': '14px', '--pn-surface': 'transparent', '--pn-blur': 'none', '--pn-text': '#242424', '--pn-tile': 'transparent', '--pn-tile-rim': 'none', '--pn-shadow': 'none', '--pn-edge': 'transparent', '--pn-rim': 'transparent', '--pn-ring': '#a64c00', '--pn-row-hover': '#f08b1d'  }}>
 
     </PillNav>}

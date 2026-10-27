@@ -780,6 +780,12 @@ function setupHeroCityHandoff() {
   const city = document.getElementById('hotels');
   const nav = document.getElementById('site-nav');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  // A ruler has no flow height. The hero remains content-sized while the
+  // handoff keeps its scroll range stable as mobile browser bars collapse.
+  const mobileViewport = document.createElement('div');
+  mobileViewport.setAttribute('aria-hidden', 'true');
+  mobileViewport.style.cssText = 'position:fixed;inset:0 auto auto 0;width:0;height:100svh;visibility:hidden;pointer-events:none';
+  document.body.append(mobileViewport);
   new IntersectionObserver(entries => {
     if (!reduced.matches) return;
     for (const entry of entries) city.classList.toggle('handoff-reduced-enter', entry.isIntersecting);
@@ -811,8 +817,9 @@ function setupHeroCityHandoff() {
     const heroBottom = hero.getBoundingClientRect().bottom + scrollY;
     const cityTop = city.getBoundingClientRect().top + scrollY;
     const compactHeader = nav.getBoundingClientRect().height;
-    const start = Math.max(0, heroBottom - innerHeight);
-    const end = Math.max(start + innerHeight * .55, cityTop - compactHeader - 2);
+    const timelineHeight = innerWidth <= 700 ? mobileViewport.getBoundingClientRect().height : innerHeight;
+    const start = Math.max(0, heroBottom - timelineHeight);
+    const end = Math.max(start + timelineHeight * .55, cityTop - compactHeader - 2);
     geometry = { start, end, source: documentRect(source), destination: documentRect(destination) };
     const sourceUrl = source.querySelector('img')?.currentSrc || source.querySelector('img')?.src;
     const destinationUrl = destination.querySelector('img')?.currentSrc || destination.querySelector('img')?.src;
@@ -842,7 +849,16 @@ function setupHeroCityHandoff() {
     document.body.style.setProperty('--handoff-hero-title', (1 - .9 * phase(.06, .36, progress)).toFixed(4));
     document.body.style.setProperty('--handoff-hero-rise', `${(-20 * phase(.06, .36, progress)).toFixed(2)}px`);
     document.body.style.setProperty('--handoff-orbit', (1 - .86 * phase(.28, .76, progress)).toFixed(4));
-    city.style.setProperty('--handoff-heading', (mobile ? phase(.20, .40, progress) : phase(.54, .79, progress)).toFixed(4));
+    let headingReveal = mobile ? phase(.20, .40, progress) : phase(.54, .79, progress);
+    if (innerWidth <= 700) {
+      // The existing 60px form-to-heading gap is already compact. Do not leave
+      // the heading invisible when natural flow puts it on a tall first screen.
+      const heading = city.querySelector('.city-heading').getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const visibleBottom = viewport ? viewport.height + viewport.offsetTop : innerHeight;
+      headingReveal = Math.max(headingReveal, phase(0, Math.min(64, heading.height), visibleBottom - heading.top));
+    }
+    city.style.setProperty('--handoff-heading', headingReveal.toFixed(4));
     city.style.setProperty('--handoff-map', phase(.48, .86, progress).toFixed(4));
     city.style.setProperty('--handoff-neighbors', phase(.68, .93, progress).toFixed(4));
     city.style.setProperty('--handoff-caption', phase(.78, .98, progress).toFixed(4));
@@ -892,6 +908,7 @@ function setupHeroCityHandoff() {
     city.addEventListener('focusin', () => { cityInteracted = true; schedule(); });
     window.addEventListener('harper:booking-position', refresh);
     window.addEventListener('scroll', schedule, { passive: true });
+    window.visualViewport?.addEventListener('resize', schedule, { passive: true });
     reduced.addEventListener('change', () => { refresh(); schedule(); });
   };
   if (!hero.querySelector('.rustic-orbit__card.is-featured')) {

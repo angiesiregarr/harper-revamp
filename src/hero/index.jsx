@@ -92,11 +92,14 @@ function phaseAt(distance, geometry) {
 
 function RusticOrbit() {
   const [active, setActive] = useState(0);
-  const cardRefs = useRef([]), orbitRef = useRef(null), controller = useRef(null), touch = useRef(null), suppressClick = useRef(false);
+  const cardRefs = useRef([]), orbitRef = useRef(null), controller = useRef(null), touch = useRef(null), suppressClick = useRef(false), clickReset = useRef(null);
   const paused = useRef({ hover: false, focus: false, touch: false, offscreen: false });
 
   useLayoutEffect(() => {
     let geometry, distance = 0, lastTime = 0, frame, move = null, currentActive = 0;
+    const phone = window.matchMedia('(max-width:700px)');
+    let idleTime = 0;
+    const mobileStepDuration = 680, mobileIdleDuration = 4000;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let introState = motion.matches ? 'done' : 'waiting', introStart = 0;
     const introLength = (rooms.length - 1) * 80 + 650;
@@ -137,11 +140,15 @@ function RusticOrbit() {
       const { width } = orbitRef.current.getBoundingClientRect();
       geometry = makeGeometry(width, window.innerHeight);
       distance = distanceAt(phase, geometry);
+      lastTime = 0;
       paint(phase);
     };
     const moveTo = target => {
       const phase = phaseAt(distance, geometry);
-      move = { from: distance, to: distanceAt(target, geometry), start: performance.now(), duration: motion.matches ? 0 : 850 };
+      if (phone.matches && move) return; // No queued swipes or competing moves.
+      idleTime = 0;
+      if (phone.matches && !motion.matches) target = Math.round(phase) + Math.max(-1, Math.min(1, target - Math.round(phase)));
+      move = { from: distance, to: distanceAt(target, geometry), fromPhase: phase, toPhase: target, elapsed: 0, start: performance.now(), duration: motion.matches ? 0 : phone.matches ? mobileStepDuration : 850 };
       if (motion.matches) { distance = move.to; move = null; paint(target); }
     };
     const finishIntro = () => {
@@ -153,12 +160,13 @@ function RusticOrbit() {
     controller.current = {
       finishIntro,
       step(delta) { finishIntro(); moveTo(Math.round(phaseAt(distance, geometry)) + delta); },
-      select(index) {
+      select(index, immediate = false) {
         finishIntro();
         const phase = phaseAt(distance, geometry), current = Math.round(phase);
         let difference = mod(index - mod(current, rooms.length), rooms.length);
         if (difference > rooms.length / 2) difference -= rooms.length;
-        moveTo(current + difference);
+        if (phone.matches && immediate) { move = null; idleTime = 0; distance = distanceAt(current + difference, geometry); paint(current + difference); }
+        else moveTo(current + difference);
       },
     };
     const visibility = new IntersectionObserver(entries => { paused.current.offscreen = !entries[0].isIntersecting; });
@@ -172,13 +180,22 @@ function RusticOrbit() {
         changed = true;
         if (now - introStart >= introLength) finishIntro();
       } else if (move) {
-        const ratio = move.duration ? Math.min(1, (now - move.start) / move.duration) : 1;
+        // Mobile moves interpolate phase rather than unequal arc lengths.
+        // This gives every adjacent card the same 680ms, ease-in-out handoff.
+        // Elapsed frame time prevents a background tab from catching up at once.
+        if (phone.matches && !document.hidden && !paused.current.offscreen && !paused.current.touch && !document.body.classList.contains('handoff-in-flight')) move.elapsed += elapsed * 1000;
+        const ratio = move.duration ? Math.min(1, (phone.matches ? move.elapsed : now - move.start) / move.duration) : 1;
         const eased = ratio * ratio * (3 - 2 * ratio);
-        distance = mix(move.from, move.to, eased);
+        distance = phone.matches ? distanceAt(mix(move.fromPhase, move.toPhase, eased), geometry) : mix(move.from, move.to, eased);
         changed = true;
         if (ratio === 1) move = null;
       } else if (introState === 'done' && !motion.matches && !document.hidden && !document.body.classList.contains('handoff-in-flight') && !Object.values(paused.current).some(Boolean)) {
-        distance += 28 * elapsed; changed = true; // CSS pixels of arc length per second.
+        if (phone.matches) {
+          idleTime += elapsed * 1000;
+          if (idleTime >= mobileIdleDuration) moveTo(Math.round(phaseAt(distance, geometry)) + 1);
+        } else {
+          distance += 28 * elapsed; changed = true; // Desktop drift is unchanged.
+        }
       }
       if (changed) paint(phaseAt(distance, geometry));
       frame = requestAnimationFrame(tick);
@@ -189,13 +206,24 @@ function RusticOrbit() {
       introState = 'running';
       introStart = performance.now();
     };
-    const onMotionChange = () => { if (motion.matches) finishIntro(); };
+    const onMotionChange = () => {
+      if (motion.matches) {
+        if (phone.matches) { distance = distanceAt(Math.round(phaseAt(distance, geometry)), geometry); move = null; idleTime = 0; }
+        finishIntro(); paint(phaseAt(distance, geometry));
+      }
+    };
+    const onPhoneChange = () => {
+      move = null; idleTime = 0; lastTime = 0;
+      if (phone.matches) distance = distanceAt(Math.round(phaseAt(distance, geometry)), geometry);
+      resize();
+    };
+    phone.addEventListener('change', onPhoneChange);
     window.addEventListener('harper:hero-orbit-start', startIntro);
     motion.addEventListener('change', onMotionChange);
     window.__harperOrbitReady = true;
     window.dispatchEvent(new Event('harper:hero-orbit-ready'));
     window.addEventListener('resize', resize);
-    return () => { cancelAnimationFrame(frame); visibility.disconnect(); window.removeEventListener('resize', resize); window.removeEventListener('harper:hero-orbit-start', startIntro); motion.removeEventListener('change', onMotionChange); controller.current = null; };
+    return () => { clearTimeout(clickReset.current); cancelAnimationFrame(frame); visibility.disconnect(); window.removeEventListener('resize', resize); window.removeEventListener('harper:hero-orbit-start', startIntro); motion.removeEventListener('change', onMotionChange); phone.removeEventListener('change', onPhoneChange); controller.current = null; };
   }, []);
 
   return (
@@ -212,8 +240,8 @@ function RusticOrbit() {
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
           event.preventDefault(); controller.current?.step(event.key === 'ArrowRight' ? 1 : -1);
         }
-        if (event.key === 'Home') { event.preventDefault(); controller.current?.select(0); }
-        if (event.key === 'End') { event.preventDefault(); controller.current?.select(rooms.length - 1); }
+        if (event.key === 'Home') { event.preventDefault(); controller.current?.select(0, true); }
+        if (event.key === 'End') { event.preventDefault(); controller.current?.select(rooms.length - 1, true); }
       }}
       onTouchStart={event => { paused.current.touch = true; touch.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }; }}
       onTouchCancel={() => { paused.current.touch = false; touch.current = null; }}
@@ -224,7 +252,8 @@ function RusticOrbit() {
         const dy = event.changedTouches[0].clientY - touch.current.y;
         if (Math.abs(dx) > 42 && Math.abs(dx) > Math.abs(dy) * 1.2) {
           suppressClick.current = true;
-          setTimeout(() => { suppressClick.current = false; }, 350);
+          clearTimeout(clickReset.current);
+          clickReset.current = setTimeout(() => { suppressClick.current = false; }, 350);
           controller.current?.step(dx < 0 ? 1 : -1);
         }
         touch.current = null;
