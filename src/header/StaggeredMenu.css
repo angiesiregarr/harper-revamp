@@ -44,3 +44,6 @@
 .header-language-menu.header-language-menu--sidebar{background:var(--gray);color:#fff;font-size:18px}
 .header-language-menu.header-language-menu--sidebar button{min-height:44px;color:#fff}
 .header-language-menu.header-language-menu--sidebar button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+
+.sm-language{white-space:nowrap}
+.sm-language-secondary{opacity:.55;white-space:pre}

@@ -117,7 +117,7 @@ export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, la
         <div className="staggered-menu-header">
           <a href="#main" aria-label="HARPER home" onClick={() => close(false)}><img src="./assets/harper-logo-white.png" alt="HARPER by ASTON" /></a>
           <div className="sm-header-actions">
-            <button className="sm-language" type="button" data-kind="language" aria-label={utilities[2].ariaLabel} aria-haspopup="menu" aria-controls="nav-language-menu" aria-expanded={languageOpen} onClick={event => follow(utilities[2], event)}>{utilities[2].icon}</button>
+            <button className="sm-language" type="button" data-kind="language" aria-label={utilities[2].ariaLabel} aria-haspopup="menu" aria-controls="nav-language-menu" aria-expanded={languageOpen} onClick={event => follow(utilities[2], event)}><span>EN</span><span className="sm-language-secondary"> / ID</span></button>
             <button ref={closeButton} className="sm-close" type="button" aria-label="Close menu" onClick={() => close()}><span className="sm-close-icon" aria-hidden="true">×</span></button>
           </div>
         </div>
