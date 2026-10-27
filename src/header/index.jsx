@@ -90,7 +90,7 @@ function HeaderNavigation() {
 
   const items = [
     { label: 'Hotels', href: '#hotels' },
-    { label: 'Deals', href: '#offers' },
+    { label: 'OFFERS', href: '#offers' },
     { label: 'Meetings', href: 'https://www.harperhotels.com/meetings' },
     { label: 'Weddings', href: 'https://www.harperhotels.com/en/weddings' },
     { label: 'News', href: '#journal' },
