@@ -124,7 +124,7 @@ export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, la
         <div className="sm-panel-inner">
           <nav aria-label="Mobile navigation"><ul className="sm-panel-list">{items.slice(0, 5).map((item, i) => <li className="sm-panel-itemWrap" key={item.label}><a className="sm-panel-item" href={item.href} target={item.href.startsWith('https:') ? '_blank' : undefined} rel={item.href.startsWith('https:') ? 'noopener noreferrer' : undefined} onClick={event => follow(item, event)}><span className="sm-panel-itemLabel"><span className="sm-item-number" aria-hidden="true">0{i + 1}</span><span>{item.label}</span></span></a></li>)}</ul></nav>
           <a className="sm-membership sm-detail" href="#membership" aria-label="Archipelago Membership" onClick={event => follow(utilities[1], event)}>
-            {utilities[1].icon}
+            <img className="header-membership-logo" src="./assets/archipelago-membership-white.svg" alt="" aria-hidden="true" />
             <span className="sm-membership-copy"><span>Archipelago Membership</span><small>Member rates and rewards</small></span>
             <span className="sm-membership-arrow" aria-hidden="true">→</span>
           </a>
