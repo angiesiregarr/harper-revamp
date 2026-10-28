@@ -263,6 +263,10 @@
     sidebarScrollFrame=requestAnimationFrame(animate);
   }
   addEventListener('harper:book-from-sidebar',showDestinationFromSidebar);
+  const floatingBook=document.getElementById('mobile-book-now');
+  floatingBook.addEventListener('click',showDestinationFromSidebar);
+  // Keep the sticky action available after the hero form leaves view.
+  new IntersectionObserver(entries=>{floatingBook.hidden=entries[0].isIntersecting;},{threshold:0}).observe(heroBooking);
   document.addEventListener('click',event=>{
     const button=event.target.closest('[data-booking-open]');
     if(!button)return;
