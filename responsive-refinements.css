@@ -317,3 +317,17 @@
  .hero-contour .hero-booking-submit,.booking-sheet .booking-search{width:52px;min-width:52px;height:52px;min-height:52px;padding:13px;margin:0 3px 0 0}
  .booking-sheet .booking-search{padding:12px}
 }
+/* Square booking frames throughout the hero, picker and results dialog. */
+.hero.hero-contour .hero-booking,.hero-booking-field,.booking-sheet input,.booking-sheet,.booking-sheet .booking-bar,.booking-sheet .booking-popover,.booking-sheet .booking-field,.booking-results,.booking-results .booking-match{border-radius:0!important}
+.booking-sheet .booking-popover.is-destination:not([hidden]){display:flex;flex-direction:column;height:min(42svh,350px);overflow:hidden}
+.destination-search-header{position:sticky;top:0;z-index:2;flex:none;background:#fffaf3;padding-bottom:12px}
+.booking-sheet .is-destination .destination-options{min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain;align-content:start;scroll-padding-block:8px}
+.is-calendar .calendar-footer{justify-content:space-between;gap:12px;font:400 12px/1.4 var(--sans)}
+.booking-sheet .calendar-footer .calendar-apply{flex:none;min-height:44px;padding:10px 16px;background:var(--orange);color:var(--ink);border:0;border-radius:0;font:700 12px var(--sans)}
+.booking-sheet .calendar-footer .calendar-apply:disabled{opacity:.45;cursor:not-allowed}
+.is-calendar .calendar-grid button.is-between{background:#fce4c7;color:#242424}
+.is-calendar .calendar-grid button.is-range-edge,.is-calendar .calendar-grid button.is-range-edge:hover{background:var(--orange);color:#fff}
+.is-calendar .calendar-grid button.is-range-start{box-shadow:inset 2px 0 0 #a64c00}
+.is-calendar .calendar-grid button.is-range-end{box-shadow:inset -2px 0 0 #a64c00}
+.is-calendar .calendar-grid button.is-range-preview{outline:1px dashed #d97815;outline-offset:-1px}
+@media(max-width:800px){.booking-sheet .booking-popover.is-destination:not([hidden]){height:min(37svh,310px)}.is-calendar .calendar-footer{flex-wrap:wrap}.calendar-range-hint{flex:1;min-width:100px}}

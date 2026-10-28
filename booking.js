@@ -70,6 +70,7 @@
     active = name; anchor = fields.find(button => button.dataset.field === name);
     fields.forEach(button => button.setAttribute('aria-expanded',String(button===anchor)));
     popup.classList.toggle('is-calendar',name==='checkin'||name==='checkout');
+    popup.classList.toggle('is-destination',name==='destination');
     popup.hidden = false; popup.setAttribute('aria-label',anchor.querySelector('span').textContent);
     if (name==='destination') renderDestination();
     else if (name==='guests') renderGuests();
@@ -79,11 +80,11 @@
     popup.scrollIntoView({block:'nearest',behavior:'instant'});
   }
   function renderDestination() {
-    popup.innerHTML = '<h3>Where would you like to stay?</h3><label for="destination-search">Find a hotel or city</label><input id="destination-search" type="search" autocomplete="off" placeholder="Try Jakarta or Harper Malioboro"><div class="destination-options"></div>';
+    popup.innerHTML = '<div class="destination-search-header"><h3>Where would you like to stay?</h3><label for="destination-search">Find a hotel or city</label><input id="destination-search" type="search" autocomplete="off" placeholder="Try Jakarta or Harper Malioboro"></div><div class="destination-options" aria-label="Hotels and cities"></div>';
     const input = popup.querySelector('input'), list = popup.querySelector('.destination-options');
     const choices = [...new Set(hotels.map(hotel=>hotel.city)),...hotels.map(hotel=>hotel.name)];
     const draw = () => {
-      list.replaceChildren();
+      list.replaceChildren(); list.scrollTop=0;
       const matches = choices.filter(value=>value.toLowerCase().includes(input.value.toLowerCase().trim()));
       for (const value of matches) {
         const button = document.createElement('button'); button.type='button'; button.textContent=value;
@@ -98,10 +99,7 @@
     const minimum = active==='checkout' && state.checkin ? nextDay(state.checkin) : today();
     const monthCount = singleMonth.matches ? 1 : 2;
     const dateTitle = value => value ? parse(value).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : 'DD MM YYYY';
-    const nights = state.checkin && state.checkout ? dayNumber(state.checkout)-dayNumber(state.checkin) : 0;
-    popup.innerHTML = '<div class="calendar-summary"><strong></strong><span></span></div><div class="calendar-months"></div><div class="calendar-footer"><i aria-hidden="true"></i><span>Rates in IDR</span></div>';
-    popup.querySelector('.calendar-summary strong').textContent = `${dateTitle(state.checkin)} – ${dateTitle(state.checkout)}`;
-    popup.querySelector('.calendar-summary span').textContent = nights > 0 ? `${nights} ${nights===1?'night':'nights'}` : '1 night minimum';
+    popup.innerHTML = '<div class="calendar-summary"><strong></strong><span></span></div><div class="calendar-months"></div><div class="calendar-footer"><span class="calendar-range-hint"></span><button type="button" class="calendar-apply">Apply dates</button></div>';
     const months = popup.querySelector('.calendar-months');
     for (let index=0; index<monthCount; index++) {
       const current = new Date(month.getFullYear(),month.getMonth()+index,1);
@@ -137,7 +135,16 @@
         button.setAttribute('aria-pressed',String(value===state.checkin||value===state.checkout));
         if(value===today())button.setAttribute('aria-current','date');
         button.innerHTML=`<span>${date.getDate()}</span>${value===today()?'<small>TODAY</small>':''}`;
-        button.addEventListener('click',()=>{const chosen=active;state[chosen]=value;if(chosen==='checkin'&&state.checkout<=value)state.checkout='';updateLabels();closeField(true);if(chosen==='checkin')openField('checkout');});
+        button.addEventListener('click',()=>{
+          const chosen=active;state[chosen]=value;
+          if(chosen==='checkin'&&state.checkout<=value)state.checkout='';
+          updateLabels();
+          if(chosen==='checkin')openField('checkout');
+          else {renderCalendar();popup.querySelector(`[data-date="${value}"]:not(.is-outside)`)?.focus({preventScroll:true});}
+        });
+        const preview=()=>{if(active==='checkout'&&state.checkin&&!button.disabled)paintRange(value);};
+        button.addEventListener('mouseenter',preview);
+        button.addEventListener('focus',preview);
         grid.append(button);
       }
       grid.addEventListener('focusin',event=>{if(event.target.dataset.date)popup.querySelectorAll('[data-date]').forEach(button=>{button.tabIndex=button===event.target?0:-1;});});
@@ -158,6 +165,26 @@
       });
       panel.append(grid);months.append(panel);
     }
+    function paintRange(previewEnd='') {
+      const end=previewEnd||state.checkout;
+      popup.querySelectorAll('[data-date]').forEach(button=>{
+        const value=button.dataset.date;
+        button.classList.toggle('is-range-start',value===state.checkin);
+        button.classList.toggle('is-range-end',Boolean(end&&value===end));
+        button.classList.toggle('is-range-edge',value===state.checkin||Boolean(end&&value===end));
+        button.classList.toggle('is-between',Boolean(state.checkin&&end&&value>state.checkin&&value<end));
+        button.classList.toggle('is-range-preview',Boolean(previewEnd&&previewEnd!==state.checkout&&value>state.checkin&&value<=end));
+      });
+      const count=state.checkin&&end?dayNumber(end)-dayNumber(state.checkin):0;
+      popup.querySelector('.calendar-summary strong').textContent=`${dateTitle(state.checkin)} – ${dateTitle(end)}`;
+      popup.querySelector('.calendar-summary span').textContent=count>0?`${count} ${count===1?'night':'nights'}`:'1 night minimum';
+    }
+    paintRange();
+    months.addEventListener('mouseleave',()=>paintRange());
+    popup.querySelector('.calendar-range-hint').textContent=active==='checkin'?'Select your check-in date':state.checkout?'Your stay is highlighted above':'Select your check-out date';
+    const apply=popup.querySelector('.calendar-apply');
+    apply.disabled=!(state.checkin&&state.checkout&&state.checkout>state.checkin);
+    apply.addEventListener('click',()=>closeField(true));
     const firstTab=popup.querySelector(`[data-date="${state[active]||minimum}"]:not(.is-outside):not(:disabled)`)||popup.querySelector('[data-date]:not(:disabled)');
     if(firstTab)firstTab.tabIndex=0;
   }
