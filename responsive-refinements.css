@@ -331,3 +331,18 @@
 .is-calendar .calendar-grid button.is-range-end{box-shadow:inset -2px 0 0 #a64c00}
 .is-calendar .calendar-grid button.is-range-preview{outline:1px dashed #d97815;outline-offset:-1px}
 @media(max-width:800px){.booking-sheet .booking-popover.is-destination:not([hidden]){height:min(37svh,310px)}.is-calendar .calendar-footer{flex-wrap:wrap}.calendar-range-hint{flex:1;min-width:100px}}
+/* Per-room guest counts follow the existing picker dimensions. */
+.guest-rooms-total{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 0 16px;border-bottom:1px solid var(--line);font:700 16px var(--sans)}
+.guest-room-list{display:grid;gap:12px;padding-top:16px}
+.booking-sheet .guest-room{display:grid;grid-template-columns:minmax(100px,.75fr) minmax(0,1.5fr);align-items:start;gap:20px;padding:16px;border:1px solid var(--line)}
+.booking-sheet .guest-room h3{margin:2px 0 0;font:400 16px/1.4 var(--sans)}
+.guest-room-counters{display:grid;gap:12px}
+.guest-room-counter{display:flex;align-items:center;justify-content:space-between;gap:12px;font:400 14px var(--sans);color:var(--gray)}
+.booking-sheet .guest-stepper{display:flex;align-items:center;gap:6px;color:var(--ink)}
+.booking-sheet .guest-stepper output{min-width:30px;margin-right:14px;font:700 18px var(--sans)}
+.booking-sheet .guest-stepper button{display:grid;place-items:center;width:40px;min-height:40px;padding:0;border:1px solid var(--gray);background:transparent;color:var(--ink);font:400 24px/1 var(--sans)}
+.booking-sheet .guest-rooms-total .guest-stepper button{background:#f8ca97;border-color:#f8ca97}
+.booking-sheet .guest-stepper button:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:600px){.booking-sheet .guest-room{grid-template-columns:1fr;gap:12px;padding:12px}.booking-sheet .guest-stepper button{width:44px;min-height:44px}.booking-sheet .guest-stepper output{margin-right:8px}.guest-room-counter{gap:8px}}
+
+.booking-sheet .guest-rooms-total .guest-stepper{margin-right:17px}

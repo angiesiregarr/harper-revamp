@@ -18,7 +18,7 @@
     { name: 'Reserva Real Harper', city: 'Dominican Republic', image: 'hero-room.png', url: 'https://harperhotels.com/' },
   ];
   const singleMonth = matchMedia('(max-width: 800px)');
-  const state = { destination: '', checkin: '', checkout: '', rooms: 1, adults: 2, children: 0 };
+  const state = { destination: '', checkin: '', checkout: '', rooms: 1, adults: 2, children: 0, roomGuests: [{ adults: 2, children: 0 }] };
   let active = '', anchor = null, opener = null, month = new Date(), frame = 0;
   const iso = date => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
   const today = () => iso(new Date());
@@ -38,7 +38,8 @@
   }
   function closeField(focus = false) {
     popup.hidden = true; fields.forEach(button => button.setAttribute('aria-expanded','false'));
-    if (focus) anchor?.focus(); active = ''; anchor = null;
+    if (focus) anchor?.focus({preventScroll:true}); active = ''; anchor = null;
+    if(sheet.open)sheet.close();
   }
   function positionPopup() { /* The popover flows inside the booking dialog. */ }
   function placeForm() {
@@ -195,15 +196,47 @@
     renderCalendar();if(value)popup.querySelector(`[data-date="${value}"]:not(.is-outside):not(:disabled)`)?.focus({preventScroll:true});
   });
   function renderGuests() {
-    popup.innerHTML='<h3>Make room for everyone</h3>';
-    [['rooms','Rooms',1,8],['adults','Adults',1,16],['children','Children',0,8]].forEach(([key,label,min,max])=>{
-      const row=document.createElement('div');row.className='guest-row';
-      row.innerHTML=`<span>${label}</span><div class="guest-stepper"><button type="button" aria-label="Fewer ${label.toLowerCase()}">−</button><output aria-live="polite" aria-label="${label}">${state[key]}</output><button type="button" aria-label="More ${label.toLowerCase()}">+</button></div>`;
-      const buttons=row.querySelectorAll('button');
-      const refresh=()=>{row.querySelector('output').textContent=state[key];buttons[0].disabled=state[key]<=min;buttons[1].disabled=state[key]>=max;updateLabels();};
-      buttons.forEach((button,index)=>button.addEventListener('click',()=>{state[key]=Math.max(min,Math.min(max,state[key]+(index?1:-1)));refresh();}));refresh();popup.append(row);
+    popup.innerHTML='<div class="guest-rooms-total"><strong>Room(s)</strong></div><div class="guest-room-list"></div>';
+    const syncGuests=()=>{
+      state.rooms=state.roomGuests.length;
+      state.adults=state.roomGuests.reduce((total,room)=>total+room.adults,0);
+      state.children=state.roomGuests.reduce((total,room)=>total+room.children,0);
+      updateLabels();
+    };
+    const stepper=(label,value,min,max,change)=>{
+      const control=document.createElement('div');control.className='guest-stepper';
+      control.innerHTML=`<output aria-live="polite" aria-label="${label}">${value}</output><button type="button" aria-label="Fewer ${label}">−</button><button type="button" aria-label="More ${label}">+</button>`;
+      const buttons=control.querySelectorAll('button');
+      buttons[0].disabled=value<=min;buttons[1].disabled=value>=max;
+      buttons.forEach((button,index)=>button.addEventListener('click',()=>change(value+(index?1:-1),button.getAttribute('aria-label'))));
+      return control;
+    };
+    const rebuild=focusLabel=>{
+      const scrollPosition=popup.scrollTop;
+      renderGuests();
+      popup.scrollTop=scrollPosition;
+      if(focusLabel){
+        const buttons=[...popup.querySelectorAll('button')];
+        (buttons.find(button=>button.getAttribute('aria-label')===focusLabel&&!button.disabled)||buttons.find(button=>!button.disabled))?.focus({preventScroll:true});
+      }
+    };
+    popup.querySelector('.guest-rooms-total').append(stepper('rooms',state.rooms,1,8,(value,label)=>{
+      while(state.roomGuests.length<value)state.roomGuests.push({adults:2,children:0});
+      state.roomGuests.length=value;syncGuests();rebuild(label);
+    }));
+    const list=popup.querySelector('.guest-room-list');
+    state.roomGuests.forEach((room,index)=>{
+      const card=document.createElement('section');card.className='guest-room';card.setAttribute('aria-label',`Room ${index+1}`);
+      const title=document.createElement('h3');title.textContent=`Room(s) ${index+1}`;card.append(title);
+      const counters=document.createElement('div');counters.className='guest-room-counters';
+      [['adults','Adult(s)',1,16],['children','Child(ren)',0,8]].forEach(([key,title,min,max])=>{
+        const row=document.createElement('div');row.className='guest-room-counter';
+        const text=document.createElement('span');text.textContent=title;row.append(text);
+        row.append(stepper(`${key} in room ${index+1}`,room[key],min,max,(value,label)=>{room[key]=value;syncGuests();rebuild(label);}));
+        counters.append(row);
+      });
+      card.append(counters);list.append(card);
     });
-    const done=document.createElement('button');done.type='button';done.className='booking-done';done.textContent='Done';done.addEventListener('click',()=>closeField(true));popup.append(done);
   }
   fields.forEach(button=>button.addEventListener('click',()=>active===button.dataset.field?closeField(true):openField(button.dataset.field)));
   document.addEventListener('click',event=>{
@@ -225,7 +258,18 @@
     }
     form.requestSubmit();
   });
-  document.addEventListener('pointerdown',event=>{if(sheet.open && sheet.contains(event.target) && event.target.closest('.booking-close'))return;if(!popup.contains(event.target) && !fields.some(button=>button.contains(event.target)))closeField();});
+  // Dismiss the whole dialog, never an empty booking shell. Counters save immediately.
+  document.addEventListener('pointerdown',event=>{
+    if(!sheet.open)return;
+    if(popup.contains(event.target)||fields.some(button=>button.contains(event.target))||event.target.closest('.booking-close,.booking-search'))return;
+    if(sheet.contains(event.target)&&event.target!==sheet)sheet.close();
+  });
+  // Require both ends of a gesture on the backdrop, so dragging a date never dismisses it.
+  [sheet,results].forEach(dialog=>{
+    let backdropDown=false;
+    dialog.addEventListener('pointerdown',event=>{const r=dialog.getBoundingClientRect();backdropDown=event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom;});
+    dialog.addEventListener('click',event=>{if(!backdropDown)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();backdropDown=false;});
+  });
   document.addEventListener('keydown',event=>{if(event.key==='Escape' && sheet.open){event.preventDefault();event.stopPropagation();sheet.close();}},true);
   sheet.addEventListener('close',()=>{closeField();opener?.focus({preventScroll:true});});
   form.querySelector('.booking-close').addEventListener('click',()=>sheet.close());
