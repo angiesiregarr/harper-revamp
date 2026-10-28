@@ -30,7 +30,8 @@ function renderCity() {
   });
   routeHost.innerHTML = '<defs><mask id="city-route-label-mask" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse"><rect width="1600" height="240" fill="white"/><rect class="city-route-label-gap" fill="black" width="0" height="0"/></mask></defs><path class="city-route is-active" pathLength="1" mask="url(#city-route-label-mask)" />';
   const route = routeHost.querySelector('.city-route');
-  const routeGap = routeHost.querySelector('.city-route-label-gap');
+  const routeMask = routeHost.querySelector('#city-route-label-mask');
+  routeMask.querySelector('.city-route-label-gap').remove();
   const reducedRouteMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let routeCurrent = null, routeTarget = null, routeFrame = 0, routeBend = 0;
   const routePath = values => `M ${values[0].toFixed(1)} ${values[1].toFixed(1)} C ${values[2].toFixed(1)} ${values[3].toFixed(1)}, ${values[4].toFixed(1)} ${values[5].toFixed(1)}, ${values[6].toFixed(1)} ${values[7].toFixed(1)}`;
@@ -98,16 +99,22 @@ function renderCity() {
   let focused = null;
   let visibleIndex = null;
   const updateRouteMask = () => {
-    const label = visibleIndex == null ? null : waypoints[visibleIndex]?.querySelector('.city-label');
-    if (!label) { routeGap.setAttribute('width', '0'); return; }
-    const box = label.getBoundingClientRect();
     const svg = routeHost.getBoundingClientRect();
     if (!svg.width || !svg.height) return;
-    const gap = 7;
-    routeGap.setAttribute('x', ((box.left - svg.left - gap) / svg.width * 1600).toFixed(1));
-    routeGap.setAttribute('y', ((box.top - svg.top - gap / 2) / svg.height * 240).toFixed(1));
-    routeGap.setAttribute('width', ((box.width + gap * 2) / svg.width * 1600).toFixed(1));
-    routeGap.setAttribute('height', ((box.height + gap) / svg.height * 240).toFixed(1));
+    // Protect every label, including neighbouring cities crossed during a route morph.
+    routeMask.querySelectorAll('.city-route-label-gap').forEach(gap => gap.remove());
+    waypoints.forEach(point => {
+      const box = point.querySelector('.city-label').getBoundingClientRect();
+      if (!box.width || !box.height) return;
+      const gap = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      gap.classList.add('city-route-label-gap');
+      gap.setAttribute('fill', 'black');
+      gap.setAttribute('x', ((box.left - svg.left - 8) / svg.width * 1600).toFixed(1));
+      gap.setAttribute('y', ((box.top - svg.top - 4) / svg.height * 240).toFixed(1));
+      gap.setAttribute('width', ((box.width + 16) / svg.width * 1600).toFixed(1));
+      gap.setAttribute('height', ((box.height + 8) / svg.height * 240).toFixed(1));
+      routeMask.append(gap);
+    });
   };
   new ResizeObserver(updateRouteMask).observe(routeHost);
   waypoints.forEach(point => new ResizeObserver(updateRouteMask).observe(point.querySelector('.city-label')));
