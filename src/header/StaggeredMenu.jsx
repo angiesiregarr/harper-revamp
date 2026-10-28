@@ -16,7 +16,7 @@ export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, la
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
   const trigger = useRef(null), overlay = useRef(null), panel = useRef(null), closeButton = useRef(null);
-  const timeline = useRef(null), restoreFocus = useRef(true);
+  const timeline = useRef(null), restoreFocus = useRef(true), bookingAfterClose = useRef(false);
   const close = (restore = true) => { restoreFocus.current = restore; setOpen(false); };
 
   useEffect(() => { onMenuToggle(open || shown); }, [open, shown, onMenuToggle]);
@@ -46,6 +46,7 @@ export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, la
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const finish = () => {
       setShown(false);
+      if (bookingAfterClose.current) { bookingAfterClose.current=false;requestAnimationFrame(()=>window.dispatchEvent(new Event('harper:book-from-sidebar'))); }
       if (restoreFocus.current) requestAnimationFrame(() => trigger.current?.focus({ preventScroll: true }));
     };
     let exit;
@@ -98,15 +99,13 @@ export default function StaggeredMenu({ items, onMenuToggle, onLanguageClick, la
 
   function follow(item, event) {
     if (item.kind === 'language') { onLanguageClick(item, 7, event); return; }
+    if (item.kind === 'booking') { event.preventDefault();event.stopPropagation();bookingAfterClose.current=true;close(false);return; }
     // Release scroll locking before existing booking and section navigation run.
     restoreFocus.current = false;
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
     close(false);
-    if (item.kind === 'booking') {
-      // The hero form is inert until the overlay finishes closing.
-      setTimeout(() => document.querySelector('[data-hero-field="destination"]')?.focus({ preventScroll: true }), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 340);
-    }
+
   }
   const utilities = items.slice(5);
   return <>

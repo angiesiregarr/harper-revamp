@@ -346,3 +346,17 @@
 @media(max-width:600px){.booking-sheet .guest-room{grid-template-columns:1fr;gap:12px;padding:12px}.booking-sheet .guest-stepper button{width:44px;min-height:44px}.booking-sheet .guest-stepper output{margin-right:8px}.guest-room-counter{gap:8px}}
 
 .booking-sheet .guest-rooms-total .guest-stepper{margin-right:17px}
+/* Mobile: a taller hero booking card with its full-width action at the bottom. */
+@media(max-width:700px){
+ .hero.hero-contour{min-height:100svh;padding-bottom:calc(48px + env(safe-area-inset-bottom))}
+ .hero-contour .hero-booking{min-height:max(274px,calc(100svh - var(--mobile-booking-top,500px) - 48px - env(safe-area-inset-bottom)));grid-template-rows:64px 64px 70px minmax(54px,1fr)}
+ .hero-contour .hero-booking .hero-booking-field[data-hero-field=guests]{grid-column:1/-1}
+ .hero-contour .hero-booking-submit{grid-column:1/-1;grid-row:4;width:100%;min-width:0;height:52px;min-height:52px;margin:0;padding:13px;justify-self:stretch;align-self:end}
+ .booking-sheet{min-height:0;max-height:90svh}
+ .booking-sheet .booking-fields{display:none}
+ .booking-sheet .booking-sheet-heading{margin-bottom:18px}
+ .booking-sheet .booking-popover{margin-top:0;max-height:min(62svh,480px)!important}
+ .booking-sheet .booking-popover.is-destination:not([hidden]){height:min(62svh,480px)}
+ .booking-sheet .booking-error:empty{display:none}
+}
+@media(max-width:700px){.booking-sheet .destination-search-header h3{display:none}}

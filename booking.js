@@ -52,6 +52,8 @@
     document.documentElement.style.setProperty('--booking-inset-end',`${innerWidth - navBounds.right + parseFloat(navStyle.paddingRight)}px`);
     nav.classList.toggle('is-over-hero', !scrolled && Boolean(hero && hero.getBoundingClientRect().bottom > height));
     document.documentElement.style.setProperty('--top-nav-height',`${height}px`);
+    heroBooking.style.setProperty('--mobile-booking-top',`${heroBooking.offsetTop}px`);
+    updateSheetTitle();
     const wasHidden = heroBooking.classList.contains('is-hidden');
     const hideBooking = scrolled && !matchMedia('(max-width: 700px)').matches;
     heroBooking.classList.toggle('is-hidden', hideBooking);
@@ -62,13 +64,17 @@
   }
   function schedule() { if (!frame) frame = requestAnimationFrame(placeForm); }
   function openBooking(event, field = 'destination') {
-    event?.preventDefault(); opener = event?.currentTarget || document.activeElement;
+    event?.preventDefault?.(); opener = event?.currentTarget || document.activeElement;
     if (opener?.closest('.pill-nav__panel')) opener=nav.querySelector('.pill-nav__toggle')||opener;
     if (!sheet.open) sheet.showModal();
     openField(field);
   }
+  function updateSheetTitle() {
+    const titles={destination:'Choose your destination',checkin:'Select your dates',checkout:'Select your dates',guests:'Rooms & guests'};
+    document.getElementById('booking-title').textContent=matchMedia('(max-width:700px)').matches?(titles[active]||'Find your Harper stay'):'Find your Harper stay';
+  }
   function openField(name) {
-    active = name; anchor = fields.find(button => button.dataset.field === name);
+    active = name; updateSheetTitle(); anchor = fields.find(button => button.dataset.field === name);
     fields.forEach(button => button.setAttribute('aria-expanded',String(button===anchor)));
     popup.classList.toggle('is-calendar',name==='checkin'||name==='checkout');
     popup.classList.toggle('is-destination',name==='destination');
@@ -177,7 +183,9 @@
         button.classList.toggle('is-range-preview',Boolean(previewEnd&&previewEnd!==state.checkout&&value>state.checkin&&value<=end));
       });
       const count=state.checkin&&end?dayNumber(end)-dayNumber(state.checkin):0;
-      popup.querySelector('.calendar-summary strong').textContent=`${dateTitle(state.checkin)} – ${dateTitle(end)}`;
+      popup.querySelector('.calendar-summary strong').textContent=matchMedia('(max-width:700px)').matches
+        ? (state.checkin?`${dateTitle(state.checkin)} – ${end?dateTitle(end):'Select check-out'}`:'Select check-in and check-out')
+        : `${dateTitle(state.checkin)} – ${dateTitle(end)}`;
       popup.querySelector('.calendar-summary span').textContent=count>0?`${count} ${count===1?'night':'nights'}`:'1 night minimum';
     }
     paintRange();
@@ -239,13 +247,28 @@
     });
   }
   fields.forEach(button=>button.addEventListener('click',()=>active===button.dataset.field?closeField(true):openField(button.dataset.field)));
+  let sidebarScrollFrame=0;
+  function showDestinationFromSidebar() {
+    cancelAnimationFrame(sidebarScrollFrame);
+    const start=scrollY;
+    const target=Math.max(0,heroBooking.getBoundingClientRect().top+scrollY-nav.getBoundingClientRect().height-16);
+    const began=performance.now(), duration=matchMedia('(prefers-reduced-motion: reduce)').matches?0:280;
+    const animate=now=>{
+      const progress=duration?Math.min(1,(now-began)/duration):1;
+      const ease=progress*progress*(3-2*progress);
+      scrollTo({top:start+(target-start)*ease,behavior:'instant'});
+      if(progress<1)sidebarScrollFrame=requestAnimationFrame(animate);
+      else {sidebarScrollFrame=0;openBooking({currentTarget:heroBooking.querySelector('[data-hero-field=destination]')},'destination');}
+    };
+    sidebarScrollFrame=requestAnimationFrame(animate);
+  }
+  addEventListener('harper:book-from-sidebar',showDestinationFromSidebar);
   document.addEventListener('click',event=>{
     const button=event.target.closest('[data-booking-open]');
     if(!button)return;
     if (button.classList.contains('nav-book') && matchMedia('(max-width: 700px)').matches) {
       event.preventDefault();
-      heroBooking.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
-      heroBooking.querySelector('button').focus({preventScroll:true});
+      showDestinationFromSidebar();
       return;
     }
     openBooking({preventDefault:()=>event.preventDefault(),currentTarget:button});
