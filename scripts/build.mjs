@@ -3,6 +3,11 @@ import { createHash } from 'node:crypto';
 import { build } from 'esbuild';
 
 const root = new URL('../', import.meta.url);
+// Local sprite uses the official Iconify Lucide icon data, without runtime network requests.
+const iconData = JSON.parse(await readFile(new URL('../node_modules/@iconify-json/lucide/icons.json', import.meta.url), 'utf8'));
+const journalIcons = ['arrow-up-right', 'arrow-left', 'arrow-right'];
+await writeFile(new URL('assets/journal-icons.svg', root), `<svg xmlns="http://www.w3.org/2000/svg">${journalIcons.map(name => `<symbol id="${name}" viewBox="0 0 24 24">${iconData.icons[name].body}</symbol>`).join('')}</svg>`);
+
 const output = new URL('dist/', root);
 await build({ entryPoints: [new URL('src/hero/index.jsx', root).pathname], outfile: new URL('hero-carousel.js', root).pathname,
   bundle: true, minify: true, format: 'iife', platform: 'browser', target: 'es2020', jsx: 'automatic' });

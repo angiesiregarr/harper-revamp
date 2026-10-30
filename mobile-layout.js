@@ -4,7 +4,7 @@
   const section = document.getElementById('journal');
   const book = document.getElementById('journal-book');
   if (!section || !book) return;
-  const sources = [...book.querySelectorAll('[data-journal-spread] .news-card')];
+  const sources = [...book.querySelectorAll('.editorial-story')];
   const region = document.createElement('div');
   region.className = 'mobile-journal';
   region.setAttribute('role', 'region');
@@ -32,7 +32,7 @@
     excerpt.textContent = source.querySelector('.news-excerpt').textContent;
     const read = document.createElement('span');
     read.className = 'mobile-story-read';
-    read.textContent = 'READ STORY ↗';
+    read.innerHTML = 'Read story <svg class="journal-icon" aria-hidden="true" focusable="false"><use href="./assets/journal-icons.svg#arrow-up-right" /></svg>';
     copy.append(meta, title, excerpt, read);
     link.append(image, copy);
     article.append(link);
@@ -41,7 +41,7 @@
   });
   const controls = document.createElement('div');
   controls.className = 'mobile-pager mobile-journal-controls';
-  controls.innerHTML = '<button type="button" data-story-step="-1">← Previous</button><span aria-live="polite"></span><button type="button" data-story-step="1">Next story →</button>';
+  controls.innerHTML = '<button type="button" data-story-step="-1"><svg class="journal-icon" aria-hidden="true"><use href="./assets/journal-icons.svg#arrow-left" /></svg> Previous</button><span aria-live="polite"></span><button type="button" data-story-step="1">Next story <svg class="journal-icon" aria-hidden="true"><use href="./assets/journal-icons.svg#arrow-right" /></svg></button>';
   const frame = document.createElement('div');
   frame.className = 'mobile-journal-book';
   const content = document.createElement('div');
@@ -49,49 +49,22 @@
   content.inert = true;
   content.setAttribute('aria-hidden','true');
   content.append(slides, controls);
-  const cover = document.createElement('button');
-  cover.type = 'button';
-  cover.className = 'mobile-journal-cover';
-  cover.setAttribute('aria-label','Open the Harper Journal');
-  cover.innerHTML = '<img src="./assets/harper-logo-white.png" alt="Harper by Aston" /><span class="mobile-cover-title">The<br>Journal</span><span class="mobile-cover-description">Something new at Harper.<br>Stories worth staying for.</span><span class="mobile-cover-open">Tap to open <span aria-hidden="true">↗</span></span>';
-  const edge = document.createElement('span');
-  edge.className = 'mobile-journal-edge';
-  edge.setAttribute('aria-hidden','true');
   frame.append(content);
-  cover.hidden = true;
   content.inert = false;
   content.removeAttribute('aria-hidden');
   frame.classList.add('is-open');
   region.append(frame);
-  let opening = false, coverMotion = null;
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  cover.addEventListener('click', async () => {
-    if (opening || cover.hidden) return;
-    opening = true;
-    if (!reduced.matches) {
-      coverMotion = cover.animate([{transform:'rotateY(0deg)',opacity:1},{transform:'rotateY(-105deg)',opacity:0}],{duration:520,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
-      try { await coverMotion.finished; } catch {}
-    }
-    cover.hidden = true;
-    coverMotion?.cancel();
-    content.inert = false;
-    content.removeAttribute('aria-hidden');
-    frame.classList.add('is-open');
-    controls.querySelector('[data-story-step="1"]').focus({preventScroll:true});
-    opening = false;
-  });
-  reduced.addEventListener('change', () => { if (reduced.matches) coverMotion?.finish(); });
   book.before(region);
   let current = 0, touch = null, suppressClickUntil = 0;
   function show(index) {
-    current = Math.max(0, Math.min(Math.ceil(stories.length / 4) - 1, index));
+    current = Math.max(0, Math.min(stories.length - 1, index));
     stories.forEach((story, i) => {
-      story.hidden = Math.floor(i / 4) !== current;
-      story.classList.toggle('is-featured', i === current * 4);
+      story.hidden = i !== current;
+      story.classList.toggle('is-featured', i === current);
     });
-    controls.querySelector('span').textContent = `${String(current + 1).padStart(2,'0')} / ${String(Math.ceil(stories.length / 4)).padStart(2,'0')}`;
+    controls.querySelector('span').textContent = `${String(current + 1).padStart(2,'0')} / ${String(stories.length).padStart(2,'0')}`;
     controls.querySelector('[data-story-step="-1"]').disabled = current === 0;
-    controls.querySelector('[data-story-step="1"]').disabled = current === Math.ceil(stories.length / 4) - 1;
+    controls.querySelector('[data-story-step="1"]').disabled = current === stories.length - 1;
   }
   controls.addEventListener('click', event => {
     const button = event.target.closest('[data-story-step]');

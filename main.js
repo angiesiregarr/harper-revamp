@@ -230,155 +230,56 @@ function setupNews() {
   const book = document.getElementById('journal-book');
   if (!section || !book) return;
   const stories = [...book.querySelectorAll('[data-journal-spread] .news-card')];
-  const oldSpreads = [...book.querySelectorAll('[data-journal-spread]')];
-  const cover = book.querySelector('.journal-cover');
-  const openButton = document.getElementById('journal-open');
   const previous = document.getElementById('journal-prev');
   const next = document.getElementById('journal-next');
   const count = document.getElementById('journal-page-count');
-  const cursor = section.querySelector('.journal-drag-hint');
-  const nav = document.getElementById('site-nav');
+  section.append(section.querySelector('.journal-controls'));
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const mobile = matchMedia('(max-width: 700px)');
-  const spreads = [];
-  const forward = document.createElement('button');
-  forward.type = 'button';
-  forward.className = 'journal-page-forward';
-  forward.setAttribute('aria-label', 'Next journal spread');
-  forward.innerHTML = '<span aria-hidden="true">›</span>';
-  book.append(forward);
-  const backward = forward.cloneNode(true);
-  backward.className = 'journal-page-back';
-  backward.setAttribute('aria-label', 'Previous journal spread');
-  backward.innerHTML = '<span aria-hidden="true">‹</span>';
-  book.append(backward);
-  let lastPointer = null;
-  let current = 0, opening = false, coverAnimation = null, pageAnimation = null;
-  book.classList.add('journal-simple', 'news-spotlight');
-  // All stories share the same editorial row; each leaf holds up to two.
-  for (let offset = 0; offset < stories.length; offset += 4) {
-    const spread = document.createElement('div');
-    spread.className = 'journal-spread';
-    spread.dataset.journalSpread = String(spreads.length);
-    for (let leaf = 0; leaf < 2; leaf++) {
-      const page = document.createElement('div');
-      page.className = `journal-page journal-page-${leaf ? 'right' : 'left'}`;
-      const rule = document.createElement('div');
-      rule.className = 'journal-page-rule';
-      rule.innerHTML = '<span>NOTES FROM HARPER</span><span>THE JOURNAL</span>';
-      const list = document.createElement('div');
-      list.className = 'journal-story-list';
-      stories.slice(offset + (leaf ? 1 : 0), offset + (leaf ? 4 : 1)).forEach(story => {
-        story.className = `news-card journal-supporting-story${leaf ? '' : ' news-spotlight-feature'}`;
-        list.append(story);
-      });
-      const folio = document.createElement('p');
-      folio.className = 'journal-folio';
-      folio.innerHTML = `STORIES TO TAKE WITH YOU <span>${String(spreads.length * 2 + leaf + 1).padStart(2,'0')}</span>`;
-      page.append(rule, list, folio);
-      spread.append(page);
-    }
-    spreads.push(spread);
-    book.insertBefore(spread, cover);
-  }
-  oldSpreads.forEach(spread => spread.remove());
-  book.querySelectorAll('.journal-turn-sheet,.journal-turn-zone').forEach(node => node.remove());
-  function measure() {
-    section.style.setProperty('--journal-header-clearance', `${nav.getBoundingClientRect().height}px`);
-    const page = spreads[current].querySelector('.journal-page-right').getBoundingClientRect();
-    const bounds = book.getBoundingClientRect();
-    book.style.setProperty('--journal-ribbon-x', `${page.left - bounds.left + page.width * .43}px`);
-    book.style.setProperty('--journal-ribbon-y', `${page.top - bounds.top}px`);
-  }
-  function show(index, animate = false) {
-    if (index < 0 || index >= spreads.length) return;
-    pageAnimation?.cancel();
-    current = index;
-    spreads.forEach((spread, i) => {
-      spread.classList.toggle('is-current', i === current);
-      spread.inert = i !== current || !book.classList.contains('is-open');
-      spread.setAttribute('aria-hidden', String(spread.inert));
-    });
-    count.textContent = `${String(current + 1).padStart(2,'0')} / ${String(spreads.length).padStart(2,'0')}`;
-    previous.disabled = current === 0 || !book.classList.contains('is-open');
-    next.disabled = current === spreads.length - 1 || !book.classList.contains('is-open');
-    if (animate && !reduced.matches) pageAnimation = spreads[current].animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'cubic-bezier(.22,1,.36,1)'});
-    forward.hidden = current === spreads.length - 1 || !book.classList.contains('is-open');
-    backward.hidden = current === 0 || !book.classList.contains('is-open');
-    updateCursor();
-    measure();
-  }
-  function hideCursor() { cursor?.classList.remove('is-visible'); section.classList.remove('has-journal-cursor'); }
-  function pageAction(target, x = lastPointer?.x) {
-    if (!book.classList.contains('is-open') || mobile.matches) return 0;
-    if (target.closest('.journal-page-back')) return current > 0 ? -1 : 0;
-    if (target.closest('.journal-page-forward')) return current < spreads.length - 1 ? 1 : 0;
-    if (!book.contains(target) || target.closest('a,button,input,select,textarea')) return 0;
-    const rect = book.getBoundingClientRect();
-    const direction = x < rect.left + rect.width / 2 ? -1 : 1;
-    return current + direction >= 0 && current + direction < spreads.length ? direction : 0;
-  }
-  function updateCursor() {
-    if (!cursor || !lastPointer || mobile.matches || reduced.matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) { hideCursor(); return; }
-    const {x,y} = lastPointer;
-    const target = document.elementFromPoint(x,y);
-    if (!target || !(book.classList.contains('is-closed') && target.closest('.journal-cover')) && !pageAction(target) && !(target.closest('#journal-next') && !next.disabled) && !(target.closest('#journal-prev') && !previous.disabled)) { hideCursor(); return; }
-    cursor.style.transform = `translate3d(${x}px,${y}px,0)`;
-    cursor.querySelector('.journal-drag-label').style.transform = `translate(${x > innerWidth - 145 ? -127 : 30}px,8px)`;
-    cursor.classList.add('is-visible');
-    section.classList.add('has-journal-cursor');
-  }
-  book.addEventListener('click', event => {
-    const direction = pageAction(event.target, event.clientX);
-    if (!direction || window.getSelection()?.toString()) return;
-    show(current + direction, true);
+  const icon = name => `<svg class="journal-icon" aria-hidden="true" focusable="false"><use href="./assets/journal-icons.svg#${name}" /></svg>`;
+  section.classList.add('journal-editorial');
+  book.className = 'journal-book editorial-stories';
+  book.setAttribute('aria-label', 'HARPER stories');
+  book.removeAttribute('tabindex');
+  section.querySelector('.journal-drag-hint')?.remove();
+  document.getElementById('journal-open')?.remove();
+  stories.forEach(story => {
+    story.className = 'news-card editorial-story';
+    story.querySelector('.news-read').innerHTML = `Read story ${icon('arrow-up-right')}`;
   });
-  async function open(immediate = false) {
-    if (opening || book.classList.contains('is-open')) return;
-    opening = true;
-    hideCursor();
-    if (!immediate && !reduced.matches && !mobile.matches) {
-      book.classList.replace('is-closed','is-opening');
-      coverAnimation = cover.animate([{transform:'rotateY(0deg)',opacity:1},{transform:'rotateY(-155deg)',opacity:0}],{duration:720,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
-      try { await coverAnimation.finished; } catch {}
-      coverAnimation.cancel();
-    }
-    book.classList.remove('is-closed','is-opening');
-    book.classList.add('is-open');
-    section.classList.add('journal-is-open');
-    book.tabIndex = 0;
-    cover.tabIndex = -1;
-    opening = false;
-    show(current);
+  book.replaceChildren();
+  const pages = [];
+  for (let offset = 0; offset < stories.length; offset += 3) {
+    const page = document.createElement('div');
+    page.className = 'editorial-spread';
+    const feature = document.createElement('div');
+    feature.className = 'editorial-feature';
+    feature.append(stories[offset]);
+    const supporting = document.createElement('div');
+    supporting.className = 'editorial-supporting';
+    supporting.append(...stories.slice(offset + 1, offset + 3));
+    page.append(feature, supporting);
+    book.append(page);
+    pages.push(page);
   }
-  book.classList.add('is-closed');
-  book.tabIndex = -1;
-  show(0);
-  open(true);
-  openButton.textContent = 'Browse stories';
-  openButton.addEventListener('click', () => show((current + 1) % spreads.length, true));
-  cover.addEventListener('click', () => open());
+  previous.innerHTML = icon('arrow-left');
+  next.innerHTML = icon('arrow-right');
+  previous.setAttribute('aria-label', 'Previous stories');
+  next.setAttribute('aria-label', 'Next stories');
+  let current = 0, animation;
+  function show(index, animate = false) {
+    if (index < 0 || index >= pages.length) return;
+    animation?.cancel();
+    current = index;
+    pages.forEach((page, i) => { page.hidden = i !== current; page.inert = i !== current; });
+    count.textContent = `${String(current + 1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')}`;
+    previous.disabled = current === 0;
+    next.disabled = current === pages.length - 1;
+    if (animate && !reduced.matches) animation = pages[current].animate([{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'translateY(0)'}],{duration:220,easing:'ease-out'});
+  }
   previous.addEventListener('click', () => show(current - 1, true));
   next.addEventListener('click', () => show(current + 1, true));
-  book.addEventListener('keydown', event => {
-    if (!book.classList.contains('is-open') || event.target.closest('a,button')) return;
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); show(current + (event.key === 'ArrowRight' ? 1 : -1), true); }
-  });
-  if (cursor) {
-    document.body.append(cursor);
-    cursor.querySelector('.journal-drag-label').textContent = 'Click me';
-    section.addEventListener('pointermove', event => {
-      lastPointer = {x:event.clientX,y:event.clientY};
-      updateCursor();
-    }, {passive:true});
-    section.addEventListener('pointerleave', () => { lastPointer = null; hideCursor(); });
-    addEventListener('scroll', () => requestAnimationFrame(updateCursor), {passive:true});
-  }
-  addEventListener('resize', measure);
-  new ResizeObserver(measure).observe(nav);
-  mobile.addEventListener('change', () => { if (mobile.matches) open(true); hideCursor(); measure(); });
-  reduced.addEventListener('change', () => { if (reduced.matches) { coverAnimation?.finish(); pageAnimation?.finish(); open(true); hideCursor(); } });
-  document.fonts?.ready.then(measure);
+  reduced.addEventListener('change', () => animation?.cancel());
+  show(0);
 }
 function setupSectionAnchors() {
   const nav = document.getElementById('site-nav');
