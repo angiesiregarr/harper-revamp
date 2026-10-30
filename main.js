@@ -248,7 +248,7 @@ function setupNews() {
   });
   book.replaceChildren();
   const pages = [];
-  for (let offset = 0; offset < stories.length; offset += 3) {
+  for (let offset = 0; offset < stories.length; offset += 5) {
     const page = document.createElement('div');
     page.className = 'editorial-spread';
     const feature = document.createElement('div');
@@ -256,7 +256,7 @@ function setupNews() {
     feature.append(stories[offset]);
     const supporting = document.createElement('div');
     supporting.className = 'editorial-supporting';
-    supporting.append(...stories.slice(offset + 1, offset + 3));
+    supporting.append(...stories.slice(offset + 1, offset + 5));
     page.append(feature, supporting);
     book.append(page);
     pages.push(page);
