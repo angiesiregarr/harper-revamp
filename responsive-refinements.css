@@ -617,3 +617,12 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
 @media(max-width:700px){.offers-stone{width:10px}.offers-stone-left{left:7px;top:90px;height:110px}.offers-stone-right{right:7px;bottom:65px;height:150px}}
 /* High-contrast sand grain remains visible at normal scale on the orange surface. */
 .offers,.offers::before{background-image:url('./assets/offers-grain.svg?v=2'),linear-gradient(135deg,#e58422 0%,#d87515 55%,#c96812 100%);background-size:192px 192px,cover;background-blend-mode:soft-light,normal}
+
+/* Membership owns and clips its stone layer, including the once-only entrance. */
+.membership{overflow:hidden}
+.membership .membership-stage{overflow:hidden}
+.membership .membership-stage::after{top:0;right:0;bottom:auto;height:100svh;opacity:0;transform:translateY(64px);transition:transform 800ms cubic-bezier(.22,1,.36,1),opacity 800ms ease-out;pointer-events:none}
+.membership.is-stone-visible .membership-stage::after{opacity:1;transform:translateY(0)}
+@media(max-width:700px){.membership .membership-stage::after{top:43%;bottom:96px;height:auto;right:0}}
+@media(prefers-reduced-motion:reduce){.membership .membership-stage::after{opacity:1;transform:none;transition:none}}
+@media(prefers-reduced-motion:reduce){.membership.is-stone-visible .membership-stage::after{transform:none;transition:none}}

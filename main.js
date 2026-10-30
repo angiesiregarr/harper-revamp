@@ -335,6 +335,30 @@ function setupCityViewport() {
   update();
 }
 
+function setupMembershipStone() {
+  const section = document.getElementById('membership');
+  if (!section) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let observer;
+  const reveal = () => {
+    section.classList.add('is-stone-visible');
+    observer?.disconnect();
+  };
+  const onMotionChange = () => { if (reduced.matches) reveal(); };
+  if (reduced.matches || !('IntersectionObserver' in window)) reveal();
+  else {
+    observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= .18)) reveal();
+    }, {threshold: .18});
+    observer.observe(section);
+  }
+  reduced.addEventListener('change', onMotionChange);
+  addEventListener('pagehide', () => {
+    observer?.disconnect();
+    reduced.removeEventListener('change', onMotionChange);
+  }, {once:true});
+}
+
 function setupMembershipOrbit() {
   const visual = document.querySelector('.membership-visual');
   if (!visual) return;
@@ -837,6 +861,7 @@ setupSectionAnchors();
 setupCityViewport();
 
 setupSectionPortalMotion();
+setupMembershipStone();
 setupMembershipOrbit();
 setupMembershipDevice();
 setupReveals();
