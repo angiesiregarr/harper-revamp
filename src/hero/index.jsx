@@ -19,31 +19,31 @@ const rooms = [
 const mod = (value, length) => ((value % length) + length) % length;
 const mix = (a, b, t) => a + (b - a) * t;
 function RusticOrbit() {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(1);
   const cardRefs = useRef([]), orbitRef = useRef(null), controller = useRef(null), touch = useRef(null), suppressClick = useRef(false), clickReset = useRef(null);
   const paused = useRef({ hover: false, focus: false, touch: false, offscreen: false });
 
   useLayoutEffect(() => {
-    let phase = 0, move = null, frame, previous = 0, idle = 0;
+    let phase = 1, move = null, frame, previous = 0, idle = 0;
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     const paint = () => {
       const width = orbitRef.current.clientWidth, mobile = window.innerWidth < 701;
-      const mainWidth = Math.min(width * (mobile ? .78 : .44), mobile ? 420 : 550);
-      const mainHeight = mobile ? Math.min(320, mainWidth * .96) : Math.min(330, window.innerHeight * .32, mainWidth * .59);
+      const mainWidth = Math.min(width * (mobile ? .78 : .408), mobile ? 420 : 636);
+      const mainHeight = mobile ? Math.min(320, mainWidth * .96) : Math.min(322, window.innerHeight * .345, mainWidth * .505);
       const nearest = mod(Math.round(phase), rooms.length);
       setActive(nearest);
       cardRefs.current.forEach((card, index) => {
         let offset = mod(index - phase + rooms.length / 2, rooms.length) - rooms.length / 2;
         const depth = Math.abs(offset), visible = depth < 2.5;
         // Interpolate between five fixed, vertically centered layers.
-        const slots = mobile ? [0, .50, .76, 1.05] : [0, .23, .35, .60];
-        const sizes = [1, .78, .56, .46];
+        const slots = mobile ? [0, .50, .76, 1.05] : [0, .235, .39, .64];
+        const sizes = [1, .75, .54, .44];
         const slot = Math.min(2, Math.floor(depth)), fraction = Math.min(1, depth - slot);
         const scale = mix(sizes[slot], sizes[slot + 1], fraction);
         const x = Math.sign(offset) * width * mix(slots[slot], slots[slot + 1], fraction);
         card.style.width = `${mainWidth}px`;
         card.style.height = `${mainHeight}px`;
-        card.style.transform = `translate(-50%,-50%) translate(${x}px,0px) scale(${scale})`;
+        card.style.transform = `translate(-50%,-50%) translate(${x}px,${mobile ? 0 : -depth * 10}px) scale(${scale})`;
         card.style.opacity = '1';
         card.style.visibility = visible ? 'visible' : 'hidden';
         card.style.zIndex = String(30 - Math.round(depth * 5));
