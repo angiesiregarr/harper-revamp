@@ -748,3 +748,42 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
 .hero-contour .hero-orbit{overflow:hidden;height:390px;max-height:none}
 @media(max-width:700px){.hero-contour .hero-orbit{height:320px}}
 @media(min-width:1051px){.hero-contour .hero-orbit{height:clamp(260px,38svh,390px)}}
+
+/* Bounded five-card composition: fixed layers, with controls outside the photographs. */
+.hero-contour #hero-title{color:#363634!important}
+.hero-contour .rustic-orbit{width:min(1240px,calc(100% - 96px));margin-inline:auto;height:100%}
+.hero-contour .rustic-orbit__card{border:2px solid #fffaf2!important;border-radius:12px!important;box-shadow:0 14px 28px #554a391c}
+.hero-contour .rustic-orbit__card img{border-radius:10px!important}
+.hero-contour .rustic-orbit__caption{border-radius:0 0 10px 10px!important}
+.hero-contour .rustic-orbit__card.is-featured::after{bottom:-9px!important}
+.hero-contour .hero-stack-control{width:44px;height:44px;background:none;border:0;color:#565653;font-size:36px}
+.hero-contour .hero-stack-prev{left:-34px}.hero-contour .hero-stack-next{right:-34px}
+.hero-contour .hero-atmosphere{background:radial-gradient(ellipse 65% 36% at 100% 84%,#f08b1d35,transparent 80%),radial-gradient(ellipse 55% 32% at 0 88%,#f08b1d27,transparent 82%),#f8f4ed}
+.hero-contour .hero-atmosphere::after{inset:13% -43vw auto auto;width:65vw;height:65vw;aspect-ratio:1;border:clamp(28px,3.5vw,60px) solid #f08b1d26;border-radius:50%;mask-image:none;filter:blur(1px);transform:none}
+.hero-contour .hero-contours-top{width:230px;height:220px;object-fit:cover;left:-110px;top:15px;opacity:.065}
+.hero-contour .hero-contours-bottom{width:250px;height:220px;object-fit:cover;left:-110px;bottom:0;opacity:.06}
+@media(min-width:1051px){
+ .hero-contour .hero-orbit{top:clamp(230px,30svh,290px);height:clamp(290px,38svh,360px);overflow:visible}
+ .hero-contour .hero-booking{top:calc(clamp(230px,30svh,290px) + clamp(290px,38svh,360px) + 36px);bottom:auto}
+}
+@media(min-width:701px) and (max-width:1050px){
+ .hero-contour .hero-orbit{overflow:visible}
+ .hero-contour .rustic-orbit{width:calc(100% - 96px)}
+}
+@media(max-width:700px){
+ .hero-contour .hero-orbit{margin-top:20px;overflow:hidden;height:350px}
+ .hero-contour .rustic-orbit{width:100%;height:310px}
+ .hero-contour .hero-stack-control{top:auto;bottom:-38px;transform:none;font-size:30px}
+ .hero-contour .hero-stack-prev{left:calc(50% - 54px)}
+ .hero-contour .hero-stack-next{right:calc(50% - 54px)}
+ .hero-contour .hero-booking{margin-top:20px}
+ .hero-contour .hero-atmosphere::after{top:20%;right:-100vw;width:145vw;height:145vw;border-width:28px}
+ .hero-contour .hero-contours-top,.hero-contour .hero-contours-bottom{width:145px;height:160px;left:-85px;opacity:.055}
+}
+@media(min-width:701px){.hero-contour .hero-orbit{overflow:hidden}}
+.hero-contour .rustic-orbit button.rustic-orbit__card,
+.hero-contour .rustic-orbit button.rustic-orbit__card.is-featured{border-radius:12px!important;background:#fffaf2!important}
+@media(min-width:701px) and (max-width:1050px){
+ .hero-contour .hero-orbit{top:250px;height:300px;margin-top:0}
+ .hero-contour .hero-booking{top:586px;bottom:auto}
+}
