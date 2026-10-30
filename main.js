@@ -254,7 +254,7 @@ function setupNews() {
   book.append(backward);
   let lastPointer = null;
   let current = 0, opening = false, coverAnimation = null, pageAnimation = null;
-  book.classList.add('journal-simple');
+  book.classList.add('journal-simple', 'news-spotlight');
   // All stories share the same editorial row; each leaf holds up to two.
   for (let offset = 0; offset < stories.length; offset += 4) {
     const spread = document.createElement('div');
@@ -268,8 +268,8 @@ function setupNews() {
       rule.innerHTML = '<span>NOTES FROM HARPER</span><span>THE JOURNAL</span>';
       const list = document.createElement('div');
       list.className = 'journal-story-list';
-      stories.slice(offset + leaf * 2, offset + leaf * 2 + 2).forEach(story => {
-        story.className = 'news-card journal-supporting-story';
+      stories.slice(offset + (leaf ? 1 : 0), offset + (leaf ? 4 : 1)).forEach(story => {
+        story.className = `news-card journal-supporting-story${leaf ? '' : ' news-spotlight-feature'}`;
         list.append(story);
       });
       const folio = document.createElement('p');

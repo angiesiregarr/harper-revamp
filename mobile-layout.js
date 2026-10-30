@@ -84,11 +84,14 @@
   book.before(region);
   let current = 0, touch = null, suppressClickUntil = 0;
   function show(index) {
-    current = Math.max(0, Math.min(stories.length - 1, index));
-    stories.forEach((story, i) => { story.hidden = i !== current; });
-    controls.querySelector('span').textContent = `${String(current + 1).padStart(2,'0')} / ${String(stories.length).padStart(2,'0')}`;
+    current = Math.max(0, Math.min(Math.ceil(stories.length / 4) - 1, index));
+    stories.forEach((story, i) => {
+      story.hidden = Math.floor(i / 4) !== current;
+      story.classList.toggle('is-featured', i === current * 4);
+    });
+    controls.querySelector('span').textContent = `${String(current + 1).padStart(2,'0')} / ${String(Math.ceil(stories.length / 4)).padStart(2,'0')}`;
     controls.querySelector('[data-story-step="-1"]').disabled = current === 0;
-    controls.querySelector('[data-story-step="1"]').disabled = current === stories.length - 1;
+    controls.querySelector('[data-story-step="1"]').disabled = current === Math.ceil(stories.length / 4) - 1;
   }
   controls.addEventListener('click', event => {
     const button = event.target.closest('[data-story-step]');
