@@ -354,8 +354,9 @@ function setupNews() {
   book.classList.add('is-closed');
   book.tabIndex = -1;
   show(0);
-  if (mobile.matches || reduced.matches) open(true);
-  openButton.addEventListener('click', () => open());
+  open(true);
+  openButton.textContent = 'Browse stories';
+  openButton.addEventListener('click', () => show((current + 1) % spreads.length, true));
   cover.addEventListener('click', () => open());
   previous.addEventListener('click', () => show(current - 1, true));
   next.addEventListener('click', () => show(current + 1, true));

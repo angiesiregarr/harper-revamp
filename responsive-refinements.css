@@ -372,3 +372,42 @@
  body:has(#site-nav[data-menu-open]) .mobile-floating-book,body:has(dialog[open]) .mobile-floating-book{display:none}
  .footer{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 }
+
+/* HARPER orange edition: typography and restrained inset brand marks. */
+body *,body *::before,body *::after{letter-spacing:0!important}
+h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-weight:700!important}
+.hero-contour #hero-title{color:var(--orange)}
+.hero-field-icon,.hero-field-chevron,.booking-field svg,.booking-field-trigger svg{color:var(--orange)}
+.rustic-orbit__card::after{content:'';position:absolute;inset:0;pointer-events:none;background:rgb(240 139 29 / 28%);mix-blend-mode:color;opacity:1;transition:opacity .3s ease}
+.rustic-orbit__card.is-featured::after{inset:0 16px 0 auto;width:20px;background:var(--orange);mix-blend-mode:normal;opacity:1}
+.rustic-orbit__caption{padding-right:48px!important;z-index:2}
+.rustic-orbit__hotel strong{font-weight:700;font-size:clamp(12px,1.1vw,17px);white-space:normal}
+.rustic-orbit__hotel small{font-size:clamp(9px,.75vw,12px)}
+.harper-grey-sequence{background:radial-gradient(ellipse at 45% 0%,#ffbd7138,transparent 60%),linear-gradient(180deg,#f6a347 0%,var(--orange) 38%,#d77512 58%,#808285 83%,#737577 100%)}
+.harper-reels .reels-floral{color:#fff1df}
+.membership-stage{position:relative;isolation:isolate}
+.membership-stage::after{content:'';position:absolute;z-index:0;top:28px;bottom:28px;right:16px;width:20px;background:var(--gray) url('./assets/paper-grain.svg') repeat;box-shadow:inset 1px 0 #ffffff35;pointer-events:none}
+.membership-content,.membership-visual{position:relative;z-index:1}
+.membership .section-kicker::before{content:'';display:inline-block;width:14px;height:14px;margin-right:10px;border:3px solid var(--orange);border-radius:50%;vertical-align:middle;background:url('./assets/paper-grain.svg')}
+/* An editorial story board, with the existing two-column story layout. */
+.journal-book,.journal-book.is-open{padding-left:0!important;perspective:none;box-shadow:none!important;background:transparent;border-radius:0!important}
+.journal-book::before,.journal-book::after,.journal-spine,.journal-cover,.journal-elastic,.journal-bookmark,.journal-page-rule,.journal-folio{display:none!important}
+.journal .journal-spread{margin-left:0!important;gap:24px;background:transparent;box-shadow:none;border:0}
+.journal .journal-page{background:#fffaf4!important;border:1px solid #e6ddd1!important;border-top:4px solid var(--orange)!important;box-shadow:none!important;border-radius:0!important;padding:24px!important}
+.journal .journal-page::before,.journal .journal-page::after{display:none!important}
+.mobile-journal-book,.mobile-journal-content{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+.mobile-journal-cover,.mobile-journal-edge{display:none!important}
+.mobile-journal-story{background:#fffaf4;border-top:4px solid var(--orange);padding:18px}
+@media(max-width:700px){
+ .rustic-orbit__card.is-featured::after{right:12px;width:16px}
+ .rustic-orbit__caption{padding-right:38px!important}
+ .membership-stage::after{right:12px;width:16px;top:24px;bottom:24px}
+ .membership-content{padding-right:22px}
+ .hero-contour #hero-title{font-size:clamp(30px,8.1vw,48px)}
+}
+.hero-contour .hero-booking-field .hero-field-icon,.hero-contour .hero-booking-field .hero-field-chevron,.booking-sheet .booking-field svg{color:var(--orange)!important}
+.mobile-journal-book::before,.mobile-journal-book::after,.mobile-journal-content::before,.mobile-journal-content::after{display:none!important}
+.membership .membership-content h2 em{color:#fff4e8}
+.membership .section-kicker::before{content:none}
+.offers-illustration{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--gray) url('./assets/paper-grain.svg');color:transparent!important;border:1px solid #ffffff40;box-shadow:inset 0 1px #ffffff33}
+.membership .membership-stage::after{background-color:#808285;background-image:url('./assets/paper-grain.svg');background-size:95px}

@@ -127,7 +127,7 @@ function RusticOrbit() {
         card.style.zIndex = featured && orbitWidth < 640 ? '40' : String(20 - Math.round(shortest * 2));
         const gray = featured ? 0 : 1;
         const blur = Math.min(2.7, Math.max(0, shortest - .42) * .85);
-        card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${1 - gray * .82}) blur(${featured ? 0 : blur}px)`;
+        card.querySelector('img').style.filter = `grayscale(${gray}) sepia(${featured ? 0 : 1}) saturate(${featured ? 1 : 2.4}) hue-rotate(${featured ? 0 : -12}deg) blur(${featured ? 0 : Math.max(2, blur)}px)`;
         const visible = visibleOpacity > .12 && introProgress > .5;
         card.tabIndex = visible ? 0 : -1;
         if (visible) card.removeAttribute('aria-hidden'); else card.setAttribute('aria-hidden', 'true');
@@ -266,7 +266,7 @@ function RusticOrbit() {
         aria-current={index === active ? 'true' : undefined}
         aria-label={`Show ${room.hotel} room in ${room.place}${index === active ? ', featured' : ''}`}>
         <img src={room.src} alt={room.alt} style={{ objectPosition: room.position }} draggable="false" loading="eager" />
-        {index === active && <span className="rustic-orbit__caption" aria-hidden="true"><span className="rustic-orbit__hotel"><svg className="rustic-orbit__pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M19 9c0 5-7 12-7 12S5 14 5 9a7 7 0 0 1 14 0Z"/><circle cx="12" cy="9" r="2.3"/></svg><span><small>{room.place}, Indonesia</small><strong>{room.hotel}</strong></span></span></span>}
+        {index === active && <span className="rustic-orbit__caption" aria-hidden="true"><span className="rustic-orbit__hotel"><svg className="rustic-orbit__pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M19 9c0 5-7 12-7 12S5 14 5 9a7 7 0 0 1 14 0Z"/><circle cx="12" cy="9" r="2.3"/></svg><span><strong>{room.hotel}</strong><small>{room.place}, Indonesia</small></span></span></span>}
       </button>)}
       <span className="visually-hidden" aria-live="polite">Featured room: {rooms[active].hotel}, {rooms[active].place}. Use left and right arrow keys or select a surrounding room.</span>
     </div>

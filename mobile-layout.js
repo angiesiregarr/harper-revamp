@@ -57,7 +57,11 @@
   const edge = document.createElement('span');
   edge.className = 'mobile-journal-edge';
   edge.setAttribute('aria-hidden','true');
-  frame.append(content,cover,edge);
+  frame.append(content);
+  cover.hidden = true;
+  content.inert = false;
+  content.removeAttribute('aria-hidden');
+  frame.classList.add('is-open');
   region.append(frame);
   let opening = false, coverMotion = null;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
