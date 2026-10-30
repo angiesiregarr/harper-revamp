@@ -98,13 +98,13 @@
     const mobile = phone.matches;
     const previousHeight = Math.min(mobile ? 430 : 500, box.height * (mobile ? .82 : .70));
     const focalTheta = mobile ? Math.PI/2 : Math.acos(.38);
-    const y = box.height * (mobile ? .10 : .14);
+    const y = box.height * (mobile ? .10 : .06);
     const centerY = box.top + box.height / 2 + Math.sin(focalTheta) * y;
     const sectionBox = section.getBoundingClientRect();
     const headingBottom = document.getElementById('reels-center').getBoundingClientRect().bottom;
-    const availableHeight = Math.max(180, 2 * Math.min(sectionBox.bottom - centerY - 32, centerY - headingBottom - 24));
-    const activeHeight = Math.min(previousHeight * 1.50, box.height * .94, availableHeight, mobile ? (box.width - 12) * 16 / 9 : Infinity);
-    const h = activeHeight * .66;
+    const availableHeight = Math.max(180, 2 * Math.min(sectionBox.bottom - centerY - 32, centerY - headingBottom - 16));
+    const activeHeight = Math.min(previousHeight * 1.70, box.height * .98, availableHeight, mobile ? (box.width - 12) * 16 / 9 : Infinity);
+    const h = activeHeight * .58;
     const w = h * 9 / 16;
     const x = mobile ? box.width * .90 : Math.max(0, box.width / 2 - w / 2 - 20);
     const points = [{theta:0,length:0}];
@@ -191,7 +191,7 @@
       if(Math.abs(offset)<distance){distance=Math.abs(offset);nearest=i;}
       const [x,y]=pointAt(geometry.focal+i/n+phase);
       const weight=Math.exp(-Math.pow(offset*n/.43,2));
-      const scale=.94+(1/.66-.94)*weight;
+      const scale=.90+(1/.58-.90)*weight;
       card.style.width=`${geometry.w}px`;
       card.style.height=`${geometry.h}px`;
       card.style.setProperty('--card-width',`${geometry.w}px`);card.style.setProperty('--card-height',`${geometry.h}px`);
@@ -212,7 +212,7 @@
       light.style.transform=`translate(-50%,-50%) translate3d(${x.toFixed(3)}px,${(y+geometry.h*scale/2+14).toFixed(3)}px,0)`;
       light.style.opacity=String(visibility*(.30+.22*weight));
       card.style.zIndex=String(Math.round(100+weight*200+y));
-      card.style.setProperty('--reel-blur',`${(.8*(1-weight)).toFixed(3)}px`);
+      card.style.setProperty('--reel-blur',`${(2.2*(1-weight)).toFixed(3)}px`);
       card.style.setProperty('--reel-saturation',String(.86+.14*weight));
       card.style.setProperty('--reel-brightness',String(.91+.09*weight));
       card.dataset.orbitX=x.toFixed(3);card.dataset.orbitY=y.toFixed(3);

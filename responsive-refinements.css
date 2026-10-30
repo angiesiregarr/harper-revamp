@@ -327,8 +327,8 @@
 .booking-sheet .calendar-footer .calendar-apply:disabled{opacity:.45;cursor:not-allowed}
 .is-calendar .calendar-grid button.is-between{background:#fce4c7;color:#242424}
 .is-calendar .calendar-grid button.is-range-edge,.is-calendar .calendar-grid button.is-range-edge:hover{background:var(--orange);color:#fff}
-.is-calendar .calendar-grid button.is-range-start{box-shadow:inset 2px 0 0 #a64c00}
-.is-calendar .calendar-grid button.is-range-end{box-shadow:inset -2px 0 0 #a64c00}
+.is-calendar .calendar-grid button.is-range-start{box-shadow:inset 2px 0 0 #f08b1d}
+.is-calendar .calendar-grid button.is-range-end{box-shadow:inset -2px 0 0 #f08b1d}
 .is-calendar .calendar-grid button.is-range-preview{outline:1px dashed #d97815;outline-offset:-1px}
 @media(max-width:800px){.booking-sheet .booking-popover.is-destination:not([hidden]){height:min(37svh,310px)}.is-calendar .calendar-footer{flex-wrap:wrap}.calendar-range-hint{flex:1;min-width:100px}}
 /* Per-room guest counts follow the existing picker dimensions. */
@@ -685,3 +685,21 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
  .hero-contour #hero-title{font-size:clamp(24px,6.3vw,33px)!important}
  .journal.journal-editorial::before{inset:-9px -18px -18px -9px;clip-path:polygon(0 0,48px 0,48px 9px,9px 9px,9px calc(100% - 18px),100% calc(100% - 18px),100% 100%,0 100%)}
 }
+
+/* Finer hero preview accents and quieter headline scale. */
+.rustic-orbit__card:not(.is-featured)::after{width:10px}
+.hero-contour #hero-title{font-size:clamp(36px,3.9vw,58px)!important}
+.journal.journal-editorial::before{clip-path:none}
+.harper-reels .reels-kicker{--kicker-block:#fff}
+@media(min-width:701px){
+ .harper-reels{padding-inline:3vw;padding-bottom:140px}
+ .harper-reels .reels-stage{max-width:1720px;height:max(900px,calc(100svh - 40px));max-height:none}
+}
+@media(max-width:700px){
+ .rustic-orbit__card:not(.is-featured)::after{width:8px}
+ .hero-contour #hero-title{font-size:clamp(22px,5.7vw,30px)!important}
+ .harper-reels{padding-inline:14px;padding-bottom:64px}
+ .harper-reels .reels-stage{height:max(800px,calc(100svh - 100px));max-height:none}
+}
+@media(min-width:701px){.harper-reels .reels-orbit{transform:translateY(-100px)}}
+@media(max-width:700px){.harper-reels .reels-orbit{transform:translateY(-130px)}}
