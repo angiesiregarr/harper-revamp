@@ -348,31 +348,84 @@ function setupMembershipStone() {
   stone.append(texture);
   stage.prepend(stone);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let observer, animation, textureAnimation, revealed = false;
-  const reveal = () => {
-    if (revealed) return;
-    revealed = true;
-    section.classList.add('is-stone-visible');
-    observer?.disconnect();
-    if (!reduced.matches) {
-      const timing = {duration:800, easing:'cubic-bezier(.22,1,.36,1)'};
-      animation = stone.animate([{clipPath:'inset(100% 0 0 0)'},{clipPath:'inset(0% 0 0 0)'}], timing);
-      textureAnimation = texture.animate([{transform:'translateY(64px)'},{transform:'translateY(0)'}], timing);
-    }
+  const timing = {duration:800, easing:'cubic-bezier(.22,1,.36,1)', fill:'both'};
+  const animations = [
+    stone.animate([{clipPath:'inset(100% 0 0 0)'},{clipPath:'inset(0% 0 0 0)'}], timing),
+    texture.animate([{transform:'translateY(64px)'},{transform:'translateY(0)'}], timing)
+  ];
+  animations.forEach(animation => { animation.pause(); animation.currentTime = 0; });
+  let eligible = false, suppressed = false, timer = 0, frame = 0;
+  let lastY = scrollY, direction = 0, travel = 0, lastUserInput = -Infinity;
+  const clearDelay = () => { clearTimeout(timer); timer = 0; };
+  const hide = () => {
+    clearDelay();
+    stone.dataset.state = 'hidden';
+    animations.forEach(animation => {
+      if (reduced.matches) { animation.pause(); animation.currentTime = 800; }
+      else if (Number(animation.currentTime) > 0) { animation.updatePlaybackRate(-1); animation.play(); }
+    });
   };
-  const onMotionChange = () => { if (reduced.matches) { animation?.cancel(); textureAnimation?.cancel(); reveal(); } };
-  if (reduced.matches || !('IntersectionObserver' in window)) reveal();
-  else {
-    observer = new IntersectionObserver(entries => {
-      if (entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= .18)) reveal();
-    }, {threshold:.18});
-    observer.observe(visual);
-  }
+  const schedule = () => {
+    if (!eligible || suppressed || timer) return;
+    if (reduced.matches) {
+      animations.forEach(animation => { animation.pause(); animation.currentTime = 800; });
+      stone.dataset.state = 'visible';
+      return;
+    }
+    stone.dataset.state = 'waiting';
+    timer = setTimeout(() => {
+      timer = 0;
+      if (!eligible || suppressed) return;
+      stone.dataset.state = 'visible';
+      animations.forEach(animation => { animation.updatePlaybackRate(1); animation.play(); });
+    }, 3000);
+  };
+  const observer = new IntersectionObserver(entries => {
+    const active = entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= .18);
+    if (active === eligible) return;
+    eligible = active;
+    suppressed = false;
+    if (eligible) schedule(); else hide();
+  }, {threshold:.18});
+  observer.observe(visual);
+  const updateDirection = () => {
+    frame = 0;
+    const y = Math.max(0, scrollY), delta = y - lastY;
+    lastY = y;
+    if (Math.abs(delta) < 1 || performance.now() - lastUserInput > 1200) return;
+    const nextDirection = Math.sign(delta);
+    if (nextDirection !== direction) { direction = nextDirection; travel = 0; }
+    travel += Math.abs(delta);
+    if (!eligible || travel < 18 || reduced.matches) return;
+    if (direction < 0 && !suppressed) { suppressed = true; hide(); }
+    else if (direction > 0 && suppressed) { suppressed = false; schedule(); }
+  };
+  const onScroll = () => { if (!frame) frame = requestAnimationFrame(updateDirection); };
+  const onUserInput = event => {
+    if (event.type !== 'keydown' || ['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)) lastUserInput = performance.now();
+  };
+  const onMotionChange = () => {
+    clearDelay();
+    animations.forEach(animation => { animation.pause(); animation.currentTime = reduced.matches ? 800 : 0; });
+    suppressed = false;
+    if (eligible) schedule();
+  };
+  stone.dataset.state = 'hidden';
+  if (reduced.matches) animations.forEach(animation => { animation.currentTime = 800; });
+  addEventListener('scroll', onScroll, {passive:true});
+  addEventListener('wheel', onUserInput, {passive:true});
+  addEventListener('touchmove', onUserInput, {passive:true});
+  addEventListener('keydown', onUserInput);
   reduced.addEventListener('change', onMotionChange);
   addEventListener('pagehide', () => {
-    observer?.disconnect();
-    animation?.cancel();
-    textureAnimation?.cancel();
+    observer.disconnect();
+    clearDelay();
+    cancelAnimationFrame(frame);
+    animations.forEach(animation => animation.cancel());
+    removeEventListener('scroll', onScroll);
+    removeEventListener('wheel', onUserInput);
+    removeEventListener('touchmove', onUserInput);
+    removeEventListener('keydown', onUserInput);
     reduced.removeEventListener('change', onMotionChange);
   }, {once:true});
 }
