@@ -627,10 +627,12 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
 @media(prefers-reduced-motion:reduce){.membership .membership-stage::after{opacity:1;transform:none;transition:none}}
 @media(prefers-reduced-motion:reduce){.membership.is-stone-visible .membership-stage::after{transform:none;transition:none}}
 
-/* Reveal with the mockup, with a feathered edge instead of a hard section divider. */
+/* The original opaque stone rises inside a clipped, section-owned wrapper. */
 .membership .membership-stage::after{content:none!important}
-.membership-stone-layer{position:absolute;z-index:0;top:0;right:0;width:46%;height:100svh;background:#808285 url('./assets/harper-pattern.webp') center/cover no-repeat;opacity:0;transform:translateY(64px);mask-image:linear-gradient(to bottom,transparent,#000 120px,#000 calc(100% - 64px),transparent);pointer-events:none}
-.membership.is-stone-visible .membership-stone-layer{opacity:1;transform:translateY(0)}
+.membership-stone-layer{position:absolute;z-index:0;top:0;right:0;width:46%;height:100svh;overflow:hidden;opacity:1;clip-path:inset(100% 0 0 0);pointer-events:none}
+.membership-stone-texture{position:absolute;inset:0;background:#808285 url('./assets/harper-pattern.webp') center/cover no-repeat;opacity:1;transform:translateY(64px)}
+.membership.is-stone-visible .membership-stone-layer{clip-path:inset(0% 0 0 0)}
+.membership.is-stone-visible .membership-stone-texture{transform:translateY(0)}
 .membership .membership-visual{left:10%}
-@media(max-width:700px){.membership-stone-layer{top:43%;bottom:96px;height:auto;width:48%;mask-image:linear-gradient(to bottom,transparent,#000 64px,#000 calc(100% - 40px),transparent)}}
-@media(prefers-reduced-motion:reduce){.membership .membership-stone-layer{opacity:1;transform:none}}
+@media(max-width:700px){.membership-stone-layer{top:43%;bottom:96px;height:auto;width:48%}}
+@media(prefers-reduced-motion:reduce){.membership .membership-stone-layer{clip-path:inset(0% 0 0 0)}.membership .membership-stone-texture{transform:none}}
