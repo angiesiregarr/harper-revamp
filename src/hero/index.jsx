@@ -18,213 +18,78 @@ const rooms = [
 
 const mod = (value, length) => ((value % length) + length) % length;
 const mix = (a, b, t) => a + (b - a) * t;
-const fanEase = value => {
-  // cubic-bezier(.42, 0, .2, 1), solved by the x coordinate.
-  let low = 0, high = 1;
-  for (let i = 0; i < 12; i++) {
-    const t = (low + high) / 2;
-    const x = 3 * .42 * t * (1 - t) * (1 - t) + 3 * .2 * t * t * (1 - t) + t * t * t;
-    if (x < value) low = t; else high = t;
-  }
-  const t = (low + high) / 2;
-  return 3 * t * t * (1 - t) + t * t * t;
-};
-
-// The near, outer and far points form one closed oval. Hidden top points let
-// cards travel behind the headline without appearing over the lettering.
-function makeGeometry(width, height) {
-  const mobile = width < 640, tablet = width < 1050;
-  const frontWidth = mobile ? Math.min(width * .76, 390) : tablet ? Math.min(width * .57, 510) : Math.min(width * .36, 600);
-  const frontHeight = mobile ? Math.min(310, Math.max(260, width * .72)) : tablet ? 285 : height < 820 ? 270 : 312;
-  const nearX = width * (mobile ? .33 : tablet ? .39 : .30);
-  const outerX = width * (mobile ? .52 : tablet ? .47 : .42);
-  const upperX = width * (mobile ? .29 : tablet ? .31 : .235);
-  const visibleOuter = mobile ? 0 : 1;
-  const visibleUpper = mobile || tablet ? 0 : 1;
-  const points = [
-    [0, 0, frontWidth, frontHeight, 1],
-    [nearX, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, 1],
-    [outerX, -65, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
-    [upperX, mobile ? -100 : -108, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
-    [width * .12, mobile ? -119 : -137, 100, 86, 0],
-    [0, mobile ? -125 : -145, 100, 86, 0],
-    [-width * .12, mobile ? -119 : -137, 100, 86, 0],
-    [-upperX, mobile ? -100 : -108, mobile ? 88 : 132, mobile ? 102 : 112, visibleUpper],
-    [-outerX * .93, -65, mobile ? 100 : tablet ? 122 : 176, mobile ? 118 : tablet ? 126 : 163, visibleOuter],
-    [-nearX * 1.04, mobile ? -17 : 5, mobile ? 120 : tablet ? 180 : 242, mobile ? 140 : tablet ? 185 : 245, 1],
-  ];
-  const sample = phase => {
-    const t = mod(phase, points.length), i = Math.floor(t), u = t - i;
-    const previous = points[mod(i - 1, points.length)], a = points[i], b = points[(i + 1) % points.length], next = points[(i + 2) % points.length];
-    const curve = dimension => .5 * ((2 * a[dimension]) + (-previous[dimension] + b[dimension]) * u + (2 * previous[dimension] - 5 * a[dimension] + 4 * b[dimension] - next[dimension]) * u * u + (-previous[dimension] + 3 * a[dimension] - 3 * b[dimension] + next[dimension]) * u * u * u);
-    const ease = u * u * (3 - 2 * u);
-    return [curve(0), curve(1), mix(a[2], b[2], ease), mix(a[3], b[3], ease), Math.max(0, mix(a[4], b[4], ease))];
-  };
-  const steps = 1000, distances = [0];
-  let previous = sample(0), total = 0;
-  for (let step = 1; step <= steps; step++) {
-    const current = sample(step * points.length / steps);
-    total += Math.hypot(current[0] - previous[0], current[1] - previous[1]);
-    distances.push(total); previous = current;
-  }
-  return { sample, distances, total, steps, count: points.length };
-}
-
-function distanceAt(phase, geometry) {
-  const revolutions = Math.floor(phase / geometry.count);
-  const within = mod(phase, geometry.count) * geometry.steps / geometry.count;
-  const index = Math.floor(within), fraction = within - index;
-  return revolutions * geometry.total + mix(geometry.distances[index], geometry.distances[index + 1], fraction);
-}
-
-function phaseAt(distance, geometry) {
-  const revolutions = Math.floor(distance / geometry.total);
-  const within = distance - revolutions * geometry.total;
-  let low = 0, high = geometry.steps;
-  while (low + 1 < high) {
-    const middle = (low + high) >> 1;
-    if (geometry.distances[middle] <= within) low = middle; else high = middle;
-  }
-  const segment = geometry.distances[low + 1] - geometry.distances[low];
-  const fraction = segment ? (within - geometry.distances[low]) / segment : 0;
-  return revolutions * geometry.count + (low + fraction) * geometry.count / geometry.steps;
-}
-
 function RusticOrbit() {
   const [active, setActive] = useState(0);
   const cardRefs = useRef([]), orbitRef = useRef(null), controller = useRef(null), touch = useRef(null), suppressClick = useRef(false), clickReset = useRef(null);
   const paused = useRef({ hover: false, focus: false, touch: false, offscreen: false });
 
   useLayoutEffect(() => {
-    let geometry, distance = 0, lastTime = 0, frame, move = null, currentActive = 0;
-    const phone = window.matchMedia('(max-width:700px)');
-    let idleTime = 0;
-    const mobileStepDuration = 680, mobileIdleDuration = 4000;
-    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let introState = motion.matches ? 'done' : 'waiting', introStart = 0;
-    const introLength = (rooms.length - 1) * 80 + 650;
-    const paint = (phase, now = performance.now()) => {
+    let phase = 0, move = null, frame, previous = 0, idle = 0;
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const paint = () => {
+      const width = orbitRef.current.clientWidth, mobile = width < 701;
+      const mainWidth = Math.min(width * (mobile ? .78 : .38), mobile ? 420 : 620);
+      const mainHeight = mobile ? Math.min(320, mainWidth * .96) : Math.min(330, window.innerHeight * .32, mainWidth * .59);
       const nearest = mod(Math.round(phase), rooms.length);
-      if (nearest !== currentActive) { currentActive = nearest; setActive(nearest); window.dispatchEvent(new Event('harper:hero-change')); }
+      setActive(nearest);
       cardRefs.current.forEach((card, index) => {
-        if (!card) return;
-        const targetPosition = mod(index - phase, rooms.length);
-        const introProgress = introState === 'done' ? 1 : introState === 'waiting' ? 0
-          : fanEase(Math.min(1, Math.max(0, (now - introStart - index * 80) / 650)));
-        const shortPath = targetPosition > rooms.length / 2 ? targetPosition - rooms.length : targetPosition;
-        const pathPosition = mod(shortPath * introProgress, rooms.length);
-        const shortest = Math.min(targetPosition, rooms.length - targetPosition);
-        const [x, y, width, height, opacity] = geometry.sample(pathPosition);
-        const previewScale = 1 - .10 * Math.min(1, Math.max(0, shortest - .5));
-        const orbitWidth = orbitRef.current.clientWidth;
-        const edgeRoom = Math.max(0, orbitWidth / 2 - width / 2 - (orbitWidth < 640 ? 8 : 12));
-        const safeX = orbitWidth <= 1050 ? Math.max(-edgeRoom, Math.min(edgeRoom, x)) : x;
-        card.style.width = `${width * previewScale}px`;
-        card.style.height = `${height * previewScale}px`;
-        card.style.transform = `translate(-50%,-50%) translate(${safeX}px,${y}px)`;
-        const visibleOpacity = opacity;
-        card.style.opacity = String(visibleOpacity * introProgress);
-        const featured = index === nearest;
-        card.style.zIndex = featured && orbitWidth < 640 ? '40' : String(20 - Math.round(shortest * 2));
-        const gray = featured ? 0 : 1;
-        const blur = Math.min(2.7, Math.max(0, shortest - .42) * .85);
-        card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${featured ? 1 : .18}) blur(${featured ? 0 : Math.max(2, blur)}px)`;
-        const visible = visibleOpacity > .12 && introProgress > .5;
+        let offset = mod(index - phase + rooms.length / 2, rooms.length) - rooms.length / 2;
+        const depth = Math.abs(offset), visible = depth < 2.65;
+        const scale = Math.max(.49, 1 - depth * .19);
+        const x = offset * mainWidth * (mobile ? .76 : .50);
+        card.style.width = `${mainWidth}px`;
+        card.style.height = `${mainHeight}px`;
+        card.style.transform = `translate(-50%,-50%) translate(${x}px,${depth * 8}px) scale(${scale})`;
+        card.style.opacity = '1';
+        card.style.visibility = visible ? 'visible' : 'hidden';
+        card.style.zIndex = String(30 - Math.round(depth * 5));
+        card.style.pointerEvents = visible ? 'auto' : 'none';
+        card.querySelector('img').style.filter = `grayscale(${Math.min(1, depth)}) blur(${Math.min(1.8, depth * 1.2)}px)`;
         card.tabIndex = visible ? 0 : -1;
-        if (visible) card.removeAttribute('aria-hidden'); else card.setAttribute('aria-hidden', 'true');
-        card.classList.toggle('is-featured', featured);
-        if (featured) card.setAttribute('aria-current', 'true'); else card.removeAttribute('aria-current');
+        card.setAttribute('aria-hidden', String(!visible));
+        card.classList.toggle('is-featured', index === nearest);
+        if(index === nearest) card.setAttribute('aria-current','true'); else card.removeAttribute('aria-current');
       });
     };
-    const resize = () => {
-      const phase = geometry ? phaseAt(distance, geometry) : 0;
-      const { width } = orbitRef.current.getBoundingClientRect();
-      geometry = makeGeometry(width, window.innerHeight);
-      distance = distanceAt(phase, geometry);
-      lastTime = 0;
-      paint(phase);
-    };
     const moveTo = target => {
-      const phase = phaseAt(distance, geometry);
-      if (phone.matches && move) return; // No queued swipes or competing moves.
-      idleTime = 0;
-      if (phone.matches && !motion.matches) target = Math.round(phase) + Math.max(-1, Math.min(1, target - Math.round(phase)));
-      move = { from: distance, to: distanceAt(target, geometry), fromPhase: phase, toPhase: target, elapsed: 0, start: performance.now(), duration: motion.matches ? 0 : phone.matches ? mobileStepDuration : 850 };
-      if (motion.matches) { distance = move.to; move = null; paint(target); }
-    };
-    const finishIntro = () => {
-      if (introState === 'done') return;
-      introState = 'done';
-      paint(phaseAt(distance, geometry));
-      window.dispatchEvent(new Event('harper:hero-orbit-complete'));
+      idle = 0;
+      if (move) return;
+      if (motion.matches) { phase = target; paint(); return; }
+      move = {from:phase,to:target,elapsed:0};
     };
     controller.current = {
-      finishIntro,
-      step(delta) { finishIntro(); moveTo(Math.round(phaseAt(distance, geometry)) + delta); },
-      select(index, immediate = false) {
-        finishIntro();
-        const phase = phaseAt(distance, geometry), current = Math.round(phase);
-        let difference = mod(index - mod(current, rooms.length), rooms.length);
-        if (difference > rooms.length / 2) difference -= rooms.length;
-        if (phone.matches && immediate) { move = null; idleTime = 0; distance = distanceAt(current + difference, geometry); paint(current + difference); }
-        else moveTo(current + difference);
-      },
+      finishIntro() {},
+      step(delta) { moveTo(Math.round(phase) + delta); },
+      select(index) {
+        let difference = mod(index - mod(Math.round(phase), rooms.length), rooms.length);
+        if(difference > rooms.length/2) difference -= rooms.length;
+        moveTo(Math.round(phase)+difference);
+      }
     };
-    const visibility = new IntersectionObserver(entries => { paused.current.offscreen = !entries[0].isIntersecting; });
-    visibility.observe(document.querySelector('.hero-orbit-stage'));
+    const observer = new IntersectionObserver(entries => { paused.current.offscreen = !entries[0].isIntersecting; });
+    observer.observe(orbitRef.current);
     const tick = now => {
-      const elapsed = lastTime ? Math.min((now - lastTime) / 1000, .05) : 0;
-      lastTime = now;
-      let changed = false;
-      if (introState === 'running') {
-        paint(phaseAt(distance, geometry), now);
-        changed = true;
-        if (now - introStart >= introLength) finishIntro();
-      } else if (move) {
-        // Mobile moves interpolate phase rather than unequal arc lengths.
-        // This gives every adjacent card the same 680ms, ease-in-out handoff.
-        // Elapsed frame time prevents a background tab from catching up at once.
-        if (phone.matches && !document.hidden && !paused.current.offscreen && !paused.current.touch && !document.body.classList.contains('handoff-in-flight')) move.elapsed += elapsed * 1000;
-        const ratio = move.duration ? Math.min(1, (phone.matches ? move.elapsed : now - move.start) / move.duration) : 1;
-        const eased = ratio * ratio * (3 - 2 * ratio);
-        distance = phone.matches ? distanceAt(mix(move.fromPhase, move.toPhase, eased), geometry) : mix(move.from, move.to, eased);
-        changed = true;
-        if (ratio === 1) move = null;
-      } else if (introState === 'done' && !motion.matches && !document.hidden && !document.body.classList.contains('handoff-in-flight') && !Object.values(paused.current).some(Boolean)) {
-        if (phone.matches) {
-          idleTime += elapsed * 1000;
-          if (idleTime >= mobileIdleDuration) moveTo(Math.round(phaseAt(distance, geometry)) + 1);
-        } else {
-          distance += 28 * elapsed; changed = true; // Desktop drift is unchanged.
-        }
+      const dt = previous ? Math.min(now - previous, 50) : 0; previous = now;
+      const frozen = document.hidden || paused.current.offscreen || paused.current.touch;
+      if(move && !frozen) {
+        move.elapsed += dt;
+        const t = Math.min(1, move.elapsed / 700), eased = t*t*(3-2*t);
+        phase = mix(move.from,move.to,eased); paint();
+        if(t === 1) {move=null;idle=0;}
+      } else if(!move && !motion.matches && !frozen && !Object.values(paused.current).some(Boolean)) {
+        idle += dt;
+        if(idle >= 5500) moveTo(Math.round(phase)+1);
       }
-      if (changed) paint(phaseAt(distance, geometry));
-      frame = requestAnimationFrame(tick);
+      frame=requestAnimationFrame(tick);
     };
-    resize(); frame = requestAnimationFrame(tick);
-    const startIntro = () => {
-      if (introState !== 'waiting') return;
-      introState = 'running';
-      introStart = performance.now();
-    };
-    const onMotionChange = () => {
-      if (motion.matches) {
-        if (phone.matches) { distance = distanceAt(Math.round(phaseAt(distance, geometry)), geometry); move = null; idleTime = 0; }
-        finishIntro(); paint(phaseAt(distance, geometry));
-      }
-    };
-    const onPhoneChange = () => {
-      move = null; idleTime = 0; lastTime = 0;
-      if (phone.matches) distance = distanceAt(Math.round(phaseAt(distance, geometry)), geometry);
-      resize();
-    };
-    phone.addEventListener('change', onPhoneChange);
-    window.addEventListener('harper:hero-orbit-start', startIntro);
-    motion.addEventListener('change', onMotionChange);
+    const onMotion = () => { if(motion.matches && move) {phase=move.to;move=null;paint();} idle=0; };
+    paint(); frame=requestAnimationFrame(tick);
     window.__harperOrbitReady = true;
     window.dispatchEvent(new Event('harper:hero-orbit-ready'));
-    window.addEventListener('resize', resize);
-    return () => { clearTimeout(clickReset.current); cancelAnimationFrame(frame); visibility.disconnect(); window.removeEventListener('resize', resize); window.removeEventListener('harper:hero-orbit-start', startIntro); motion.removeEventListener('change', onMotionChange); phone.removeEventListener('change', onPhoneChange); controller.current = null; };
+    window.dispatchEvent(new Event('harper:hero-orbit-complete'));
+    window.addEventListener('resize',paint);
+    motion.addEventListener('change',onMotion);
+    return () => {cancelAnimationFrame(frame);observer.disconnect();clearTimeout(clickReset.current);window.removeEventListener('resize',paint);motion.removeEventListener('change',onMotion);controller.current=null;};
   }, []);
 
   return (
@@ -259,6 +124,8 @@ function RusticOrbit() {
         }
         touch.current = null;
       }}>
+      <button className="hero-stack-control hero-stack-prev" type="button" aria-label="Previous hotel" onClick={() => controller.current?.step(-1)}>‹</button>
+      <button className="hero-stack-control hero-stack-next" type="button" aria-label="Next hotel" onClick={() => controller.current?.step(1)}>›</button>
       {rooms.map((room, index) => <button type="button" key={index} ref={element => { cardRefs.current[index] = element; }}
         className="rustic-orbit__card"
         onClick={() => controller.current?.select(index)}

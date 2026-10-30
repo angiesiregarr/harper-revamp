@@ -725,3 +725,26 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
  .hero-contour .hero-booking .hero-booking-field{padding-block:12px}
  .hero-contour .hero-atmosphere{mask-image:linear-gradient(to bottom,#000 calc(100% - 100px),transparent 100%)}
 }
+
+/* Ivory sunrise and a horizontal, layered hotel gallery. */
+.hero-contour .hero-atmosphere{background:radial-gradient(ellipse 65% 42% at 95% 83%,#f08b1d22,transparent 78%),radial-gradient(ellipse 70% 35% at 0 87%,#f08b1d18,transparent 80%),#f8f4ed}
+.hero-contour .hero-atmosphere::after{display:block;position:absolute;content:"";width:75vw;height:75vw;right:-52vw;top:12%;border:44px solid #f08b1d0c;border-radius:50%;background:none;filter:blur(2px);transform:none}
+.hero-contour .hero-clouds,.hero-contour .hero-palm-shadow{display:none!important}
+.hero-contour .hero-contours{opacity:.06}
+.hero-contour .rustic-orbit{overflow:visible;touch-action:pan-y}
+.hero-contour .rustic-orbit__card{border:1px solid #ffffffb8;box-shadow:0 16px 28px #554a3920;overflow:visible!important;background:var(--orange)}
+.hero-contour .rustic-orbit__card img{width:100%;height:100%;object-fit:cover}
+.hero-contour .rustic-orbit__card::after{display:block!important;content:"";position:absolute;inset:8px!important;width:auto!important;height:auto!important;background:linear-gradient(var(--orange),var(--orange)) left top/22px 2px no-repeat,linear-gradient(var(--orange),var(--orange)) left top/2px 22px no-repeat,linear-gradient(var(--orange),var(--orange)) right bottom/22px 2px no-repeat,linear-gradient(var(--orange),var(--orange)) right bottom/2px 22px no-repeat;border:0;pointer-events:none}
+.hero-contour .rustic-orbit__card.is-featured::after{inset:auto 42% -13px!important;height:3px!important;background:var(--orange);width:auto!important}
+.hero-contour .rustic-orbit__caption{overflow:hidden}
+.hero-stack-control{position:absolute;top:50%;z-index:60;width:40px;height:40px;transform:translateY(-50%);border:1px solid #80828544;background:#f8f4edf2;color:var(--gray);font:30px/1 var(--sans);cursor:pointer}
+.hero-stack-prev{left:12%}.hero-stack-next{right:12%}
+.hero-stack-control:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+@media(max-width:700px){.hero-stack-control{width:32px;height:36px}.hero-stack-prev{left:5px}.hero-stack-next{right:5px}.hero-contour .hero-atmosphere::after{width:135vw;height:135vw;right:-105vw;top:18%;border-width:24px}}
+.hero-contour{overflow-x:clip}
+.hero-contour .hero-atmosphere::before{opacity:.025}
+.hero-contour .hero-palm{display:none!important}
+.hero-contour .hero-contours-top{left:-12%;right:auto;opacity:.055;transform:rotate(180deg);width:34%}
+.hero-contour .hero-orbit{overflow:hidden;height:390px;max-height:none}
+@media(max-width:700px){.hero-contour .hero-orbit{height:320px}}
+@media(min-width:1051px){.hero-contour .hero-orbit{height:clamp(260px,38svh,390px)}}
