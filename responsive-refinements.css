@@ -817,3 +817,17 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
 }
 .hero-contour .hero-paper::after{content:"";position:absolute;right:-80px;bottom:0;width:400px;height:270px;background:url('./assets/hero-contours.svg') center/contain no-repeat;transform:rotate(90deg);opacity:.17;pointer-events:none}
 @media(max-width:700px){.hero-contour .hero-paper::after{width:190px;height:180px;right:-90px;opacity:.12}}
+
+/* Focused background polish; preserve hotel layers and booking geometry. */
+.hero-contour #hero-title{color:var(--gray)!important}
+.hero-contour .hero-atmosphere{background:linear-gradient(180deg,#f8f4ed 0%,#f8f4ed 42%,color-mix(in srgb,var(--orange) 8%,#f8f4ed) 60%,color-mix(in srgb,var(--orange) 25%,#f8f4ed) 78%,color-mix(in srgb,var(--orange) 52%,#f8f4ed) 100%)}
+.hero-contour .hero-atmosphere::after{inset:13% -43vw auto auto;width:74vw;height:74vw;border:0;border-radius:50%;background:radial-gradient(circle,transparent 0 55%,color-mix(in srgb,var(--orange) 6%,transparent) 59%,color-mix(in srgb,var(--orange) 28%,transparent) 65%,color-mix(in srgb,var(--orange) 22%,transparent) 71%,color-mix(in srgb,var(--orange) 5%,transparent) 76%,transparent 80%);filter:blur(4px);mask-image:linear-gradient(#000 55%,transparent 98%)}
+.hero-contour .hero-contours-top{width:220px;height:220px;left:-100px;top:-30px;opacity:.055}
+.hero-contour .hero-contours-bottom{width:240px;height:180px;left:-105px;bottom:30px;opacity:.045}
+.hero-contour .hero-paper::after{width:240px;height:170px;right:-110px;bottom:0;opacity:.1}
+@media(max-width:700px){
+ .hero-contour .hero-atmosphere::after{top:17%;right:-103vw;width:160vw;height:160vw;filter:blur(3px)}
+ .hero-contour .hero-contours-top{width:150px;height:165px;left:-100px;top:-20px}
+ .hero-contour .hero-contours-bottom{width:180px;height:150px;left:-110px;bottom:40px}
+ .hero-contour .hero-paper::after{width:180px;height:150px;right:-110px}
+}

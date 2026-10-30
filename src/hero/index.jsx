@@ -128,8 +128,6 @@ function RusticOrbit() {
         }
         touch.current = null;
       }}>
-      <button className="hero-stack-control hero-stack-prev" type="button" aria-label="Previous hotel" onClick={() => controller.current?.step(-1)}>‹</button>
-      <button className="hero-stack-control hero-stack-next" type="button" aria-label="Next hotel" onClick={() => controller.current?.step(1)}>›</button>
       {rooms.map((room, index) => <button type="button" key={index} ref={element => { cardRefs.current[index] = element; }}
         className="rustic-orbit__card"
         onClick={() => controller.current?.select(index)}
