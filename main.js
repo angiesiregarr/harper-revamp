@@ -337,24 +337,37 @@ function setupCityViewport() {
 
 function setupMembershipStone() {
   const section = document.getElementById('membership');
-  if (!section) return;
+  const stage = section?.querySelector('.membership-stage');
+  const visual = section?.querySelector('.membership-visual');
+  if (!stage || !visual) return;
+  const stone = document.createElement('div');
+  stone.className = 'membership-stone-layer';
+  stone.setAttribute('aria-hidden', 'true');
+  stage.prepend(stone);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let observer;
+  let observer, animation, revealed = false;
   const reveal = () => {
+    if (revealed) return;
+    revealed = true;
     section.classList.add('is-stone-visible');
     observer?.disconnect();
+    if (!reduced.matches) animation = stone.animate([
+      {opacity:0, transform:'translateY(64px)'},
+      {opacity:1, transform:'translateY(0)'}
+    ], {duration:800, easing:'cubic-bezier(.22,1,.36,1)'});
   };
-  const onMotionChange = () => { if (reduced.matches) reveal(); };
+  const onMotionChange = () => { if (reduced.matches) { animation?.cancel(); reveal(); } };
   if (reduced.matches || !('IntersectionObserver' in window)) reveal();
   else {
     observer = new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= .18)) reveal();
-    }, {threshold: .18});
-    observer.observe(section);
+    }, {threshold:.18});
+    observer.observe(visual);
   }
   reduced.addEventListener('change', onMotionChange);
   addEventListener('pagehide', () => {
     observer?.disconnect();
+    animation?.cancel();
     reduced.removeEventListener('change', onMotionChange);
   }, {once:true});
 }
