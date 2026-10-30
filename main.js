@@ -237,6 +237,10 @@ function setupNews() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const icon = name => `<svg class="journal-icon" aria-hidden="true" focusable="false"><use href="./assets/journal-icons.svg#${name}" /></svg>`;
   section.classList.add('journal-editorial');
+  const stoneAccent = document.createElement('span');
+  stoneAccent.className = 'journal-stone-right';
+  stoneAccent.setAttribute('aria-hidden', 'true');
+  section.prepend(stoneAccent);
   book.className = 'journal-book editorial-stories';
   book.setAttribute('aria-label', 'HARPER stories');
   book.removeAttribute('tabindex');

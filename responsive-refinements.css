@@ -591,3 +591,11 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
  .journal.journal-editorial::before{inset:-9px -14px -15px -3px;clip-path:polygon(0 0,48px 0,48px 9px,calc(100% - 38px) 9px,calc(100% - 38px) 0,100% 0,100% 100%,12px 100%,12px 25px,0 25px)}
  .journal.journal-editorial::after{clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,0 100%)}
 }
+
+/* Right stone accent is independent of the unchanged lower backing sheet. */
+.journal.journal-editorial::before{clip-path:polygon(0 0,76px 0,76px 14px,22px 14px,22px calc(100% - 28px),100% calc(100% - 28px),100% 100%,22px 100%,22px 36px,0 36px)}
+.journal-stone-right{position:absolute;z-index:-2;top:-14px;right:-30px;bottom:clamp(80px,6vw,120px);width:68px;height:auto;background:#808285 url('./assets/harper-pattern.webp') center/cover no-repeat;border-right:1px solid var(--orange);box-shadow:inset -2px -2px 0 #2525253b,inset 0 1px 0 #ffffff36;pointer-events:none}
+@media(max-width:700px){
+ .journal.journal-editorial::before{clip-path:polygon(0 0,48px 0,48px 9px,12px 9px,12px calc(100% - 15px),100% calc(100% - 15px),100% 100%,12px 100%,12px 25px,0 25px)}
+ .journal-stone-right{top:-9px;right:-14px;bottom:64px;width:38px}
+}
