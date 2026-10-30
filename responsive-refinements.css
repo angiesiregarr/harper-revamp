@@ -703,3 +703,13 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
 }
 @media(min-width:701px){.harper-reels .reels-orbit{transform:translateY(-100px)}}
 @media(max-width:700px){.harper-reels .reels-orbit{transform:translateY(-130px)}}
+
+/* A low orange half-circle sits behind the room orbit, separate from all UI. */
+.hero-contour .hero-atmosphere::after{content:'';position:absolute;left:50%;top:30%;width:min(1180px,90vw);aspect-ratio:2/1;transform:translateX(-50%);border-radius:50% 50% 0 0 / 100% 100% 0 0;background:radial-gradient(ellipse at 50% 100%,rgb(240 139 29 / 38%) 0%,rgb(240 139 29 / 24%) 48%,rgb(240 139 29 / 8%) 78%,transparent 100%);pointer-events:none}
+@media(min-width:1051px){.hero-contour .hero-orbit{top:calc(38svh + 24px)}}
+@media(min-width:701px) and (max-width:1050px){.hero-contour .hero-orbit{margin-top:54px}}
+@media(max-width:700px){
+ .hero-contour .hero-orbit{margin-top:36px}
+ .hero-contour .hero-atmosphere::after{top:180px;width:110vw;max-width:520px;aspect-ratio:2/1}
+}
+.hero-contour .hero-atmosphere::after{mask-image:linear-gradient(to bottom,#000 68%,transparent 100%)}
