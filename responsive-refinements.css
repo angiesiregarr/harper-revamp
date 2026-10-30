@@ -615,3 +615,5 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
 .offers-stone-left{left:clamp(12px,2.2vw,38px);top:110px;height:220px}
 .offers-stone-right{right:clamp(12px,2.2vw,38px);bottom:130px;height:280px}
 @media(max-width:700px){.offers-stone{width:10px}.offers-stone-left{left:7px;top:90px;height:110px}.offers-stone-right{right:7px;bottom:65px;height:150px}}
+/* High-contrast sand grain remains visible at normal scale on the orange surface. */
+.offers,.offers::before{background-image:url('./assets/offers-grain.svg?v=2'),linear-gradient(135deg,#e58422 0%,#d87515 55%,#c96812 100%);background-size:192px 192px,cover;background-blend-mode:soft-light,normal}
