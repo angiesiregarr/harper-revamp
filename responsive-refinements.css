@@ -608,3 +608,10 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
  .journal.journal-editorial::before{inset:-9px -18px -18px -3px;clip-path:polygon(0 0,48px 0,48px 9px,12px 9px,12px calc(100% - 18px),100% calc(100% - 18px),100% 100%,12px 100%,12px 25px,0 25px)}
  .journal-stone-right{top:9px;right:-18px;bottom:-18px;width:18px}
 }
+
+/* Fine grain follows the orange sheet through its entrance; edge strips stay behind UI. */
+.offers,.offers::before{background-image:url('./assets/offers-grain.svg'),linear-gradient(135deg,#e58422 0%,#d87515 55%,#c96812 100%);background-size:180px 180px,cover;background-repeat:repeat,no-repeat}
+.offers-stone{position:absolute;z-index:0;width:20px;background:#808285 url('./assets/harper-pattern.webp') center/cover no-repeat;box-shadow:inset 1px 0 #ffffff35,2px 5px 10px #66320d18;pointer-events:none}
+.offers-stone-left{left:clamp(12px,2.2vw,38px);top:110px;height:220px}
+.offers-stone-right{right:clamp(12px,2.2vw,38px);bottom:130px;height:280px}
+@media(max-width:700px){.offers-stone{width:10px}.offers-stone-left{left:7px;top:90px;height:110px}.offers-stone-right{right:7px;bottom:65px;height:150px}}
