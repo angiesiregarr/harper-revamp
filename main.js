@@ -378,7 +378,7 @@ function setupMembershipStone() {
       if (!eligible || suppressed) return;
       stone.dataset.state = 'visible';
       animations.forEach(animation => { animation.updatePlaybackRate(1); animation.play(); });
-    }, 3000);
+    }, 800);
   };
   const observer = new IntersectionObserver(entries => {
     const active = entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= .18);

@@ -127,7 +127,7 @@ function RusticOrbit() {
         card.style.zIndex = featured && orbitWidth < 640 ? '40' : String(20 - Math.round(shortest * 2));
         const gray = featured ? 0 : 1;
         const blur = Math.min(2.7, Math.max(0, shortest - .42) * .85);
-        card.querySelector('img').style.filter = `grayscale(${gray}) sepia(${featured ? 0 : 1}) saturate(${featured ? 1 : 2.4}) hue-rotate(${featured ? 0 : -12}deg) blur(${featured ? 0 : Math.max(2, blur)}px)`;
+        card.querySelector('img').style.filter = `grayscale(${gray}) saturate(${featured ? 1 : .18}) blur(${featured ? 0 : Math.max(2, blur)}px)`;
         const visible = visibleOpacity > .12 && introProgress > .5;
         card.tabIndex = visible ? 0 : -1;
         if (visible) card.removeAttribute('aria-hidden'); else card.setAttribute('aria-hidden', 'true');

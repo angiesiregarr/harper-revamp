@@ -96,12 +96,17 @@
     stage.setAttribute('aria-description', 'Drag or swipe to rotate Moments. Focus a reel and use the left and right arrow keys. Press Enter to watch.');
     const box = orbit.getBoundingClientRect();
     const mobile = phone.matches;
-    const previousHeight = Math.min(mobile ? 400 : 430, box.height * (mobile ? .78 : .62));
-    const activeHeight = Math.min(previousHeight * 1.30, mobile ? (box.width - 12) * 16 / 9 : Infinity);
+    const previousHeight = Math.min(mobile ? 430 : 500, box.height * (mobile ? .82 : .70));
+    const focalTheta = mobile ? Math.PI/2 : Math.acos(.38);
+    const y = box.height * (mobile ? .10 : .14);
+    const centerY = box.top + box.height / 2 + Math.sin(focalTheta) * y;
+    const sectionBox = section.getBoundingClientRect();
+    const headingBottom = document.getElementById('reels-center').getBoundingClientRect().bottom;
+    const availableHeight = Math.max(180, 2 * Math.min(sectionBox.bottom - centerY - 32, centerY - headingBottom - 24));
+    const activeHeight = Math.min(previousHeight * 1.50, box.height * .94, availableHeight, mobile ? (box.width - 12) * 16 / 9 : Infinity);
     const h = activeHeight * .66;
     const w = h * 9 / 16;
     const x = mobile ? box.width * .90 : Math.max(0, box.width / 2 - w / 2 - 20);
-    const y = box.height * (mobile ? .13 : .20);
     const points = [{theta:0,length:0}];
     let length = 0, previous = [x,0];
     for (let i = 1; i <= 720; i++) {
@@ -110,7 +115,6 @@
       length += Math.hypot(point[0]-previous[0],point[1]-previous[1]);
       points.push({theta,length}); previous = point;
     }
-    const focalTheta = mobile ? Math.PI/2 : Math.acos(.38);
     const focal = points[Math.round(focalTheta/(Math.PI*2)*720)].length / Math.max(1,length);
     geometry = {x,y,w,h,length,points,focal};
     orbit.style.setProperty('--orbit-width', `${x*2}px`);

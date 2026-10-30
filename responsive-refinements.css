@@ -636,3 +636,42 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
 .membership .membership-visual{left:10%}
 @media(max-width:700px){.membership-stone-layer{top:43%;bottom:96px;height:auto;width:48%}}
 @media(prefers-reduced-motion:reduce){.membership .membership-stone-layer{clip-path:inset(0% 0 0 0)}.membership .membership-stone-texture{transform:none}}
+
+/* Manager revision: neutral hero typography and matching orange inset stripes. */
+.hero-contour #hero-title{color:var(--gray);font-size:clamp(44px,5.2vw,78px)}
+.hero-contour #hero-title span{font-size:inherit}
+.rustic-orbit__card::after,.rustic-orbit__card.is-featured::after{inset:0 16px 0 auto;width:20px;background:var(--orange);mix-blend-mode:normal;opacity:1}
+.rustic-orbit__pin{color:var(--orange)}
+/* Square frames throughout the photography, cards, forms and dialogs. */
+.rustic-orbit button.rustic-orbit__card,.rustic-orbit button.rustic-orbit__card.is-featured,
+.offer-card,.offer-card-content,.pixel-card,.offer-image,.offer-image img,.offer-body,
+.offers .offer-image>span,.offers .offer-card:is(:hover,:focus-within) .offer-image>span,
+.prism-card,.news-card,.news-photo,.news-photo img,.mobile-story-image,.mobile-story-image img,
+.harper-reels .reels-card,.harper-reels .reels-card img,.harper-reels .reels-card video,
+.membership-print,.membership-print img,.hero-booking,.booking-sheet,.booking-popover,.booking-results{border-radius:0!important}
+.offers .offer-image>span,.offers .offer-card:is(:hover,:focus-within) .offer-image>span{background:rgb(240 139 29 / 2%)!important;color:#fff!important;backdrop-filter:blur(12px) saturate(1.1);-webkit-backdrop-filter:blur(12px) saturate(1.1);border:1px solid #ffffff55;box-shadow:inset 0 1px #ffffff40,0 2px 8px #0002;text-shadow:0 1px 3px #0009!important}
+.offers-illustration{display:block!important;width:auto;height:auto;margin:20px 0 8px;background:none;border:0;box-shadow:none;color:#fff8ed!important;font-size:38px;line-height:1;animation:harper-offer-spin 18s linear infinite;rotate:0deg}
+@keyframes harper-offer-spin{to{transform:rotate(360deg)}}
+/* Four-sided stone backing with an unchanged ivory content box. */
+.journal.journal-editorial::before{inset:-14px -20px -20px -14px;clip-path:none;box-shadow:inset 0 0 0 1px #ffffff24}
+.journal-editorial>.news-heading{margin-bottom:42px}
+.journal-editorial .editorial-supporting .news-meta{display:flex!important;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;color:#8a7260;font:400 9px/1.4 var(--sans)}
+/* Kicker replaces the floral divider and precedes the existing Reels headline. */
+.harper-reels .reels-kicker{margin:0 auto 16px;--kicker-block:var(--gray)}
+.harper-reels .reels-center{display:flex;flex-direction:column;align-items:center}
+.harper-reels .reels-orbit{top:165px}
+/* Membership uses the solid HARPER grey; the independent stone keeps its reveal. */
+.harper-grey-sequence .membership,.harper-grey-sequence .membership-stage{background:var(--gray)}
+.harper-grey-sequence .membership-stage::before{background:none}
+@media(max-width:700px){
+ .hero-contour #hero-title{font-size:clamp(27px,7vw,38px)}
+ .rustic-orbit__card::after,.rustic-orbit__card.is-featured::after{right:12px;width:16px}
+ .journal.journal-editorial::before{inset:-9px -12px -14px -9px}
+ .journal-editorial>.news-heading{margin-bottom:40px}
+ .harper-reels .reels-orbit{top:190px}
+ .harper-reels .reels-kicker{margin-bottom:14px}
+}
+@media(prefers-reduced-motion:reduce){.offers-illustration{animation:none}}
+.harper-reels .reels-card::before,.harper-reels .reels-card::after,.pixel-card::before,.pixel-card::after{border-radius:0!important}
+@media(max-width:700px){.hero-contour #hero-title{font-size:clamp(27px,7vw,38px)!important}}
+@media(min-width:701px){.harper-reels{padding-bottom:100px}}
