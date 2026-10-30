@@ -713,3 +713,15 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
  .hero-contour .hero-atmosphere::after{top:180px;width:110vw;max-width:520px;aspect-ratio:2/1}
 }
 .hero-contour .hero-atmosphere::after{mask-image:linear-gradient(to bottom,#000 68%,transparent 100%)}
+
+/* Full-surface white-to-orange glow, without a visible semicircle boundary. */
+.hero-contour .hero-atmosphere{background:radial-gradient(ellipse 90% 92% at 50% 0%,#fff 0%,#fffdf9 44%,#fff2e8 59%,#ffc79c 80%,var(--orange) 100%);mask-image:linear-gradient(to bottom,#000 calc(100% - 150px),transparent 100%)}
+.hero-contour .hero-atmosphere::after{display:none}
+.hero-contour .hero-clouds{opacity:.08}
+.hero-contour .hero-booking{padding-block:10px}
+@media(min-width:1051px){.hero-contour .hero-booking{height:96px}}
+@media(max-width:700px){
+ .hero-contour .hero-booking{padding-block:4px;min-height:0;grid-template-rows:64px 64px 66px 52px}
+ .hero-contour .hero-booking .hero-booking-field{padding-block:12px}
+ .hero-contour .hero-atmosphere{mask-image:linear-gradient(to bottom,#000 calc(100% - 100px),transparent 100%)}
+}
