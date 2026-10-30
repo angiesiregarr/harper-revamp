@@ -831,3 +831,10 @@ h1,h2,h3,h4,h5,h6,.hero-contour #hero-title,.hero-contour #hero-title span{font-
  .hero-contour .hero-contours-bottom{width:180px;height:150px;left:-110px;bottom:40px}
  .hero-contour .hero-paper::after{width:180px;height:150px;right:-110px}
 }
+
+/* Primary orange endpoint and restored slim preview stripes. */
+.hero-contour .hero-atmosphere{background:linear-gradient(180deg,#f8f4ed 0%,#f8f4ed 42%,color-mix(in srgb,var(--orange) 25%,#f8f4ed) 62%,var(--orange) 100%)}
+.hero-contour .rustic-orbit__card:not(.is-featured)::after{inset:0 14px 0 auto!important;width:8px!important;height:auto!important;background:var(--orange);border-radius:0;mix-blend-mode:normal}
+@media(max-width:700px){.hero-contour .rustic-orbit__card:not(.is-featured)::after{right:10px!important;width:6px!important}}
+.hero-contour .rustic-orbit__card.is-left-preview:not(.is-featured)::after{left:14px!important;right:auto!important}
+@media(max-width:700px){.hero-contour .rustic-orbit__card.is-left-preview:not(.is-featured)::after{left:10px!important}}

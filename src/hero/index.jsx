@@ -52,6 +52,7 @@ function RusticOrbit() {
         card.tabIndex = visible ? 0 : -1;
         card.setAttribute('aria-hidden', String(!visible));
         card.classList.toggle('is-featured', index === nearest);
+        card.classList.toggle('is-left-preview', offset < -.5);
         if(index === nearest) card.setAttribute('aria-current','true'); else card.removeAttribute('aria-current');
       });
     };
@@ -77,12 +78,12 @@ function RusticOrbit() {
       const frozen = document.hidden || paused.current.offscreen || paused.current.touch;
       if(move && !frozen) {
         move.elapsed += dt;
-        const t = Math.min(1, move.elapsed / 700), eased = t*t*(3-2*t);
+        const t = Math.min(1, move.elapsed / 500), eased = t*t*(3-2*t);
         phase = mix(move.from,move.to,eased); paint();
         if(t === 1) {move=null;idle=0;}
       } else if(!move && !motion.matches && !frozen && !Object.values(paused.current).some(Boolean)) {
         idle += dt;
-        if(idle >= 5500) moveTo(Math.round(phase)+1);
+        if(idle >= 4000) moveTo(Math.round(phase)+1);
       }
       frame=requestAnimationFrame(tick);
     };
