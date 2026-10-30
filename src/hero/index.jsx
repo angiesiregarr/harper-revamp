@@ -115,11 +115,12 @@ function RusticOrbit() {
         const pathPosition = mod(shortPath * introProgress, rooms.length);
         const shortest = Math.min(targetPosition, rooms.length - targetPosition);
         const [x, y, width, height, opacity] = geometry.sample(pathPosition);
+        const previewScale = 1 - .10 * Math.min(1, Math.max(0, shortest - .5));
         const orbitWidth = orbitRef.current.clientWidth;
         const edgeRoom = Math.max(0, orbitWidth / 2 - width / 2 - (orbitWidth < 640 ? 8 : 12));
         const safeX = orbitWidth <= 1050 ? Math.max(-edgeRoom, Math.min(edgeRoom, x)) : x;
-        card.style.width = `${width}px`;
-        card.style.height = `${height}px`;
+        card.style.width = `${width * previewScale}px`;
+        card.style.height = `${height * previewScale}px`;
         card.style.transform = `translate(-50%,-50%) translate(${safeX}px,${y}px)`;
         const visibleOpacity = opacity;
         card.style.opacity = String(visibleOpacity * introProgress);
